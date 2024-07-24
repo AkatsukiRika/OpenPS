@@ -9,6 +9,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.R
+import com.akatsukirika.openps.compose.EditScreen
+import com.akatsukirika.openps.compose.EditScreenCallback
 import com.akatsukirika.openps.databinding.ActivityEditBinding
 import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.utils.LogUtils
@@ -39,6 +41,14 @@ class EditActivity : AppCompatActivity() {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setTitle(R.string.image_edit)
+        }
+
+        binding.composeView.setContent {
+            EditScreen(callback = object : EditScreenCallback {
+                override fun onProceed() {
+                    sourceImage?.proceed()
+                }
+            })
         }
     }
 
