@@ -18,7 +18,9 @@ import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,18 +35,24 @@ import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
 
 interface EditScreenCallback {
-    fun onProceed()
+    fun onSetSmoothLevel(level: Float)
+    fun onSetWhiteLevel(level: Float)
 }
+
+const val INDEX_SMOOTH = 0
+const val INDEX_WHITE = 1
 
 @Composable
 fun EditScreen(callback: EditScreenCallback) {
     val context = LocalContext.current
     val itemList = remember {
         listOf(
-            FunctionItem(index = 0, icon = R.drawable.ic_smooth, name = context.getString(R.string.smooth)),
-            FunctionItem(index = 1, icon = R.drawable.ic_white, name = context.getString(R.string.white))
+            FunctionItem(index = INDEX_SMOOTH, icon = R.drawable.ic_smooth, name = context.getString(R.string.smooth)),
+            FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white))
         )
     }
+    val levelMap = remember { mutableStateMapOf<Int, Float>() }
+    var currentLevel by remember { mutableFloatStateOf(0f) }
     var selectedFunctionIndex by remember { mutableIntStateOf(-1) }
 
     Column(modifier = Modifier
@@ -54,8 +62,18 @@ fun EditScreen(callback: EditScreenCallback) {
     ) {
         if (selectedFunctionIndex != -1) {
             Slider(
-                value = 0f,
-                onValueChange = {},
+                value = currentLevel,
+                onValueChange = {
+                    if (selectedFunctionIndex != -1) {
+                        currentLevel = it
+                        levelMap[selectedFunctionIndex] = currentLevel
+
+                        when (selectedFunctionIndex) {
+                            INDEX_SMOOTH -> callback.onSetSmoothLevel(currentLevel)
+                            INDEX_WHITE -> callback.onSetWhiteLevel(currentLevel)
+                        }
+                    }
+                },
                 modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),
                 colors = SliderDefaults.colors(
                     thumbColor = AppColors.Green500,
@@ -69,7 +87,10 @@ fun EditScreen(callback: EditScreenCallback) {
             itemList = itemList,
             selectedIndex = selectedFunctionIndex,
             onSelect = {
-                selectedFunctionIndex = if (selectedFunctionIndex == -1) it else -1
+                selectedFunctionIndex = if (selectedFunctionIndex == -1 || it != selectedFunctionIndex) it else -1
+                if (selectedFunctionIndex != -1) {
+                    currentLevel = levelMap[selectedFunctionIndex] ?: 0f
+                }
             }
         )
     }

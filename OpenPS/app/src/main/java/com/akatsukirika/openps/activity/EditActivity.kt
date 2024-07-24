@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
 import com.pixpark.gpupixel.GPUPixelSourceImage
+import com.pixpark.gpupixel.filter.BeautyFaceFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -27,6 +28,7 @@ class EditActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
 
     private var sourceImage: GPUPixelSourceImage? = null
+    private var beautyFaceFilter: BeautyFaceFilter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +47,13 @@ class EditActivity : AppCompatActivity() {
 
         binding.composeView.setContent {
             EditScreen(callback = object : EditScreenCallback {
-                override fun onProceed() {
+                override fun onSetSmoothLevel(level: Float) {
+                    beautyFaceFilter?.smoothLevel = level
+                    sourceImage?.proceed()
+                }
+
+                override fun onSetWhiteLevel(level: Float) {
+                    beautyFaceFilter?.whiteLevel = level
                     sourceImage?.proceed()
                 }
             })
@@ -94,8 +102,10 @@ class EditActivity : AppCompatActivity() {
     }
 
     private fun startImageFilter(bitmap: Bitmap) {
+        beautyFaceFilter = BeautyFaceFilter()
         sourceImage = GPUPixelSourceImage(bitmap)
-        sourceImage?.addTarget(binding.surfaceView)
+        sourceImage?.addTarget(beautyFaceFilter)
+        beautyFaceFilter?.addTarget(binding.surfaceView)
         sourceImage?.proceed()
     }
 
