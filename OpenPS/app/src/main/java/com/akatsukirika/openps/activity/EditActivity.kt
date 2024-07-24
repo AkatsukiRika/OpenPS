@@ -2,6 +2,7 @@ package com.akatsukirika.openps.activity
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
@@ -14,6 +15,8 @@ import com.akatsukirika.openps.utils.LogUtils
 import com.akatsukirika.openps.utils.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.pixpark.gpupixel.GPUPixel
+import com.pixpark.gpupixel.GPUPixelSourceImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -21,10 +24,14 @@ class EditActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditBinding
     private var imageUri: Uri? = null
 
+    private var sourceImage: GPUPixelSourceImage? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        GPUPixel.setContext(this)
 
         imageUri = intent.getParcelableExtra(EXTRA_KEY_IMAGE_URI)
         loadImage()
@@ -33,6 +40,11 @@ class EditActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
             setTitle(R.string.image_edit)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        NativeLib.releaseBitmap()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -66,8 +78,15 @@ class EditActivity : AppCompatActivity() {
                     ToastUtils.showToast(this@EditActivity, getString(R.string.msg_image_process_fail))
                     return@launch
                 }
+                startImageFilter(bitmap)
             }
         }
+    }
+
+    private fun startImageFilter(bitmap: Bitmap) {
+        sourceImage = GPUPixelSourceImage(bitmap)
+        sourceImage?.addTarget(binding.surfaceView)
+        sourceImage?.proceed()
     }
 
     companion object {
