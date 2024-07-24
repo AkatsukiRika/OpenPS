@@ -11,6 +11,9 @@ cmake_minimum_required(VERSION 3.22.1)
 # build script scope).
 project("openps")
 
+set(OpenCV_DIR ${CMAKE_SOURCE_DIR}/lib/opencv-mobile-4.10.0-android/sdk/native/jni)
+find_package(OpenCV REQUIRED)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -26,7 +29,10 @@ project("openps")
 # used in the AndroidManifest.xml file.
 add_library(${CMAKE_PROJECT_NAME} SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
-        native-lib.cpp)
+        NativeLib.cpp
+        model/SkinModelProcessor.cpp
+        cv/CvLoader.cpp
+        cv/CvUtils.cpp)
 
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this
@@ -34,4 +40,6 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 target_link_libraries(${CMAKE_PROJECT_NAME}
         # List libraries link to the target library
         android
-        log)
+        log
+        jnigraphics
+        ${OpenCV_LIBS})

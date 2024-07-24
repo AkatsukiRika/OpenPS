@@ -2,4 +2,6 @@
     <string name="app_name">Open Photo Studio</string>
     <string name="select_image">Select Photo</string>
     <string name="image_edit">Photo Edit</string>
+    <string name="msg_image_load_fail">An error occurred while loading the photo.</string>
+    <string name="msg_image_process_fail">An error occurred while processing the photo.</string>
 </resources>
