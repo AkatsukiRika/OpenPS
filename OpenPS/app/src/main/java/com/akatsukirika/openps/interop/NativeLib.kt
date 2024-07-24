@@ -13,4 +13,6 @@ object NativeLib {
     external fun releaseBitmap(): Int
 
     external fun runSkinModelInference(assetManager: AssetManager, modelFile: String): Int
+
+    external fun getSkinMaskBitmap(): Bitmap?
 }

@@ -15,3 +15,43 @@ cv::Mat CvUtils::bitmapToMat(const AndroidBitmapInfo bitmapInfo, const void *pix
         return cv::Mat();
     }
 }
+
+jobject CvUtils::matToBitmap(JNIEnv* env, const cv::Mat mat) {
+    jobject bitmap;
+    AndroidBitmapInfo info;
+    void* pixels = nullptr;
+
+    int width = mat.cols;
+    int height = mat.rows;
+    int bitmapFormat = ANDROID_BITMAP_FORMAT_RGBA_8888;
+
+    jclass bitmapClass = env->FindClass("android/graphics/Bitmap");
+    jmethodID createBitmapMethod = env->GetStaticMethodID(bitmapClass, "createBitmap",
+                                                          "(IILandroid/graphics/Bitmap$Config;)Landroid/graphics/Bitmap;");
+    jstring configName = env->NewStringUTF("ARGB_8888");
+    jclass bitmapConfigClass = env->FindClass("android/graphics/Bitmap$Config");
+    jmethodID valueOfMethod = env->GetStaticMethodID(bitmapConfigClass, "valueOf",
+                                                     "(Ljava/lang/String;)Landroid/graphics/Bitmap$Config;");
+    jobject bitmapConfig = env->CallStaticObjectMethod(bitmapConfigClass, valueOfMethod, configName);
+    env->DeleteLocalRef(configName);
+    bitmap = env->CallStaticObjectMethod(bitmapClass, createBitmapMethod, width, height, bitmapConfig);
+
+    if (AndroidBitmap_getInfo(env, bitmap, &info) < 0) {
+        LOGE("获取Bitmap信息失败!");
+        return nullptr;
+    }
+    if (info.format != bitmapFormat) {
+        LOGE("Bitmap格式设置失败!");
+        return nullptr;
+    }
+    if (AndroidBitmap_lockPixels(env, bitmap, &pixels) < 0) {
+        LOGE("锁定Bitmap像素失败!");
+        return nullptr;
+    }
+
+    cv::Mat tmp(info.height, info.width, CV_8UC4, pixels);
+    cv::cvtColor(mat, tmp, cv::COLOR_RGB2RGBA);
+
+    AndroidBitmap_unlockPixels(env, bitmap);
+    return bitmap;
+}

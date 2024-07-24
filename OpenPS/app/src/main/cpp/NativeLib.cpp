@@ -48,3 +48,13 @@ Java_com_akatsukirika_openps_interop_NativeLib_runSkinModelInference(JNIEnv *env
     env->ReleaseStringUTFChars(model_file, model_file_path);
     return 0;
 }
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_akatsukirika_openps_interop_NativeLib_getSkinMaskBitmap(JNIEnv *env, jobject thiz) {
+    if (cvLoader == nullptr) {
+        return nullptr;
+    }
+
+    return cvLoader->getSkinMaskBitmap(env);
+}

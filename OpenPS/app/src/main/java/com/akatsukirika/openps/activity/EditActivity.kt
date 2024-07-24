@@ -5,7 +5,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.R
@@ -13,6 +15,7 @@ import com.akatsukirika.openps.compose.EditScreen
 import com.akatsukirika.openps.compose.EditScreenCallback
 import com.akatsukirika.openps.databinding.ActivityEditBinding
 import com.akatsukirika.openps.interop.NativeLib
+import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.LogUtils
 import com.akatsukirika.openps.utils.ToastUtils
 import com.bumptech.glide.Glide
@@ -65,10 +68,31 @@ class EditActivity : AppCompatActivity() {
         NativeLib.releaseBitmap()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        if (!SettingsStore.isDebugMode) {
+            return super.onCreateOptionsMenu(menu)
+        }
+
+        menuInflater.inflate(R.menu.menu_debug, menu)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 onBackPressedDispatcher.onBackPressed()
+                true
+            }
+            R.id.show_skin_mask -> {
+                if (binding.debugImageView.visibility == View.VISIBLE) {
+                    binding.debugImageView.visibility = View.GONE
+                } else {
+                    val result = NativeLib.getSkinMaskBitmap()
+                    binding.debugImageView.apply {
+                        visibility = View.VISIBLE
+                        setImageBitmap(result)
+                    }
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)

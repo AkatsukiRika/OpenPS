@@ -4,9 +4,14 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.PopupMenu
+import com.akatsukirika.openps.R
 import com.akatsukirika.openps.databinding.ActivityMainBinding
+import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.PermissionUtils
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +38,34 @@ class MainActivity : AppCompatActivity() {
             if (PermissionUtils.checkAndRequestGalleryPermission(this, PERMISSION_REQUEST_CODE)) {
                 selectImageLauncher?.launch("image/*")
             }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                val popupMenu = PopupMenu(this, findViewById(R.id.action_settings))
+                popupMenu.menuInflater.inflate(R.menu.menu_settings, popupMenu.menu)
+                popupMenu.menu.findItem(R.id.debug_mode).isChecked = SettingsStore.isDebugMode
+                popupMenu.setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.debug_mode -> {
+                            SettingsStore.isDebugMode = !SettingsStore.isDebugMode
+                            it.isChecked = SettingsStore.isDebugMode
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                popupMenu.show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

@@ -10,6 +10,7 @@ public:
     int storeBitmap(JNIEnv* env, jobject bitmap);
     int releaseStoredBitmap();
     int runSkinModelInference(const char* modelBuffer, off_t modelSize);
+    jobject getSkinMaskBitmap(JNIEnv* env);
 
 private:
     AndroidBitmapInfo bitmapInfo;    // Bitmap 元数据，如宽度、高度等

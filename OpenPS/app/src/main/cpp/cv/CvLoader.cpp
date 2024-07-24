@@ -170,3 +170,13 @@ int CvLoader::runSkinModelInference(const char *modelBuffer, off_t modelSize) {
 
     return 0;
 }
+
+jobject CvLoader::getSkinMaskBitmap(JNIEnv *env) {
+    if (skinMask.empty()) {
+        LOGE("皮肤掩膜为空!");
+        return nullptr;
+    }
+
+    auto skinMaskBitmap = CvUtils::matToBitmap(env, skinMask);
+    return skinMaskBitmap;
+}
