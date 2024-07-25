@@ -9,4 +9,9 @@
     <string name="settings">Settings</string>
     <string name="debug_mode">Debug Mode</string>
     <string name="show_skin_mask">Show Skin Mask</string>
+    <string name="image_size_limit">Photo Size Limit</string>
+    <string name="size_no_limit">No Limit</string>
+    <string name="size_4k" translatable="false">4K</string>
+    <string name="size_2k" translatable="false">2K</string>
+    <string name="size_1k" translatable="false">1K</string>
 </resources>

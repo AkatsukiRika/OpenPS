@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 #include <face_reshape_filter.h>
+#include <beauty_face_unit_filter.h>
 #include "gpupixel_context.h"
 #include "jni_helpers.h"
 #include "libyuv.h"
@@ -309,6 +310,14 @@ Java_com_pixpark_gpupixel_GPUPixel_nativeFilterSetPropertyString(
   env->ReleaseStringUTFChars(jProperty, property);
   env->ReleaseStringUTFChars(jValue, value);
 };
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_GPUPixel_nativeSetSkinMaskTexture(JNIEnv *env, jclass clazz, jlong class_id, jint width, jint height, jint channel_count, jbyteArray data) {
+  jbyte* data_ptr = env->GetByteArrayElements(data, 0);
+  ((BeautyFaceUnitFilter*) class_id)->setSkinMaskTexture(width, height, channel_count, (unsigned char*) data_ptr);
+  env->ReleaseByteArrayElements(data, data_ptr, 0);
+}
 
 extern "C" void Java_com_pixpark_gpupixel_GPUPixel_nativeContextInit(
     JNIEnv* env,

@@ -1,5 +1,7 @@
 package com.pixpark.gpupixel.filter;
 
+import com.pixpark.gpupixel.GPUPixel;
+
 // 美颜 美白
 public final class BeautyFaceFilter extends GPUPixelFilter {
     private static final String name = "BeautyFaceFilter";
@@ -29,5 +31,13 @@ public final class BeautyFaceFilter extends GPUPixelFilter {
     public void setWhiteLevel(float whiteLevel) {
         this.whiteLevel = whiteLevel;
         setProperty(propWhiteLevel, whiteLevel);
+    }
+
+    public void setSkinMaskTexture(int width, int height, int channelCount, byte[] data) {
+        GPUPixel.getInstance().runOnDraw(() -> {
+            if (mNativeClassID != 0) {
+                GPUPixel.nativeSetSkinMaskTexture(mNativeClassID, width, height, channelCount, data);
+            }
+        });
     }
 }

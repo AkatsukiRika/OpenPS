@@ -13,6 +13,7 @@ import com.akatsukirika.openps.R
 import com.akatsukirika.openps.databinding.ActivityMainBinding
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.PermissionUtils
+import com.pixpark.gpupixel.GPUPixel
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -27,6 +28,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        GPUPixel.setContext(this)
 
         selectImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {

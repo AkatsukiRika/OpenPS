@@ -2,6 +2,7 @@ package com.akatsukirika.openps.interop
 
 import android.content.res.AssetManager
 import android.graphics.Bitmap
+import com.akatsukirika.openps.model.SkinMaskTextureData
 
 object NativeLib {
     init {
@@ -15,4 +16,6 @@ object NativeLib {
     external fun runSkinModelInference(assetManager: AssetManager, modelFile: String): Int
 
     external fun getSkinMaskBitmap(): Bitmap?
+
+    external fun getSkinMaskTextureData(): SkinMaskTextureData?
 }

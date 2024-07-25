@@ -214,6 +214,7 @@ public class GPUPixel {
     public static native void nativeFilterSetPropertyInt(long classID, String property, int value);
     public static native void nativeFilterSetPropertyFloatArray(long classID, String property, float[] array);
     public static native void nativeFilterSetPropertyString(long classID, String prooerty, String value);
+    public static native void nativeSetSkinMaskTexture(long classID, int width, int height, int channelCount, byte[] data);
     // SourceImage
     public static native long nativeSourceImageNew();
     public static native void nativeSourceImageDestroy(final long classID);

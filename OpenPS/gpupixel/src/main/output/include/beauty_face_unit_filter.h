@@ -23,6 +23,7 @@ class GPUPIXEL_API BeautyFaceUnitFilter : public Filter {
   void setSharpen(float sharpen);
   void setBlurAlpha(float blurAlpha);
   void setWhite(float white);
+  void setSkinMaskTexture(const int width, const int height, int channel_count, const unsigned char *data);
 
  protected:
   BeautyFaceUnitFilter();
@@ -31,6 +32,7 @@ class GPUPIXEL_API BeautyFaceUnitFilter : public Filter {
   std::shared_ptr<SourceImage> originImage_;
   std::shared_ptr<SourceImage> skinImage_;
   std::shared_ptr<SourceImage> customImage_;
+  std::shared_ptr<SourceImage> skinMaskImage_;
 
  private:
   float sharpen_ = 0.0;
