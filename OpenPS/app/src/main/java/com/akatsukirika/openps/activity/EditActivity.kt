@@ -16,6 +16,7 @@ import com.akatsukirika.openps.compose.EditScreenCallback
 import com.akatsukirika.openps.databinding.ActivityEditBinding
 import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.store.SettingsStore
+import com.akatsukirika.openps.utils.BitmapUtils
 import com.akatsukirika.openps.utils.LogUtils
 import com.akatsukirika.openps.utils.ToastUtils
 import com.bumptech.glide.Glide
@@ -32,6 +33,8 @@ class EditActivity : AppCompatActivity() {
 
     private var sourceImage: GPUPixelSourceImage? = null
     private var beautyFaceFilter: BeautyFaceFilter? = null
+
+    private var skinMaskBitmap: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,10 +90,9 @@ class EditActivity : AppCompatActivity() {
                 if (binding.debugImageView.visibility == View.VISIBLE) {
                     binding.debugImageView.visibility = View.GONE
                 } else {
-                    val result = NativeLib.getSkinMaskBitmap()
-                    binding.debugImageView.apply {
-                        visibility = View.VISIBLE
-                        setImageBitmap(result)
+                    skinMaskBitmap?.let { bitmap ->
+                        binding.debugImageView.visibility = View.VISIBLE
+                        binding.debugImageView.setImageBitmap(bitmap)
                     }
                 }
                 true
@@ -119,6 +121,14 @@ class EditActivity : AppCompatActivity() {
                 if (result != 0) {
                     ToastUtils.showToast(this@EditActivity, getString(R.string.msg_image_process_fail))
                     return@launch
+                }
+                skinMaskBitmap = NativeLib.getSkinMaskBitmap()
+                if (skinMaskBitmap == null) {
+                    ToastUtils.showToast(this@EditActivity, getString(R.string.msg_image_process_fail))
+                    return@launch
+                }
+                skinMaskBitmap?.let {
+                    BitmapUtils.saveBitmapToFile(it, GPUPixel.getResource_path(), "skin_mask.png")
                 }
                 startImageFilter(bitmap)
             }

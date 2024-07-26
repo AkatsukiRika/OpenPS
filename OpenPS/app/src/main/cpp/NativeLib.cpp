@@ -58,23 +58,3 @@ Java_com_akatsukirika_openps_interop_NativeLib_getSkinMaskBitmap(JNIEnv *env, jo
 
     return cvLoader->getSkinMaskBitmap(env);
 }
-
-extern "C"
-JNIEXPORT jobject JNICALL
-Java_com_akatsukirika_openps_interop_NativeLib_getSkinMaskTextureData(JNIEnv *env, jobject thiz) {
-    if (cvLoader == nullptr) {
-        return nullptr;
-    }
-    CvLoader::SkinMaskTextureData textureData = cvLoader->getSkinMaskTextureData();
-
-    jclass clazz = env->FindClass("com/akatsukirika/openps/model/SkinMaskTextureData");
-    jmethodID constructor = env->GetMethodID(clazz, "<init>", "(III[B)V");
-
-    jbyteArray byteArray = env->NewByteArray(textureData.width * textureData.height * textureData.channelCount);
-    env->SetByteArrayRegion(byteArray, 0, textureData.width * textureData.height * textureData.channelCount, reinterpret_cast<jbyte*>(textureData.data));
-
-    jobject textureDataObj = env->NewObject(clazz, constructor, textureData.width, textureData.height, textureData.channelCount, byteArray);
-    cvLoader->releaseSkinMaskTextureData();
-
-    return textureDataObj;
-}

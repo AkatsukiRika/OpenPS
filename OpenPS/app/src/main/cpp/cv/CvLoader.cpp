@@ -180,24 +180,3 @@ jobject CvLoader::getSkinMaskBitmap(JNIEnv *env) {
     auto skinMaskBitmap = CvUtils::matToBitmap(env, skinMask);
     return skinMaskBitmap;
 }
-
-CvLoader::SkinMaskTextureData CvLoader::getSkinMaskTextureData() {
-    if (skinMask.empty()) {
-        return CvLoader::SkinMaskTextureData();
-    }
-    skinMaskTextureData.width = skinMask.cols;
-    skinMaskTextureData.height = skinMask.rows;
-    skinMaskTextureData.channelCount = skinMask.channels();
-
-    size_t dataSize = skinMask.total() * skinMask.elemSize();
-    skinMaskTextureData.data = new unsigned char[dataSize];
-    memcpy(skinMaskTextureData.data, skinMask.data, dataSize);
-
-    return skinMaskTextureData;
-}
-
-int CvLoader::releaseSkinMaskTextureData() {
-    delete skinMaskTextureData.data;
-    skinMaskTextureData.data = nullptr;
-    return 0;
-}
