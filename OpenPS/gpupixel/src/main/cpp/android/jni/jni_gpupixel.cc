@@ -56,6 +56,12 @@ extern "C" void Java_com_pixpark_gpupixel_GPUPixel_nativeSourceImageSetImage(
   AndroidBitmap_unlockPixels(env, bitmap);
 };
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_GPUPixel_nativeSourceImageRender(JNIEnv *env, jclass clazz, jlong class_id) {
+    ((SourceImage*)class_id)->Render();
+};
+
 extern "C" jlong Java_com_pixpark_gpupixel_GPUPixel_nativeSourceCameraNew(
     JNIEnv* env,
     jclass) {
@@ -378,7 +384,7 @@ extern "C" void Java_com_pixpark_gpupixel_GPUPixel_nativeSetLandmarkCallback (
         jlong classId) {
 
     jobject globalSourceRef = env->NewGlobalRef(source);
-  ((SourceCamera*)classId)->RegLandmarkCallback([=](std::vector<float> landmarks) {
+  ((Source*)classId)->RegLandmarkCallback([=](std::vector<float> landmarks) {
       jclass cls = env->GetObjectClass(globalSourceRef);
     jmethodID methodID = env->GetMethodID(cls, "onFaceLandmark", "([F)V");
 

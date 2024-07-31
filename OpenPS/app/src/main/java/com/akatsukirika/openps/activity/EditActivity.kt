@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -138,8 +139,14 @@ class EditActivity : AppCompatActivity() {
     private fun startImageFilter(bitmap: Bitmap) {
         beautyFaceFilter = BeautyFaceFilter()
         sourceImage = GPUPixelSourceImage(bitmap)
+        sourceImage?.setLandmarkCallback { landmarks ->
+            landmarks.forEachIndexed { index, fl ->
+                Log.d("xuanTest", "landmark $index: $fl")
+            }
+        }
         sourceImage?.addTarget(beautyFaceFilter)
         beautyFaceFilter?.addTarget(binding.surfaceView)
+        sourceImage?.render()
         sourceImage?.proceed()
     }
 

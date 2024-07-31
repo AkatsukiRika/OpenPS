@@ -220,6 +220,7 @@ public class GPUPixel {
     public static native void nativeSourceImageDestroy(final long classID);
     public static native void nativeSourceImageFinalize(final long classID);
     public static  native void nativeSourceImageSetImage(final long classID, final Bitmap bitmap);
+    public static native void nativeSourceImageRender(final long classID);
 
     // SourceCamera
     public static native long nativeSourceCameraNew();

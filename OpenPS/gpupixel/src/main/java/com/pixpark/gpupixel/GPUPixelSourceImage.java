@@ -20,7 +20,10 @@ import java.io.IOException;
 public class GPUPixelSourceImage extends GPUPixelSource {
     private static final String TAG = "GPUPixelSourceImage";
     protected  Bitmap bitmap;
+    private GPUPixel.GPUPixelLandmarkCallback landmarkCallback;
+    private final Object objectThis;
     public GPUPixelSourceImage(Bitmap bitmap) {
+        objectThis = this;
         if (mNativeClassID != 0) return;
         GPUPixel.getInstance().runOnDraw(new Runnable() {
             @Override
@@ -123,6 +126,30 @@ public class GPUPixelSourceImage extends GPUPixelSource {
         } catch (IOException e) {
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    public void render() {
+        GPUPixel.getInstance().runOnDraw(() -> {
+            if (mNativeClassID != 0) {
+                GPUPixel.nativeSourceImageRender(mNativeClassID);
+            }
+        });
+    }
+
+    public void setLandmarkCallback(GPUPixel.GPUPixelLandmarkCallback callback) {
+        landmarkCallback = callback;
+        GPUPixel.getInstance().runOnDraw(() -> {
+            if (mNativeClassID != 0) {
+                GPUPixel.nativeSetLandmarkCallback(objectThis, mNativeClassID);
+            }
+        });
+    }
+
+    // callback by native
+    public void onFaceLandmark(float[] landmarks) {
+        if (landmarkCallback != null) {
+            landmarkCallback.onFaceLandmark(landmarks);
         }
     }
 }
