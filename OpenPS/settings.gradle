@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "OpenPS"
 include ':app'
 include ':gpupixel'
+include ':kotstore'
