@@ -13,7 +13,7 @@
 #include "gpupixel_macros.h"
 
 NS_GPUPIXEL_BEGIN
-GPUPIXEL_API typedef std::function<void(std::vector<float> landmarks)>
+GPUPIXEL_API typedef std::function<void(std::vector<float> landmarks, std::vector<float> rect)>
 FaceDetectorCallback;
 
 GPUPIXEL_API typedef enum {

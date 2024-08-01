@@ -21,6 +21,7 @@ public class GPUPixel {
 
     public interface GPUPixelLandmarkCallback {
         public void onFaceLandmark(float[] landmarks);
+        public void onFaceLandmark(float[] landmarks, float[] rect);
     }
     public static final int NoRotation = 0;
     public static final int RotateLeft = 1;

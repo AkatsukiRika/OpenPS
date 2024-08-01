@@ -147,9 +147,9 @@ public class GPUPixelSourceImage extends GPUPixelSource {
     }
 
     // callback by native
-    public void onFaceLandmark(float[] landmarks) {
+    public void onFaceLandmark(float[] landmarks, float[] rect) {
         if (landmarkCallback != null) {
-            landmarkCallback.onFaceLandmark(landmarks);
+            landmarkCallback.onFaceLandmark(landmarks, rect);
         }
     }
 }

@@ -23,6 +23,7 @@ import com.akatsukirika.openps.utils.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
+import com.pixpark.gpupixel.GPUPixel.GPUPixelLandmarkCallback
 import com.pixpark.gpupixel.GPUPixelSourceImage
 import com.pixpark.gpupixel.filter.BeautyFaceFilter
 import kotlinx.coroutines.Dispatchers
@@ -156,11 +157,18 @@ class EditActivity : AppCompatActivity() {
     private fun startImageFilter(bitmap: Bitmap) {
         beautyFaceFilter = BeautyFaceFilter()
         sourceImage = GPUPixelSourceImage(bitmap)
-        sourceImage?.setLandmarkCallback { landmarks ->
-            landmarks.forEachIndexed { index, fl ->
-                Log.d("xuanTest", "landmark $index: $fl")
+        sourceImage?.setLandmarkCallback(object : GPUPixelLandmarkCallback {
+            override fun onFaceLandmark(landmarks: FloatArray?) {}
+
+            override fun onFaceLandmark(landmarks: FloatArray?, rect: FloatArray?) {
+                landmarks?.forEachIndexed { index, it ->
+                    Log.d("xuanTest", "landmark $index: $it")
+                }
+                rect?.forEachIndexed { index, it ->
+                    Log.d("xuanTest", "rect $index: $it")
+                }
             }
-        }
+        })
         sourceImage?.addTarget(beautyFaceFilter)
         beautyFaceFilter?.addTarget(binding.surfaceView)
         sourceImage?.render()

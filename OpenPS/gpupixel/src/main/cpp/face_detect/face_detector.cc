@@ -83,7 +83,13 @@ int FaceDetector::Detect(const uint8_t* data,
   VNN_Result ret = VNN_Apply_Face_CPU(vnn_handle_, &input, &output);
  
   std::vector<float> landmarks;
+  std::vector<float> rect;
   if(output.facesNum > 0) {
+    rect.push_back(output.facesArr[0].faceRect.x0);   // left
+    rect.push_back(output.facesArr[0].faceRect.y0);   // top
+    rect.push_back(output.facesArr[0].faceRect.x1);   // right
+    rect.push_back(output.facesArr[0].faceRect.y1);   // bottom
+
     for (int i = 0; i < output.facesArr[0].faceLandmarksNum; i++) {
       landmarks.push_back(output.facesArr[0].faceLandmarks[i].x);
       landmarks.push_back(output.facesArr[0].faceLandmarks[i].y);
@@ -123,7 +129,7 @@ int FaceDetector::Detect(const uint8_t* data,
   
   // do callbck
   for(auto cb : _face_detector_callbacks) {
-    cb(landmarks);
+    cb(landmarks, rect);
   }
   return 0;
 }

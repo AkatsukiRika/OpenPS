@@ -384,17 +384,19 @@ extern "C" void Java_com_pixpark_gpupixel_GPUPixel_nativeSetLandmarkCallback (
         jlong classId) {
 
     jobject globalSourceRef = env->NewGlobalRef(source);
-  ((Source*)classId)->RegLandmarkCallback([=](std::vector<float> landmarks) {
+  ((Source*)classId)->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
       jclass cls = env->GetObjectClass(globalSourceRef);
-    jmethodID methodID = env->GetMethodID(cls, "onFaceLandmark", "([F)V");
+    jmethodID methodID = env->GetMethodID(cls, "onFaceLandmark", "([F[F)V");
 
       jfloatArray arr = env->NewFloatArray(landmarks.size());
       env->SetFloatArrayRegion( arr, 0, landmarks.size(), landmarks.data());
+      jfloatArray rectArr = env->NewFloatArray(rect.size());
+      env->SetFloatArrayRegion(rectArr, 0, rect.size(), rect.data());
 
-      env->CallVoidMethod(globalSourceRef, methodID, arr);
+      env->CallVoidMethod(globalSourceRef, methodID, arr, rectArr);
 
       env->DeleteLocalRef(arr);
-
+      env->DeleteLocalRef(rectArr);
   });
 
 };
