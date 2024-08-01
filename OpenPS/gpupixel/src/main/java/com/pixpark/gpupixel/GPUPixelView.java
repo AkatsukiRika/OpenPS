@@ -22,6 +22,7 @@ public class GPUPixelView extends FrameLayout implements GPUPixelTarget {
     protected long mNativeClassID = 0;
 
     private GLSurfaceView mGLSurfaceView;
+    private Callback mCallback;
 
     public GPUPixelView(Context context) {
         super(context);
@@ -34,6 +35,10 @@ public class GPUPixelView extends FrameLayout implements GPUPixelTarget {
             return;
         }
         init(context, attrs);
+    }
+
+    public void setCallback(Callback callback) {
+        mCallback = callback;
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -133,6 +138,7 @@ public class GPUPixelView extends FrameLayout implements GPUPixelTarget {
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
             super.surfaceChanged(holder, format, w, h);
             host.onSurfaceSizeChanged(w, h);
+            mCallback.onSurfaceChanged(format, w, h);
         }
 
         @Override
@@ -141,4 +147,7 @@ public class GPUPixelView extends FrameLayout implements GPUPixelTarget {
         }
     }
 
+    public interface Callback {
+        void onSurfaceChanged(int format, int w, int h);
+    }
 }

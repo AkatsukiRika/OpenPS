@@ -27,6 +27,7 @@ import com.pixpark.gpupixel.GPUPixel.GPUPixelLandmarkCallback
 import com.pixpark.gpupixel.GPUPixelSourceImage
 import com.pixpark.gpupixel.filter.BeautyFaceFilter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class EditActivity : AppCompatActivity() {
@@ -53,6 +54,12 @@ class EditActivity : AppCompatActivity() {
             setTitle(R.string.image_edit)
         }
 
+        binding.surfaceView.setCallback { _, _, _ ->
+            lifecycleScope.launch {
+                delay(50)
+                sourceImage?.proceed()
+            }
+        }
         binding.composeView.setContent {
             EditScreen(callback = object : EditScreenCallback {
                 override fun onSetSmoothLevel(level: Float) {
