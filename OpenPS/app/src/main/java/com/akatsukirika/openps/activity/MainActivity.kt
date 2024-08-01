@@ -55,11 +55,32 @@ class MainActivity : AppCompatActivity() {
                 val popupMenu = PopupMenu(this, findViewById(R.id.action_settings))
                 popupMenu.menuInflater.inflate(R.menu.menu_settings, popupMenu.menu)
                 popupMenu.menu.findItem(R.id.debug_mode).isChecked = SettingsStore.isDebugMode
+                refreshPhotoSizeLimitMenuItems(popupMenu)
                 popupMenu.setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.debug_mode -> {
                             SettingsStore.isDebugMode = !SettingsStore.isDebugMode
                             it.isChecked = SettingsStore.isDebugMode
+                            true
+                        }
+                        R.id.size_no_limit -> {
+                            SettingsStore.photoSizeLimit = SettingsStore.PHOTO_SIZE_NO_LIMIT
+                            refreshPhotoSizeLimitMenuItems(popupMenu)
+                            true
+                        }
+                        R.id.size_4k -> {
+                            SettingsStore.photoSizeLimit = SettingsStore.PHOTO_SIZE_LIMIT_4K
+                            refreshPhotoSizeLimitMenuItems(popupMenu)
+                            true
+                        }
+                        R.id.size_2k -> {
+                            SettingsStore.photoSizeLimit = SettingsStore.PHOTO_SIZE_LIMIT_2K
+                            refreshPhotoSizeLimitMenuItems(popupMenu)
+                            true
+                        }
+                        R.id.size_1k -> {
+                            SettingsStore.photoSizeLimit = SettingsStore.PHOTO_SIZE_LIMIT_1K
+                            refreshPhotoSizeLimitMenuItems(popupMenu)
                             true
                         }
                         else -> false
@@ -70,6 +91,13 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun refreshPhotoSizeLimitMenuItems(popupMenu: PopupMenu) {
+        popupMenu.menu.findItem(R.id.size_no_limit).isChecked = SettingsStore.photoSizeLimit == SettingsStore.PHOTO_SIZE_NO_LIMIT
+        popupMenu.menu.findItem(R.id.size_4k).isChecked = SettingsStore.photoSizeLimit == SettingsStore.PHOTO_SIZE_LIMIT_4K
+        popupMenu.menu.findItem(R.id.size_2k).isChecked = SettingsStore.photoSizeLimit == SettingsStore.PHOTO_SIZE_LIMIT_2K
+        popupMenu.menu.findItem(R.id.size_1k).isChecked = SettingsStore.photoSizeLimit == SettingsStore.PHOTO_SIZE_LIMIT_1K
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

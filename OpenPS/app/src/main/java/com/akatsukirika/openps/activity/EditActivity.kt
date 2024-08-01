@@ -105,12 +105,22 @@ class EditActivity : AppCompatActivity() {
     private fun loadImage() {
         imageUri?.let { uri ->
             lifecycleScope.launch(Dispatchers.IO) {
-                val bitmap = Glide.with(this@EditActivity)
-                    .asBitmap()
-                    .load(uri)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .submit()
-                    .get()
+                val bitmap = if (SettingsStore.photoSizeLimit != SettingsStore.PHOTO_SIZE_NO_LIMIT) {
+                    Glide.with(this@EditActivity)
+                        .asBitmap()
+                        .load(uri)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .override(getSizeLimit())
+                        .submit()
+                        .get()
+                } else {
+                    Glide.with(this@EditActivity)
+                        .asBitmap()
+                        .load(uri)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .submit()
+                        .get()
+                }
                 var result = NativeLib.loadBitmap(bitmap)
                 LogUtils.d("loadImage result: $result")
                 if (result != 0) {
@@ -134,6 +144,13 @@ class EditActivity : AppCompatActivity() {
                 startImageFilter(bitmap)
             }
         }
+    }
+
+    private fun getSizeLimit() = when (SettingsStore.photoSizeLimit) {
+        SettingsStore.PHOTO_SIZE_LIMIT_4K -> 4096
+        SettingsStore.PHOTO_SIZE_LIMIT_2K -> 2048
+        SettingsStore.PHOTO_SIZE_LIMIT_1K -> 1024
+        else -> Int.MAX_VALUE
     }
 
     private fun startImageFilter(bitmap: Bitmap) {
