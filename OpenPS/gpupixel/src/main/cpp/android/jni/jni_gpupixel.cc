@@ -250,6 +250,16 @@ Java_com_pixpark_gpupixel_GPUPixel_nativeTargetViewSetMirror(JNIEnv *env, jclass
     ((TargetView*)class_id)->setMirror(mirror);
 }
 
+extern "C"
+JNIEXPORT jfloatArray JNICALL
+Java_com_pixpark_gpupixel_GPUPixel_nativeTargetViewGetInfo(JNIEnv *env, jclass clazz, jlong class_id) {
+  float info[4];
+  ((TargetView*)class_id)->getViewInfo(info);
+  jfloatArray jinfo = env->NewFloatArray(4);
+  env->SetFloatArrayRegion(jinfo, 0, 4, info);
+  return jinfo;
+}
+
 extern "C" jlong Java_com_pixpark_gpupixel_GPUPixel_nativeFilterCreate(
     JNIEnv* env,
     jclass obj,

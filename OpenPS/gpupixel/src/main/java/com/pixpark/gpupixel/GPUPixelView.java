@@ -98,6 +98,22 @@ public class GPUPixelView extends FrameLayout implements GPUPixelTarget {
         return mGLSurfaceView.getHeight();
     }
 
+    public interface GetInfoCallback {
+        void onGotInfo(float viewWidth, float viewHeight, float scaledWidth, float scaledHeight);
+    }
+
+    public void getInfo(GetInfoCallback callback) {
+        GPUPixel.getInstance().runOnDraw(new Runnable() {
+            @Override
+            public void run() {
+                if (mNativeClassID != 0) {
+                    float[] info = GPUPixel.nativeTargetViewGetInfo(mNativeClassID);
+                    callback.onGotInfo(info[0], info[1], info[2], info[3]);
+                }
+            }
+        });
+    }
+
     @Override
     protected void finalize() throws Throwable {
         try {

@@ -29,6 +29,7 @@ import com.pixpark.gpupixel.filter.BeautyFaceFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class EditActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditBinding
@@ -38,6 +39,13 @@ class EditActivity : AppCompatActivity() {
     private var beautyFaceFilter: BeautyFaceFilter? = null
 
     private var skinMaskBitmap: Bitmap? = null
+    private var showFaceRect: Boolean = false
+
+    // Face Rect
+    private var faceRectLeft: Float = 0f
+    private var faceRectTop: Float = 0f
+    private var faceRectRight: Float = 0f
+    private var faceRectBottom: Float = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,7 +93,7 @@ class EditActivity : AppCompatActivity() {
             return super.onCreateOptionsMenu(menu)
         }
 
-        menuInflater.inflate(R.menu.menu_debug, menu)
+        menuInflater.inflate(R.menu.menu_edit, menu)
         return true
     }
 
@@ -99,10 +107,17 @@ class EditActivity : AppCompatActivity() {
                 if (binding.debugImageView.visibility == View.VISIBLE) {
                     binding.debugImageView.visibility = View.GONE
                 } else {
-                    skinMaskBitmap?.let { bitmap ->
-                        binding.debugImageView.visibility = View.VISIBLE
-                        binding.debugImageView.setImageBitmap(bitmap)
-                    }
+                    binding.debugImageView.visibility = View.VISIBLE
+                }
+                true
+            }
+            R.id.show_face_rect -> {
+                showFaceRect = !showFaceRect
+                if (showFaceRect) {
+                    initFaceRect()
+                    item.setIcon(R.drawable.ic_visibility_off)
+                } else {
+                    item.setIcon(R.drawable.ic_visibility)
                 }
                 true
             }
@@ -148,6 +163,9 @@ class EditActivity : AppCompatActivity() {
                 }
                 skinMaskBitmap?.let {
                     BitmapUtils.saveBitmapToFile(it, GPUPixel.getResource_path(), "skin_mask.png")
+                    withContext(Dispatchers.Main) {
+                        binding.debugImageView.setImageBitmap(it)
+                    }
                 }
                 startImageFilter(bitmap)
             }
@@ -168,17 +186,25 @@ class EditActivity : AppCompatActivity() {
             override fun onFaceLandmark(landmarks: FloatArray?) {}
 
             override fun onFaceLandmark(landmarks: FloatArray?, rect: FloatArray?) {
-                landmarks?.forEachIndexed { index, it ->
-                    Log.d("xuanTest", "landmark $index: $it")
-                }
-                rect?.forEachIndexed { index, it ->
-                    Log.d("xuanTest", "rect $index: $it")
+                if (rect != null && rect.size == 4) {
+                    faceRectLeft = rect[0]
+                    faceRectTop = rect[1]
+                    faceRectRight = rect[2]
+                    faceRectBottom = rect[3]
                 }
             }
         })
         sourceImage?.addTarget(beautyFaceFilter)
         beautyFaceFilter?.addTarget(binding.surfaceView)
         sourceImage?.render()
+        sourceImage?.proceed()
+    }
+
+    private fun initFaceRect() {
+        binding.surfaceView.getInfo { viewWidth, viewHeight, scaledWidth, scaledHeight ->
+            Log.d("xuanTest", "faceRectLeft: $faceRectLeft, faceRectTop: $faceRectTop, faceRectRight: $faceRectRight, faceRectBottom: $faceRectBottom")
+            Log.d("xuanTest", "viewWidth: $viewWidth, viewHeight: $viewHeight, scaledWidth: $scaledWidth, scaledHeight: $scaledHeight")
+        }
         sourceImage?.proceed()
     }
 

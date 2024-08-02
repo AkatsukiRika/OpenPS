@@ -91,6 +91,13 @@ void TargetView::onSizeChanged(int width, int height) {
   }
 }
 
+void TargetView::getViewInfo(float *info) {
+  info[0] = _viewWidth;
+  info[1] = _viewHeight;
+  info[2] = _scaledWidth;
+  info[3] = _scaledHeight;
+}
+
 void TargetView::update(int64_t frameTime) {
   CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
@@ -162,6 +169,9 @@ void TargetView::_updateDisplayVertices() {
   _displayVertices[5] = scaledHeight;
   _displayVertices[6] = scaledWidth;
   _displayVertices[7] = scaledHeight;
+
+  _scaledWidth = scaledWidth;
+  _scaledHeight = scaledHeight;
 }
 
 const GLfloat* TargetView::_getTexureCoordinate(RotationMode rotationMode) {

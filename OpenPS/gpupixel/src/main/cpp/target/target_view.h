@@ -31,11 +31,14 @@ class GPUPIXEL_API TargetView : public Target {
   void setFillMode(FillMode fillMode);
   void setMirror(bool mirror);
   void onSizeChanged(int width, int height);
+  void getViewInfo(float* info);
   virtual void update(int64_t frameTime) override;
 
  private:
   int _viewWidth;
   int _viewHeight;
+  float _scaledWidth;
+  float _scaledHeight;
   FillMode _fillMode;
   bool _mirror = false;
   GLProgram* _displayProgram;
