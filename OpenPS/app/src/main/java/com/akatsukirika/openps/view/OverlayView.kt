@@ -3,7 +3,6 @@ package com.akatsukirika.openps.view
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
@@ -11,11 +10,12 @@ import android.view.View
 import com.akatsukirika.openps.R
 
 class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
-    private var imageMatrix: Matrix? = null
-    private val normalizedBox = RectF()
     private val actualBox = RectF()
-    private var imageWidth = 0
-    private var imageHeight = 0
+    private var viewWidth = 0f
+    private var viewHeight = 0f
+    private var scaledWidth = 0f
+    private var scaledHeight = 0f
+    private var faceRect = RectF()
 
     private val paint = Paint().apply {
         color = Color.GREEN
@@ -30,30 +30,19 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
         }
     }
 
-    fun setData(matrix: Matrix, box: RectF, width: Int, height: Int) {
-        imageMatrix = matrix
-        normalizedBox.set(box)
-        imageWidth = width
-        imageHeight = height
-        updateBoxes()
-    }
+    fun setData(viewWidth: Float, viewHeight: Float, scaledWidth: Float, scaledHeight: Float, faceRect: RectF) {
+        this.viewWidth = viewWidth
+        this.viewHeight = viewHeight
+        this.scaledWidth = scaledWidth
+        this.scaledHeight = scaledHeight
+        this.faceRect = faceRect
 
-    private fun updateBoxes() {
-        val matrix = imageMatrix ?: return
-        val box = normalizedBox
-        val values = FloatArray(9)
-        matrix.getValues(values)
+        val actualTop = (viewHeight * (1 - scaledHeight)) / 2 + viewHeight * scaledHeight * faceRect.top
+        val actualLeft = (viewWidth * (1 - scaledWidth)) / 2 + viewWidth * scaledWidth * faceRect.left
+        val actualRight = (viewWidth * (1 - scaledWidth)) / 2 + viewWidth * scaledWidth * faceRect.right
+        val actualBottom = (viewHeight * (1 - scaledHeight)) / 2 + viewHeight * scaledHeight * faceRect.bottom
 
-        val scaleX = values[Matrix.MSCALE_X]
-        val scaleY = values[Matrix.MSCALE_Y]
-        val transX = values[Matrix.MTRANS_X]
-        val transY = values[Matrix.MTRANS_Y]
-        actualBox.set(RectF(
-            box.left * imageWidth * scaleX + transX,
-            box.top * imageHeight * scaleY + transY,
-            box.right * imageWidth * scaleX + transX,
-            box.bottom * imageHeight * scaleY + transY
-        ))
+        actualBox.set(actualLeft, actualTop, actualRight, actualBottom)
         invalidate()
     }
 }

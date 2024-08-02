@@ -3,6 +3,7 @@ package com.akatsukirika.openps.activity
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.RectF
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -117,6 +118,7 @@ class EditActivity : AppCompatActivity() {
                     initFaceRect()
                     item.setIcon(R.drawable.ic_visibility_off)
                 } else {
+                    binding.overlayView.visibility = View.GONE
                     item.setIcon(R.drawable.ic_visibility)
                 }
                 true
@@ -204,6 +206,10 @@ class EditActivity : AppCompatActivity() {
         binding.surfaceView.getInfo { viewWidth, viewHeight, scaledWidth, scaledHeight ->
             Log.d("xuanTest", "faceRectLeft: $faceRectLeft, faceRectTop: $faceRectTop, faceRectRight: $faceRectRight, faceRectBottom: $faceRectBottom")
             Log.d("xuanTest", "viewWidth: $viewWidth, viewHeight: $viewHeight, scaledWidth: $scaledWidth, scaledHeight: $scaledHeight")
+            binding.overlayView.setData(viewWidth, viewHeight, scaledWidth, scaledHeight, RectF(faceRectLeft, faceRectTop, faceRectRight, faceRectBottom))
+            runOnUiThread {
+                binding.overlayView.visibility = View.VISIBLE
+            }
         }
         sourceImage?.proceed()
     }
