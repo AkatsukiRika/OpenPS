@@ -31,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.abs
 
 class EditActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditBinding
@@ -47,6 +48,7 @@ class EditActivity : AppCompatActivity() {
     private var faceRectTop: Float = 0f
     private var faceRectRight: Float = 0f
     private var faceRectBottom: Float = 0f
+    private val faceRectExpandRatio: Float = 0.5f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -189,10 +191,17 @@ class EditActivity : AppCompatActivity() {
 
             override fun onFaceLandmark(landmarks: FloatArray?, rect: FloatArray?) {
                 if (rect != null && rect.size == 4) {
-                    faceRectLeft = rect[0]
-                    faceRectTop = rect[1]
-                    faceRectRight = rect[2]
-                    faceRectBottom = rect[3]
+                    val rectLeft = rect[0]
+                    val rectTop = rect[1]
+                    val rectRight = rect[2]
+                    val rectBottom = rect[3]
+                    val rectWidth = abs(rectRight - rectLeft)
+                    val rectHeight = abs(rectBottom - rectTop)
+                    // 扩大人脸框区域
+                    faceRectLeft = (rectLeft - rectWidth * faceRectExpandRatio).coerceAtLeast(0f)
+                    faceRectTop = (rectTop - rectHeight * faceRectExpandRatio).coerceAtLeast(0f)
+                    faceRectRight = (rectRight + rectWidth * faceRectExpandRatio).coerceAtMost(1f)
+                    faceRectBottom = (rectBottom + rectHeight * faceRectExpandRatio).coerceAtMost(1f)
                 }
             }
         })

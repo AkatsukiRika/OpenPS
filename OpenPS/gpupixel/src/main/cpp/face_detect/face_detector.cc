@@ -81,14 +81,17 @@ int FaceDetector::Detect(const uint8_t* data,
 
   VNN_FaceFrameDataArr output;
   VNN_Result ret = VNN_Apply_Face_CPU(vnn_handle_, &input, &output);
+
+  VNN_FaceFrameDataArr expanded_output;
+  ret = VNN_Get_Face_Attr(vnn_handle_, "_detection_data", &expanded_output);
  
   std::vector<float> landmarks;
   std::vector<float> rect;
-  if(output.facesNum > 0) {
-    rect.push_back(output.facesArr[0].faceRect.x0);   // left
-    rect.push_back(output.facesArr[0].faceRect.y0);   // top
-    rect.push_back(output.facesArr[0].faceRect.x1);   // right
-    rect.push_back(output.facesArr[0].faceRect.y1);   // bottom
+  if(output.facesNum > 0 && expanded_output.facesNum > 0) {
+    rect.push_back(expanded_output.facesArr[0].faceRect.x0);   // left
+    rect.push_back(expanded_output.facesArr[0].faceRect.y0);   // top
+    rect.push_back(expanded_output.facesArr[0].faceRect.x1);   // right
+    rect.push_back(expanded_output.facesArr[0].faceRect.y1);   // bottom
 
     for (int i = 0; i < output.facesArr[0].faceLandmarksNum; i++) {
       landmarks.push_back(output.facesArr[0].faceLandmarks[i].x);
