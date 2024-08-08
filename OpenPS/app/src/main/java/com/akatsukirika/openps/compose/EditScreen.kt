@@ -43,6 +43,7 @@ interface EditScreenCallback {
     fun onSetLipstickLevel(level: Float)
     fun onSetBlusherLevel(level: Float)
     fun onSetEyeZoomLevel(level: Float)
+    fun onSetFaceSlimLevel(level: Float)
 }
 
 const val INDEX_SMOOTH = 0
@@ -50,6 +51,7 @@ const val INDEX_WHITE = 1
 const val INDEX_LIPSTICK = 2
 const val INDEX_BLUSHER = 3
 const val INDEX_EYE_ZOOM = 4
+const val INDEX_FACE_SLIM = 5
 const val STATUS_IDLE = 10
 const val STATUS_LOADING = 11
 const val STATUS_SUCCESS = 12
@@ -64,7 +66,8 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
             FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white)),
             FunctionItem(index = INDEX_LIPSTICK, icon = R.drawable.ic_lipstick, name = context.getString(R.string.lipstick)),
             FunctionItem(index = INDEX_BLUSHER, icon = R.drawable.ic_blusher, name = context.getString(R.string.blusher)),
-            FunctionItem(index = INDEX_EYE_ZOOM, icon = R.drawable.ic_eye_zoom, name = context.getString(R.string.eye_zoom))
+            FunctionItem(index = INDEX_EYE_ZOOM, icon = R.drawable.ic_eye_zoom, name = context.getString(R.string.eye_zoom)),
+            FunctionItem(index = INDEX_FACE_SLIM, icon = R.drawable.ic_face_slim, name = context.getString(R.string.face_slim))
         )
     }
     val levelMap = remember { mutableStateMapOf<Int, Float>() }
@@ -90,6 +93,7 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
                             INDEX_LIPSTICK -> callback.onSetLipstickLevel(currentLevel)
                             INDEX_BLUSHER -> callback.onSetBlusherLevel(currentLevel)
                             INDEX_EYE_ZOOM -> callback.onSetEyeZoomLevel(currentLevel)
+                            INDEX_FACE_SLIM -> callback.onSetFaceSlimLevel(currentLevel)
                         }
                     }
                 },

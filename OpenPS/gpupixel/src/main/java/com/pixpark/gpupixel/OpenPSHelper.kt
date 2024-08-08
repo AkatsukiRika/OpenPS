@@ -76,6 +76,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun setFaceSlimLevel(level: Float) {
+        renderView.postOnGLThread {
+            OpenPS.nativeSetFaceSlimLevel(level)
+            requestRender()
+        }
+    }
+
     fun destroy() {
         OpenPS.nativeDestroy()
     }

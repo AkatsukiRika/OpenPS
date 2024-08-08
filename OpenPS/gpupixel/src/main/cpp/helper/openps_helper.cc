@@ -70,7 +70,8 @@ void gpupixel::OpenPSHelper::setSmoothLevel(float level) {
 
 void gpupixel::OpenPSHelper::setWhiteLevel(float level) {
   if (beautyFaceFilter) {
-    beautyFaceFilter->setWhite(level);
+    float whiteLevel = level / 2;
+    beautyFaceFilter->setWhite(whiteLevel);
   }
 }
 
@@ -90,5 +91,12 @@ void gpupixel::OpenPSHelper::setEyeZoomLevel(float level) {
   if (faceReshapeFilter) {
     float eyeZoomLevel = level / 5;
     faceReshapeFilter->setEyeZoomLevel(eyeZoomLevel);
+  }
+}
+
+void gpupixel::OpenPSHelper::setFaceSlimLevel(float level) {
+  if (faceReshapeFilter) {
+    float faceSlimLevel = level / 10;
+    faceReshapeFilter->setFaceSlimLevel(faceSlimLevel);
   }
 }

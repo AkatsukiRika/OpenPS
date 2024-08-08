@@ -42,6 +42,8 @@ public:
 
   void setEyeZoomLevel(float level);
 
+  void setFaceSlimLevel(float level);
+
 private:
   std::shared_ptr<SourceImage> gpuSourceImage;
   std::shared_ptr<LipstickFilter> lipstickFilter;

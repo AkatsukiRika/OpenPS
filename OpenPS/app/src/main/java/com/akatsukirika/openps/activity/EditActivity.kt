@@ -89,6 +89,10 @@ class EditActivity : AppCompatActivity() {
                 override fun onSetEyeZoomLevel(level: Float) {
                     helper.setEyeZoomLevel(level)
                 }
+
+                override fun onSetFaceSlimLevel(level: Float) {
+                    helper.setFaceSlimLevel(level)
+                }
             }, loadStatus = status)
         }
     }
