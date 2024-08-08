@@ -206,7 +206,8 @@ class EditActivity : AppCompatActivity() {
 
                 // 4. 使用深度学习模型进行皮肤分割
                 withContext(Dispatchers.IO) {
-                    var result = NativeLib.loadBitmap(bitmap)
+                    val croppedBitmap = BitmapUtils.cropBitmap(bitmap, faceRectLeft, faceRectTop, faceRectRight, faceRectBottom)
+                    var result = NativeLib.loadBitmap(croppedBitmap)
 
                     if (result != 0) {
                         // 加载失败
@@ -232,6 +233,7 @@ class EditActivity : AppCompatActivity() {
                     }
 
                     // 5. 把皮肤分割结果保存到资源目录
+                    skinMaskBitmap = BitmapUtils.mergeBitmap(bitmap, skinMaskBitmap!!, faceRectLeft, faceRectTop, faceRectRight, faceRectBottom)
                     skinMaskBitmap?.let {
                         BitmapUtils.saveBitmapToFile(it, GPUPixel.getResource_path(), "skin_mask.png")
 

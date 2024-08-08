@@ -1,6 +1,10 @@
 package com.akatsukirika.openps.utils
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -18,5 +22,38 @@ object BitmapUtils {
         } finally {
             outputStream?.close()
         }
+    }
+
+    fun cropBitmap(bitmap: Bitmap, left: Float, top: Float, right: Float, bottom: Float): Bitmap {
+        if (left < 0f || top < 0f || right > 1f || bottom > 1f || left >= right || top >= bottom) {
+            throw IllegalArgumentException("Invalid crop parameters")
+        }
+
+        val x = (left * bitmap.width).toInt()
+        val y = (top * bitmap.height).toInt()
+        val width = ((right - left) * bitmap.width).toInt()
+        val height = ((bottom - top) * bitmap.height).toInt()
+
+        return Bitmap.createBitmap(bitmap, x, y, width, height)
+    }
+
+    fun mergeBitmap(original: Bitmap, cropped: Bitmap, left: Float, top: Float, right: Float, bottom: Float): Bitmap {
+        if (left < 0f || top < 0f || right > 1f || bottom > 1f || left >= right || top >= bottom) {
+            throw IllegalArgumentException("Invalid merge parameters")
+        }
+
+        val resultBitmap = Bitmap.createBitmap(original.width, original.height, original.config)
+        val canvas = Canvas(resultBitmap)
+        val paint = Paint()
+        paint.color = Color.BLACK
+        canvas.drawRect(0f, 0f, original.width.toFloat(), original.height.toFloat(), paint)
+
+        val x = (left * original.width).toInt()
+        val y = (top * original.height).toInt()
+        val width = ((right - left) * original.width).toInt()
+        val height = ((bottom - top) * original.height).toInt()
+
+        canvas.drawBitmap(cropped, null, Rect(x, y, x + width, y + height), null)
+        return resultBitmap
     }
 }
