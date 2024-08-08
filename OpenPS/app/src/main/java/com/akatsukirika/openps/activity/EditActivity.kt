@@ -6,42 +6,43 @@ import android.graphics.Bitmap
 import android.graphics.RectF
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.EditScreen
 import com.akatsukirika.openps.compose.EditScreenCallback
+import com.akatsukirika.openps.compose.STATUS_ERROR
+import com.akatsukirika.openps.compose.STATUS_IDLE
+import com.akatsukirika.openps.compose.STATUS_LOADING
+import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.databinding.ActivityEditBinding
 import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.BitmapUtils
-import com.akatsukirika.openps.utils.LogUtils
 import com.akatsukirika.openps.utils.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
-import com.pixpark.gpupixel.GPUPixel.GPUPixelLandmarkCallback
-import com.pixpark.gpupixel.GPUPixelSourceImage
-import com.pixpark.gpupixel.filter.BeautyFaceFilter
+import com.pixpark.gpupixel.OpenPSHelper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
 class EditActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditBinding
+    private lateinit var helper: OpenPSHelper
     private var imageUri: Uri? = null
 
-    private var sourceImage: GPUPixelSourceImage? = null
-    private var beautyFaceFilter: BeautyFaceFilter? = null
-
     private var skinMaskBitmap: Bitmap? = null
-    private var showFaceRect: Boolean = false
+    private var showFaceRect: Boolean = true
+
+    private val loadStatus = MutableStateFlow(STATUS_IDLE)
 
     // Face Rect
     private var faceRectLeft: Float = 0f
@@ -55,7 +56,7 @@ class EditActivity : AppCompatActivity() {
         binding = ActivityEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        GPUPixel.setContext(this)
+        helper = OpenPSHelper(binding.surfaceView)
 
         imageUri = intent.getParcelableExtra(EXTRA_KEY_IMAGE_URI)
         loadImage()
@@ -65,38 +66,40 @@ class EditActivity : AppCompatActivity() {
             setTitle(R.string.image_edit)
         }
 
-        binding.surfaceView.setCallback { _, _, _ ->
-            lifecycleScope.launch {
-                delay(50)
-                sourceImage?.proceed()
-            }
-        }
         binding.composeView.setContent {
+            val status = loadStatus.collectAsState(initial = STATUS_IDLE).value
+
             EditScreen(callback = object : EditScreenCallback {
                 override fun onSetSmoothLevel(level: Float) {
-                    beautyFaceFilter?.smoothLevel = level
-                    sourceImage?.proceed()
+                    helper.setSmoothLevel(level)
                 }
 
                 override fun onSetWhiteLevel(level: Float) {
-                    beautyFaceFilter?.whiteLevel = level
-                    sourceImage?.proceed()
+                    helper.setWhiteLevel(level)
                 }
-            })
+            }, loadStatus = status)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.surfaceView.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.surfaceView.onResume()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        helper.destroy()
         NativeLib.releaseBitmap()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (!SettingsStore.isDebugMode) {
-            return super.onCreateOptionsMenu(menu)
-        }
-
         menuInflater.inflate(R.menu.menu_edit, menu)
+        menu?.findItem(R.id.show_skin_mask)?.setVisible(SettingsStore.isDebugMode)
         return true
     }
 
@@ -115,9 +118,12 @@ class EditActivity : AppCompatActivity() {
                 true
             }
             R.id.show_face_rect -> {
+                if (loadStatus.value == STATUS_LOADING) {
+                    return true
+                }
                 showFaceRect = !showFaceRect
                 if (showFaceRect) {
-                    initFaceRect()
+                    binding.overlayView.visibility = View.VISIBLE
                     item.setIcon(R.drawable.ic_visibility_off)
                 } else {
                     binding.overlayView.visibility = View.GONE
@@ -148,29 +154,6 @@ class EditActivity : AppCompatActivity() {
                         .submit()
                         .get()
                 }
-                var result = NativeLib.loadBitmap(bitmap)
-                LogUtils.d("loadImage result: $result")
-                if (result != 0) {
-                    ToastUtils.showToast(this@EditActivity, getString(R.string.msg_image_load_fail))
-                    return@launch
-                }
-                result = NativeLib.runSkinModelInference(assets, "79999_iter.tflite")
-                LogUtils.d("runSkinModelInference result: $result")
-                if (result != 0) {
-                    ToastUtils.showToast(this@EditActivity, getString(R.string.msg_image_process_fail))
-                    return@launch
-                }
-                skinMaskBitmap = NativeLib.getSkinMaskBitmap()
-                if (skinMaskBitmap == null) {
-                    ToastUtils.showToast(this@EditActivity, getString(R.string.msg_image_process_fail))
-                    return@launch
-                }
-                skinMaskBitmap?.let {
-                    BitmapUtils.saveBitmapToFile(it, GPUPixel.getResource_path(), "skin_mask.png")
-                    withContext(Dispatchers.Main) {
-                        binding.debugImageView.setImageBitmap(it)
-                    }
-                }
                 startImageFilter(bitmap)
             }
         }
@@ -184,43 +167,86 @@ class EditActivity : AppCompatActivity() {
     }
 
     private fun startImageFilter(bitmap: Bitmap) {
-        beautyFaceFilter = BeautyFaceFilter()
-        sourceImage = GPUPixelSourceImage(bitmap)
-        sourceImage?.setLandmarkCallback(object : GPUPixelLandmarkCallback {
-            override fun onFaceLandmark(landmarks: FloatArray?) {}
+        lifecycleScope.launch(Dispatchers.Main) {
+            // 0. 使用最基本的渲染管线，先让图片显示到屏幕上（加载状态开始，不得操作效果滑杆）
+            loadStatus.emit(STATUS_LOADING)
+            helper.initWithImage(bitmap)
+            helper.buildBasicRenderPipeline()
+            helper.requestRender()
 
-            override fun onFaceLandmark(landmarks: FloatArray?, rect: FloatArray?) {
-                if (rect != null && rect.size == 4) {
-                    val rectLeft = rect[0]
-                    val rectTop = rect[1]
-                    val rectRight = rect[2]
-                    val rectBottom = rect[3]
-                    val rectWidth = abs(rectRight - rectLeft)
-                    val rectHeight = abs(rectBottom - rectTop)
-                    // 扩大人脸框区域
-                    faceRectLeft = (rectLeft - rectWidth * faceRectExpandRatio).coerceAtLeast(0f)
-                    faceRectTop = (rectTop - rectHeight * faceRectExpandRatio).coerceAtLeast(0f)
-                    faceRectRight = (rectRight + rectWidth * faceRectExpandRatio).coerceAtMost(1f)
-                    faceRectBottom = (rectBottom + rectHeight * faceRectExpandRatio).coerceAtMost(1f)
+            // 1. 从Native层获取VNN人脸识别的结果
+            val landmarkResult = helper.getLandmark()
+            val rect = landmarkResult.rect
+            if (rect != null && rect.size == 4) {
+                val rectLeft = rect[0]
+                val rectTop = rect[1]
+                val rectRight = rect[2]
+                val rectBottom = rect[3]
+                val rectWidth = abs(rectRight - rectLeft)
+                val rectHeight = abs(rectBottom - rectTop)
+
+                // 2. 适当扩大人脸框的区域
+                faceRectLeft = (rectLeft - rectWidth * faceRectExpandRatio).coerceAtLeast(0f)
+                faceRectTop = (rectTop - rectHeight * faceRectExpandRatio).coerceAtLeast(0f)
+                faceRectRight = (rectRight + rectWidth * faceRectExpandRatio).coerceAtMost(1f)
+                faceRectBottom = (rectBottom + rectHeight * faceRectExpandRatio).coerceAtMost(1f)
+
+                // 3. 根据原图缩放比例展示人脸框
+                val renderViewInfo = helper.getRenderViewInfo()
+                renderViewInfo?.let { info ->
+                    binding.overlayView.setData(
+                        info.viewWidth,
+                        info.viewHeight,
+                        info.scaledWidth,
+                        info.scaledHeight,
+                        RectF(faceRectLeft, faceRectTop, faceRectRight, faceRectBottom)
+                    )
+                    binding.overlayView.visibility = View.VISIBLE
+                }
+
+                // 4. 使用深度学习模型进行皮肤分割
+                withContext(Dispatchers.IO) {
+                    var result = NativeLib.loadBitmap(bitmap)
+
+                    if (result != 0) {
+                        // 加载失败
+                        loadStatus.emit(STATUS_ERROR)
+                        ToastUtils.showToast(this@EditActivity, getString(R.string.msg_image_load_fail))
+                        return@withContext
+                    }
+
+                    result = NativeLib.runSkinModelInference(assets, "79999_iter.tflite")
+                    if (result != 0) {
+                        // 加载失败
+                        loadStatus.emit(STATUS_ERROR)
+                        ToastUtils.showToast(this@EditActivity, getString(R.string.msg_image_process_fail))
+                        return@withContext
+                    }
+
+                    skinMaskBitmap = NativeLib.getSkinMaskBitmap()
+                    if (skinMaskBitmap == null) {
+                        // 加载失败
+                        loadStatus.emit(STATUS_ERROR)
+                        ToastUtils.showToast(this@EditActivity, getString(R.string.msg_image_process_fail))
+                        return@withContext
+                    }
+
+                    // 5. 把皮肤分割结果保存到资源目录
+                    skinMaskBitmap?.let {
+                        BitmapUtils.saveBitmapToFile(it, GPUPixel.getResource_path(), "skin_mask.png")
+
+                        withContext(Dispatchers.Main) {
+                            binding.debugImageView.setImageBitmap(it)
+
+                            // 6. 重新搭建一套带美颜滤镜的渲染管线（加载成功，可以操作效果滑杆）
+                            helper.buildRealRenderPipeline()
+                            helper.requestRender()
+                            loadStatus.emit(STATUS_SUCCESS)
+                        }
+                    }
                 }
             }
-        })
-        sourceImage?.addTarget(beautyFaceFilter)
-        beautyFaceFilter?.addTarget(binding.surfaceView)
-        sourceImage?.render()
-        sourceImage?.proceed()
-    }
-
-    private fun initFaceRect() {
-        binding.surfaceView.getInfo { viewWidth, viewHeight, scaledWidth, scaledHeight ->
-            Log.d("xuanTest", "faceRectLeft: $faceRectLeft, faceRectTop: $faceRectTop, faceRectRight: $faceRectRight, faceRectBottom: $faceRectBottom")
-            Log.d("xuanTest", "viewWidth: $viewWidth, viewHeight: $viewHeight, scaledWidth: $scaledWidth, scaledHeight: $scaledHeight")
-            binding.overlayView.setData(viewWidth, viewHeight, scaledWidth, scaledHeight, RectF(faceRectLeft, faceRectTop, faceRectRight, faceRectBottom))
-            runOnUiThread {
-                binding.overlayView.visibility = View.VISIBLE
-            }
         }
-        sourceImage?.proceed()
     }
 
     companion object {

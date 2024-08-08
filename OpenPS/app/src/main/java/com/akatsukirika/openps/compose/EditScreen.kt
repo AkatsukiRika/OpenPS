@@ -2,8 +2,11 @@ package com.akatsukirika.openps.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
@@ -41,9 +45,13 @@ interface EditScreenCallback {
 
 const val INDEX_SMOOTH = 0
 const val INDEX_WHITE = 1
+const val STATUS_IDLE = 10
+const val STATUS_LOADING = 11
+const val STATUS_SUCCESS = 12
+const val STATUS_ERROR = 13
 
 @Composable
-fun EditScreen(callback: EditScreenCallback) {
+fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
     val context = LocalContext.current
     val itemList = remember {
         listOf(
@@ -82,17 +90,27 @@ fun EditScreen(callback: EditScreenCallback) {
             )
         }
 
-        FunctionList(
-            modifier = Modifier.padding(vertical = 16.dp),
-            itemList = itemList,
-            selectedIndex = selectedFunctionIndex,
-            onSelect = {
-                selectedFunctionIndex = if (selectedFunctionIndex == -1 || it != selectedFunctionIndex) it else -1
-                if (selectedFunctionIndex != -1) {
-                    currentLevel = levelMap[selectedFunctionIndex] ?: 0f
+        Box {
+            FunctionList(
+                modifier = Modifier.height(84.dp),
+                itemList = itemList,
+                selectedIndex = selectedFunctionIndex,
+                onSelect = {
+                    selectedFunctionIndex = if (selectedFunctionIndex == -1 || it != selectedFunctionIndex) it else -1
+                    if (selectedFunctionIndex != -1) {
+                        currentLevel = levelMap[selectedFunctionIndex] ?: 0f
+                    }
                 }
+            )
+
+            if (loadStatus == STATUS_LOADING) {
+                LoadingMask(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(84.dp)
+                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {}
+                )
             }
-        )
+        }
     }
 }
 
@@ -103,7 +121,7 @@ private fun FunctionList(
     selectedIndex: Int,
     onSelect: (Int) -> Unit
 ) {
-    LazyRow(modifier = modifier) {
+    LazyRow(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         item {
             Spacer(modifier = Modifier.width(8.dp))
         }
@@ -144,6 +162,16 @@ private fun FunctionListItem(item: FunctionItem, isSelected: Boolean, onClick: (
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = if (isSelected) AppColors.Green200 else Color.White
+        )
+    }
+}
+
+@Composable
+private fun LoadingMask(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.background(Color.Black.copy(alpha = 0.5f))) {
+        CircularProgressIndicator(
+            modifier = Modifier.align(Alignment.Center),
+            color = AppColors.Green500
         )
     }
 }

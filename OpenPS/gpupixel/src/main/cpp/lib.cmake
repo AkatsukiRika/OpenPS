@@ -42,6 +42,7 @@ INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_SOURCE_DIR}/target
 	${CMAKE_CURRENT_SOURCE_DIR}/utils
 	${CMAKE_CURRENT_SOURCE_DIR}/face_detect
+	${CMAKE_CURRENT_SOURCE_DIR}/helper
 	${CMAKE_CURRENT_SOURCE_DIR}/android/jni
 	${CMAKE_CURRENT_SOURCE_DIR}/target/objc
 	${CMAKE_CURRENT_SOURCE_DIR}/third_party/glfw/include
@@ -58,7 +59,8 @@ FILE(GLOB SOURCE_FILES
 	"${CMAKE_CURRENT_SOURCE_DIR}/source/*"       
 	"${CMAKE_CURRENT_SOURCE_DIR}/target/*"                               
 	"${CMAKE_CURRENT_SOURCE_DIR}/face_detect/*"                 
-	"${CMAKE_CURRENT_SOURCE_DIR}/utils/*"                 
+	"${CMAKE_CURRENT_SOURCE_DIR}/utils/*"
+	"${CMAKE_CURRENT_SOURCE_DIR}/helper/*"
 	"${CMAKE_CURRENT_SOURCE_DIR}/third_party/libyuv/source/*"
 )
 
@@ -69,7 +71,8 @@ FILE(GLOB EXPORT_HEADER
 	"${CMAKE_CURRENT_SOURCE_DIR}/source/*.h"       
 	"${CMAKE_CURRENT_SOURCE_DIR}/target/*.h"                      
 	"${CMAKE_CURRENT_SOURCE_DIR}/utils/*.h"                 
-	"${CMAKE_CURRENT_SOURCE_DIR}/face_detect/*.h"                 
+	"${CMAKE_CURRENT_SOURCE_DIR}/face_detect/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/helper/*.h"
 )
 
 FILE(GLOB RESOURCE_FILES 
