@@ -64,39 +64,76 @@ void gpupixel::OpenPSHelper::setLandmarkCallback(gpupixel::FaceDetectorCallback 
 
 void gpupixel::OpenPSHelper::setSmoothLevel(float level) {
   if (beautyFaceFilter) {
+    smoothLevel = level;
     beautyFaceFilter->setBlurAlpha(level);
   }
 }
 
 void gpupixel::OpenPSHelper::setWhiteLevel(float level) {
   if (beautyFaceFilter) {
-    float whiteLevel = level / 2;
+    whiteLevel = level / 2;
     beautyFaceFilter->setWhite(whiteLevel);
   }
 }
 
 void gpupixel::OpenPSHelper::setLipstickLevel(float level) {
   if (lipstickFilter) {
+    lipstickLevel = level;
     lipstickFilter->setBlendLevel(level);
   }
 }
 
 void gpupixel::OpenPSHelper::setBlusherLevel(float level) {
   if (blusherFilter) {
+    blusherLevel = level;
     blusherFilter->setBlendLevel(level);
   }
 }
 
 void gpupixel::OpenPSHelper::setEyeZoomLevel(float level) {
   if (faceReshapeFilter) {
-    float eyeZoomLevel = level / 5;
+    eyeZoomLevel = level / 5;
     faceReshapeFilter->setEyeZoomLevel(eyeZoomLevel);
   }
 }
 
 void gpupixel::OpenPSHelper::setFaceSlimLevel(float level) {
   if (faceReshapeFilter) {
-    float faceSlimLevel = level / 10;
+    faceSlimLevel = level / 10;
+    faceReshapeFilter->setFaceSlimLevel(faceSlimLevel);
+  }
+}
+
+void gpupixel::OpenPSHelper::onCompareBegin() {
+  if (beautyFaceFilter) {
+    beautyFaceFilter->setBlurAlpha(0);
+    beautyFaceFilter->setWhite(0);
+  }
+  if (lipstickFilter) {
+    lipstickFilter->setBlendLevel(0);
+  }
+  if (blusherFilter) {
+    blusherFilter->setBlendLevel(0);
+  }
+  if (faceReshapeFilter) {
+    faceReshapeFilter->setEyeZoomLevel(0);
+    faceReshapeFilter->setFaceSlimLevel(0);
+  }
+}
+
+void gpupixel::OpenPSHelper::onCompareEnd() {
+  if (beautyFaceFilter) {
+    beautyFaceFilter->setBlurAlpha(smoothLevel);
+    beautyFaceFilter->setWhite(whiteLevel);
+  }
+  if (lipstickFilter) {
+    lipstickFilter->setBlendLevel(lipstickLevel);
+  }
+  if (blusherFilter) {
+    blusherFilter->setBlendLevel(blusherLevel);
+  }
+  if (faceReshapeFilter) {
+    faceReshapeFilter->setEyeZoomLevel(eyeZoomLevel);
     faceReshapeFilter->setFaceSlimLevel(faceSlimLevel);
   }
 }

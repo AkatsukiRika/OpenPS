@@ -2,6 +2,7 @@ package com.akatsukirika.openps.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +46,8 @@ interface EditScreenCallback {
     fun onSetBlusherLevel(level: Float)
     fun onSetEyeZoomLevel(level: Float)
     fun onSetFaceSlimLevel(level: Float)
+    fun onCompareBegin()
+    fun onCompareEnd()
 }
 
 const val INDEX_SMOOTH = 0
@@ -70,6 +74,35 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
             FunctionItem(index = INDEX_FACE_SLIM, icon = R.drawable.ic_face_slim, name = context.getString(R.string.face_slim))
         )
     }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_compare),
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(end = 16.dp, bottom = 16.dp)
+                .size(24.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(onPress = {
+                        callback.onCompareBegin()
+                        tryAwaitRelease()
+                        callback.onCompareEnd()
+                    })
+                }
+        )
+
+        MainColumn(itemList, loadStatus, callback)
+    }
+}
+
+@Composable
+private fun MainColumn(
+    itemList: List<FunctionItem>,
+    loadStatus: Int,
+    callback: EditScreenCallback
+) {
     val levelMap = remember { mutableStateMapOf<Int, Float>() }
     var currentLevel by remember { mutableFloatStateOf(0f) }
     var selectedFunctionIndex by remember { mutableIntStateOf(-1) }
@@ -83,18 +116,16 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
             Slider(
                 value = currentLevel,
                 onValueChange = {
-                    if (selectedFunctionIndex != -1) {
-                        currentLevel = it
-                        levelMap[selectedFunctionIndex] = currentLevel
+                    currentLevel = it
+                    levelMap[selectedFunctionIndex] = it
 
-                        when (selectedFunctionIndex) {
-                            INDEX_SMOOTH -> callback.onSetSmoothLevel(currentLevel)
-                            INDEX_WHITE -> callback.onSetWhiteLevel(currentLevel)
-                            INDEX_LIPSTICK -> callback.onSetLipstickLevel(currentLevel)
-                            INDEX_BLUSHER -> callback.onSetBlusherLevel(currentLevel)
-                            INDEX_EYE_ZOOM -> callback.onSetEyeZoomLevel(currentLevel)
-                            INDEX_FACE_SLIM -> callback.onSetFaceSlimLevel(currentLevel)
-                        }
+                    when (selectedFunctionIndex) {
+                        INDEX_SMOOTH -> callback.onSetSmoothLevel(currentLevel)
+                        INDEX_WHITE -> callback.onSetWhiteLevel(currentLevel)
+                        INDEX_LIPSTICK -> callback.onSetLipstickLevel(currentLevel)
+                        INDEX_BLUSHER -> callback.onSetBlusherLevel(currentLevel)
+                        INDEX_EYE_ZOOM -> callback.onSetEyeZoomLevel(currentLevel)
+                        INDEX_FACE_SLIM -> callback.onSetFaceSlimLevel(currentLevel)
                     }
                 },
                 modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),

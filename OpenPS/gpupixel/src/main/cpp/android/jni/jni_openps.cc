@@ -138,4 +138,18 @@ Java_com_pixpark_gpupixel_OpenPS_nativeSetFaceSlimLevel(JNIEnv *env, jobject thi
   }
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeCompareBegin(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    openPSHelper->onCompareBegin();
+  }
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeCompareEnd(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    openPSHelper->onCompareEnd();
+  }
+}
+
 #endif

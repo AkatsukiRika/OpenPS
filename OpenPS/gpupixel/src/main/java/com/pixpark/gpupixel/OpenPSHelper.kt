@@ -83,6 +83,20 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun onCompareBegin() {
+        renderView.postOnGLThread {
+            OpenPS.nativeCompareBegin()
+            requestRender()
+        }
+    }
+
+    fun onCompareEnd() {
+        renderView.postOnGLThread {
+            OpenPS.nativeCompareEnd()
+            requestRender()
+        }
+    }
+
     fun destroy() {
         OpenPS.nativeDestroy()
     }

@@ -4,6 +4,7 @@
     <string name="image_edit">Photo Edit</string>
     <string name="msg_image_load_fail">An error occurred while loading the photo.</string>
     <string name="msg_image_process_fail">An error occurred while analyzing the photo.</string>
+    <string name="msg_face_detect_fail">Face is not detected in the photo.</string>
     <string name="smooth">Smooth</string>
     <string name="white">White</string>
     <string name="lipstick">Lipstick</string>

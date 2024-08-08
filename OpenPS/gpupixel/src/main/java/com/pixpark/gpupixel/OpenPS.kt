@@ -39,4 +39,8 @@ internal object OpenPS {
     external fun nativeSetEyeZoomLevel(level: Float)
 
     external fun nativeSetFaceSlimLevel(level: Float)
+
+    external fun nativeCompareBegin()
+
+    external fun nativeCompareEnd()
 }

@@ -93,6 +93,14 @@ class EditActivity : AppCompatActivity() {
                 override fun onSetFaceSlimLevel(level: Float) {
                     helper.setFaceSlimLevel(level)
                 }
+
+                override fun onCompareBegin() {
+                    helper.onCompareBegin()
+                }
+
+                override fun onCompareEnd() {
+                    helper.onCompareEnd()
+                }
             }, loadStatus = status)
         }
     }
@@ -263,6 +271,10 @@ class EditActivity : AppCompatActivity() {
                         }
                     }
                 }
+            } else {
+                // 人脸识别失败
+                loadStatus.emit(STATUS_ERROR)
+                ToastUtils.showToast(this@EditActivity, getString(R.string.msg_face_detect_fail))
             }
         }
     }
