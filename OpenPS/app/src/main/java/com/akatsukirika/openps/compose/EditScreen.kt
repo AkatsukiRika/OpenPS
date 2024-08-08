@@ -41,11 +41,13 @@ interface EditScreenCallback {
     fun onSetSmoothLevel(level: Float)
     fun onSetWhiteLevel(level: Float)
     fun onSetLipstickLevel(level: Float)
+    fun onSetBlusherLevel(level: Float)
 }
 
 const val INDEX_SMOOTH = 0
 const val INDEX_WHITE = 1
 const val INDEX_LIPSTICK = 2
+const val INDEX_BLUSHER = 3
 const val STATUS_IDLE = 10
 const val STATUS_LOADING = 11
 const val STATUS_SUCCESS = 12
@@ -58,7 +60,8 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
         listOf(
             FunctionItem(index = INDEX_SMOOTH, icon = R.drawable.ic_smooth, name = context.getString(R.string.smooth)),
             FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white)),
-            FunctionItem(index = INDEX_LIPSTICK, icon = R.drawable.ic_lipstick, name = context.getString(R.string.lipstick))
+            FunctionItem(index = INDEX_LIPSTICK, icon = R.drawable.ic_lipstick, name = context.getString(R.string.lipstick)),
+            FunctionItem(index = INDEX_BLUSHER, icon = R.drawable.ic_blusher, name = context.getString(R.string.blusher))
         )
     }
     val levelMap = remember { mutableStateMapOf<Int, Float>() }
@@ -82,6 +85,7 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
                             INDEX_SMOOTH -> callback.onSetSmoothLevel(currentLevel)
                             INDEX_WHITE -> callback.onSetWhiteLevel(currentLevel)
                             INDEX_LIPSTICK -> callback.onSetLipstickLevel(currentLevel)
+                            INDEX_BLUSHER -> callback.onSetBlusherLevel(currentLevel)
                         }
                     }
                 },

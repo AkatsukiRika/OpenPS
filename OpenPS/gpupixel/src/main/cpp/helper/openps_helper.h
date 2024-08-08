@@ -38,9 +38,12 @@ public:
 
   void setLipstickLevel(float level);
 
+  void setBlusherLevel(float level);
+
 private:
   std::shared_ptr<SourceImage> gpuSourceImage;
   std::shared_ptr<LipstickFilter> lipstickFilter;
+  std::shared_ptr<BlusherFilter> blusherFilter;
   std::shared_ptr<BeautyFaceFilter> beautyFaceFilter;
   std::shared_ptr<TargetView> targetView;
 };

@@ -62,6 +62,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun setBlusherLevel(level: Float) {
+        renderView.postOnGLThread {
+            OpenPS.nativeSetBlusherLevel(level)
+            requestRender()
+        }
+    }
+
     fun destroy() {
         OpenPS.nativeDestroy()
     }

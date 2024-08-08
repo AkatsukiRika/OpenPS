@@ -35,11 +35,14 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   gpuSourceImage->removeAllTargets();
   beautyFaceFilter = BeautyFaceFilter::create();
   lipstickFilter = LipstickFilter::create();
+  blusherFilter = BlusherFilter::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
+    blusherFilter->SetFaceLandmarks(landmarks);
   });
   gpuSourceImage
       ->addTarget(lipstickFilter)
+      ->addTarget(blusherFilter)
       ->addTarget(beautyFaceFilter)
       ->addTarget(targetView);
 }
@@ -69,5 +72,11 @@ void gpupixel::OpenPSHelper::setWhiteLevel(float level) {
 void gpupixel::OpenPSHelper::setLipstickLevel(float level) {
   if (lipstickFilter) {
     lipstickFilter->setBlendLevel(level);
+  }
+}
+
+void gpupixel::OpenPSHelper::setBlusherLevel(float level) {
+  if (blusherFilter) {
+    blusherFilter->setBlendLevel(level);
   }
 }

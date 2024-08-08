@@ -81,6 +81,10 @@ class EditActivity : AppCompatActivity() {
                 override fun onSetLipstickLevel(level: Float) {
                     helper.setLipstickLevel(level)
                 }
+
+                override fun onSetBlusherLevel(level: Float) {
+                    helper.setBlusherLevel(level)
+                }
             }, loadStatus = status)
         }
     }

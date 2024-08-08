@@ -33,4 +33,6 @@ internal object OpenPS {
     external fun nativeSetWhiteLevel(level: Float)
 
     external fun nativeSetLipstickLevel(level: Float)
+
+    external fun nativeSetBlusherLevel(level: Float)
 }
