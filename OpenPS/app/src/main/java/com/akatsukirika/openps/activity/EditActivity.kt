@@ -77,6 +77,10 @@ class EditActivity : AppCompatActivity() {
                 override fun onSetWhiteLevel(level: Float) {
                     helper.setWhiteLevel(level)
                 }
+
+                override fun onSetLipstickLevel(level: Float) {
+                    helper.setLipstickLevel(level)
+                }
             }, loadStatus = status)
         }
     }

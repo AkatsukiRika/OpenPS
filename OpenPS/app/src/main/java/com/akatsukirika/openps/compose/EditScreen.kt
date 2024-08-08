@@ -6,7 +6,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,10 +40,12 @@ import com.akatsukirika.openps.R
 interface EditScreenCallback {
     fun onSetSmoothLevel(level: Float)
     fun onSetWhiteLevel(level: Float)
+    fun onSetLipstickLevel(level: Float)
 }
 
 const val INDEX_SMOOTH = 0
 const val INDEX_WHITE = 1
+const val INDEX_LIPSTICK = 2
 const val STATUS_IDLE = 10
 const val STATUS_LOADING = 11
 const val STATUS_SUCCESS = 12
@@ -56,7 +57,8 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
     val itemList = remember {
         listOf(
             FunctionItem(index = INDEX_SMOOTH, icon = R.drawable.ic_smooth, name = context.getString(R.string.smooth)),
-            FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white))
+            FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white)),
+            FunctionItem(index = INDEX_LIPSTICK, icon = R.drawable.ic_lipstick, name = context.getString(R.string.lipstick))
         )
     }
     val levelMap = remember { mutableStateMapOf<Int, Float>() }
@@ -79,6 +81,7 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
                         when (selectedFunctionIndex) {
                             INDEX_SMOOTH -> callback.onSetSmoothLevel(currentLevel)
                             INDEX_WHITE -> callback.onSetWhiteLevel(currentLevel)
+                            INDEX_LIPSTICK -> callback.onSetLipstickLevel(currentLevel)
                         }
                     }
                 },

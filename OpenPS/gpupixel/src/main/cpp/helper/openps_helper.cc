@@ -8,6 +8,7 @@ gpupixel::OpenPSHelper::OpenPSHelper() {
 gpupixel::OpenPSHelper::~OpenPSHelper() {
   gpuSourceImage.reset();
   beautyFaceFilter.reset();
+  lipstickFilter.reset();
   targetView.reset();
   GPUPixelContext::destroy();
 }
@@ -33,7 +34,14 @@ void gpupixel::OpenPSHelper::buildBasicRenderPipeline() {
 void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   gpuSourceImage->removeAllTargets();
   beautyFaceFilter = BeautyFaceFilter::create();
-  gpuSourceImage->addTarget(beautyFaceFilter)->addTarget(targetView);
+  lipstickFilter = LipstickFilter::create();
+  gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
+    lipstickFilter->SetFaceLandmarks(landmarks);
+  });
+  gpuSourceImage
+      ->addTarget(lipstickFilter)
+      ->addTarget(beautyFaceFilter)
+      ->addTarget(targetView);
 }
 
 void gpupixel::OpenPSHelper::requestRender() {
@@ -55,5 +63,11 @@ void gpupixel::OpenPSHelper::setSmoothLevel(float level) {
 void gpupixel::OpenPSHelper::setWhiteLevel(float level) {
   if (beautyFaceFilter) {
     beautyFaceFilter->setWhite(level);
+  }
+}
+
+void gpupixel::OpenPSHelper::setLipstickLevel(float level) {
+  if (lipstickFilter) {
+    lipstickFilter->setBlendLevel(level);
   }
 }

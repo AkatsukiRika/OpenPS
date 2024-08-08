@@ -55,6 +55,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun setLipstickLevel(level: Float) {
+        renderView.postOnGLThread {
+            OpenPS.nativeSetLipstickLevel(level)
+            requestRender()
+        }
+    }
+
     fun destroy() {
         OpenPS.nativeDestroy()
     }

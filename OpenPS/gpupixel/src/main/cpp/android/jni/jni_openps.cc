@@ -110,4 +110,11 @@ Java_com_pixpark_gpupixel_OpenPS_nativeSetWhiteLevel(JNIEnv *env, jobject thiz, 
   }
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeSetLipstickLevel(JNIEnv *env, jobject thiz, jfloat level) {
+  if (openPSHelper) {
+    openPSHelper->setLipstickLevel(level);
+  }
+}
+
 #endif
