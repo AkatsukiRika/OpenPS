@@ -85,6 +85,10 @@ class EditActivity : AppCompatActivity() {
                 override fun onSetBlusherLevel(level: Float) {
                     helper.setBlusherLevel(level)
                 }
+
+                override fun onSetEyeZoomLevel(level: Float) {
+                    helper.setEyeZoomLevel(level)
+                }
             }, loadStatus = status)
         }
     }

@@ -9,6 +9,8 @@ gpupixel::OpenPSHelper::~OpenPSHelper() {
   gpuSourceImage.reset();
   beautyFaceFilter.reset();
   lipstickFilter.reset();
+  blusherFilter.reset();
+  faceReshapeFilter.reset();
   targetView.reset();
   GPUPixelContext::destroy();
 }
@@ -36,13 +38,16 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   beautyFaceFilter = BeautyFaceFilter::create();
   lipstickFilter = LipstickFilter::create();
   blusherFilter = BlusherFilter::create();
+  faceReshapeFilter = FaceReshapeFilter::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
     blusherFilter->SetFaceLandmarks(landmarks);
+    faceReshapeFilter->SetFaceLandmarks(landmarks);
   });
   gpuSourceImage
       ->addTarget(lipstickFilter)
       ->addTarget(blusherFilter)
+      ->addTarget(faceReshapeFilter)
       ->addTarget(beautyFaceFilter)
       ->addTarget(targetView);
 }
@@ -78,5 +83,12 @@ void gpupixel::OpenPSHelper::setLipstickLevel(float level) {
 void gpupixel::OpenPSHelper::setBlusherLevel(float level) {
   if (blusherFilter) {
     blusherFilter->setBlendLevel(level);
+  }
+}
+
+void gpupixel::OpenPSHelper::setEyeZoomLevel(float level) {
+  if (faceReshapeFilter) {
+    float eyeZoomLevel = level / 5;
+    faceReshapeFilter->setEyeZoomLevel(eyeZoomLevel);
   }
 }

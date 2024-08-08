@@ -69,6 +69,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun setEyeZoomLevel(level: Float) {
+        renderView.postOnGLThread {
+            OpenPS.nativeSetEyeZoomLevel(level)
+            requestRender()
+        }
+    }
+
     fun destroy() {
         OpenPS.nativeDestroy()
     }

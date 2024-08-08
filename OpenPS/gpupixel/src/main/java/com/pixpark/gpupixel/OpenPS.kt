@@ -35,4 +35,6 @@ internal object OpenPS {
     external fun nativeSetLipstickLevel(level: Float)
 
     external fun nativeSetBlusherLevel(level: Float)
+
+    external fun nativeSetEyeZoomLevel(level: Float)
 }
