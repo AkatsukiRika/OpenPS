@@ -3,6 +3,7 @@ package com.pixpark.gpupixel
 import android.graphics.Bitmap
 import com.pixpark.gpupixel.GPUPixel.GPUPixelLandmarkCallback
 import com.pixpark.gpupixel.model.LandmarkResult
+import com.pixpark.gpupixel.model.PixelsResult
 import com.pixpark.gpupixel.model.RenderViewInfo
 import com.pixpark.gpupixel.utils.BitmapUtils
 import com.pixpark.gpupixel.view.OpenPSRenderView
@@ -14,6 +15,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class OpenPSHelper(private val renderView: OpenPSRenderView) {
     private var landmarkCallback: GPUPixelLandmarkCallback? = null
+    private var resultPixelsCallback: ((ByteArray, Int, Int, Long) -> Unit)? = null
 
     fun initWithImage(bitmap: Bitmap) {
         val width = bitmap.width
@@ -115,6 +117,16 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         deferred.await()
     }
 
+    suspend fun getResultPixels(): PixelsResult = withContext(Dispatchers.Main) {
+        val deferred = CompletableDeferred<PixelsResult>()
+
+        setResultPixelsCallback { bytes, i, i2, l ->
+            deferred.complete(PixelsResult(bytes, i, i2))
+        }
+
+        deferred.await()
+    }
+
     suspend fun getRenderViewInfo() = suspendCoroutine { continuation ->
         renderView.postOnGLThread {
             val info = OpenPS.nativeTargetViewGetInfo()
@@ -135,8 +147,21 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    private fun setResultPixelsCallback(callback: (ByteArray, Int, Int, Long) -> Unit) {
+        resultPixelsCallback = callback
+
+        renderView.postOnGLThread {
+            OpenPS.nativeSetRawOutputCallback(this)
+            requestRender()
+        }
+    }
+
     // C++层回调方法
     fun onLandmarkDetected(landmarks: FloatArray, rect: FloatArray) {
         landmarkCallback?.onFaceLandmark(landmarks, rect)
+    }
+
+    fun onResultPixels(data: ByteArray, width: Int, height: Int, ts: Long) {
+        resultPixelsCallback?.invoke(data, width, height, ts)
     }
 }

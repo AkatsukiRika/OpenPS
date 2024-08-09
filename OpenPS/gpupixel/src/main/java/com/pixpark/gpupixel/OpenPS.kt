@@ -28,6 +28,8 @@ internal object OpenPS {
 
     external fun nativeSetLandmarkCallback(receiver: Any)
 
+    external fun nativeSetRawOutputCallback(receiver: Any)
+
     external fun nativeSetSmoothLevel(level: Float)
 
     external fun nativeSetWhiteLevel(level: Float)

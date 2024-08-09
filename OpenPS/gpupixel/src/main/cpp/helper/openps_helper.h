@@ -32,6 +32,8 @@ public:
 
   void setLandmarkCallback(FaceDetectorCallback callback);
 
+  void setRawOutputCallback(RawOutputCallback callback);
+
   void setSmoothLevel(float level);
 
   void setWhiteLevel(float level);
@@ -55,6 +57,7 @@ private:
   std::shared_ptr<FaceReshapeFilter> faceReshapeFilter;
   std::shared_ptr<BeautyFaceFilter> beautyFaceFilter;
   std::shared_ptr<TargetView> targetView;
+  std::shared_ptr<TargetRawDataOutput> targetRawDataOutput;
 
   float smoothLevel = 0;
   float whiteLevel = 0;

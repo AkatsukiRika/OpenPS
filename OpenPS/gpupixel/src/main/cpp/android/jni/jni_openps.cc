@@ -97,6 +97,24 @@ Java_com_pixpark_gpupixel_OpenPS_nativeSetLandmarkCallback(JNIEnv *env, jobject 
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeSetRawOutputCallback(JNIEnv *env, jobject thiz, jobject receiver) {
+  if (openPSHelper) {
+    jobject globalReceiver = env->NewGlobalRef(receiver);
+    openPSHelper->setRawOutputCallback([env, globalReceiver](const uint8_t* data, int width, int height, int64_t ts) {
+      jclass receiverClass = env->GetObjectClass(globalReceiver);
+      jmethodID methodId = env->GetMethodID(receiverClass, "onResultPixels", "([BIIJ)V");
+
+      size_t length = width * height * 4;
+      jbyteArray byteArray = env->NewByteArray(length);
+      env->SetByteArrayRegion(byteArray, 0, length, reinterpret_cast<const jbyte*>(data));
+      env->CallVoidMethod(globalReceiver, methodId, byteArray, width, height, ts);
+
+      env->DeleteLocalRef(byteArray);
+    });
+  }
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeSetSmoothLevel(JNIEnv *env, jobject thiz, jfloat level) {
   if (openPSHelper) {
     openPSHelper->setSmoothLevel(level);

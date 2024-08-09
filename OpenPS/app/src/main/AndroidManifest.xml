@@ -29,6 +29,9 @@
 
         <activity android:name=".activity.EditActivity"
             android:screenOrientation="portrait" />
+
+        <activity android:name=".activity.ExportActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

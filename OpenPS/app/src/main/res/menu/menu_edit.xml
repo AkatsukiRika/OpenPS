@@ -7,6 +7,11 @@
         android:title="@string/show_face_rect"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/save_to_gallery"
+        android:icon="@drawable/ic_save"
+        android:title="@string/save_to_gallery"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/show_skin_mask"
         android:title="@string/show_skin_mask"
         app:showAsAction="never" />

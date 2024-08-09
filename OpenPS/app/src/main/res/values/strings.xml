@@ -2,8 +2,10 @@
     <string name="app_name">Open Photo Studio</string>
     <string name="select_image">Select Photo</string>
     <string name="image_edit">Photo Edit</string>
+    <string name="image_save">Photo Export</string>
     <string name="msg_image_load_fail">An error occurred while loading the photo.</string>
     <string name="msg_image_process_fail">An error occurred while analyzing the photo.</string>
+    <string name="msg_image_save_fail">An error occurred while saving your photo.</string>
     <string name="msg_face_detect_fail">Face is not detected in the photo.</string>
     <string name="smooth">Smooth</string>
     <string name="white">White</string>
@@ -17,6 +19,8 @@
     <string name="image_size_limit">Photo Size Limit</string>
     <string name="size_no_limit">No Limit</string>
     <string name="show_face_rect">Show Face Rect</string>
+    <string name="save_to_gallery">Save to Gallery</string>
+    <string name="back_to_home">Back to Home</string>
     <string name="size_4k" translatable="false">4K</string>
     <string name="size_2k" translatable="false">2K</string>
     <string name="size_1k" translatable="false">1K</string>

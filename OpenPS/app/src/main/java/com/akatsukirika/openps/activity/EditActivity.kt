@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.lifecycleScope
@@ -50,6 +51,12 @@ class EditActivity : AppCompatActivity() {
     private var faceRectRight: Float = 0f
     private var faceRectBottom: Float = 0f
     private val faceRectExpandRatio: Float = 0.5f
+
+    private val startExportForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,6 +160,10 @@ class EditActivity : AppCompatActivity() {
                     binding.overlayView.visibility = View.GONE
                     item.setIcon(R.drawable.ic_visibility)
                 }
+                true
+            }
+            R.id.save_to_gallery -> {
+                saveToGallery()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -275,6 +286,17 @@ class EditActivity : AppCompatActivity() {
                 // 人脸识别失败
                 loadStatus.emit(STATUS_ERROR)
                 ToastUtils.showToast(this@EditActivity, getString(R.string.msg_face_detect_fail))
+            }
+        }
+    }
+
+    private fun saveToGallery() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            loadStatus.emit(STATUS_LOADING)
+            ExportActivity.pixelsResult = helper.getResultPixels()
+            loadStatus.emit(STATUS_SUCCESS)
+            withContext(Dispatchers.Main) {
+                startExportForResult.launch(Intent(this@EditActivity, ExportActivity::class.java))
             }
         }
     }
