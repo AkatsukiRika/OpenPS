@@ -24,6 +24,7 @@ import com.akatsukirika.openps.databinding.ActivityEditBinding
 import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.BitmapUtils
+import com.akatsukirika.openps.utils.EvenDimensionsTransformation
 import com.akatsukirika.openps.utils.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -177,6 +178,7 @@ class EditActivity : AppCompatActivity() {
                     Glide.with(this@EditActivity)
                         .asBitmap()
                         .load(uri)
+                        .transform(EvenDimensionsTransformation())
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .override(getSizeLimit())
                         .submit()
@@ -185,6 +187,7 @@ class EditActivity : AppCompatActivity() {
                     Glide.with(this@EditActivity)
                         .asBitmap()
                         .load(uri)
+                        .transform(EvenDimensionsTransformation())
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .submit()
                         .get()
