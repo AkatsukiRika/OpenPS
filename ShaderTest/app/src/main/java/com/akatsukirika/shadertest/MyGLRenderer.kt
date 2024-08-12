@@ -32,6 +32,12 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private var program = -1
     private var textureId = -1
 
+    private var viewWidth = -1
+    private var viewHeight = -1
+
+    private var imageWidth = -1
+    private var imageHeight = -1
+
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(1f, 1f, 1f, 1f)
 
@@ -47,6 +53,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
         textureId = loadTexture(R.drawable.test)
+        viewWidth = width
+        viewHeight = height
     }
 
     override fun onDrawFrame(gl: GL10?) {
@@ -59,12 +67,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         drawOrderBuffer.put(drawOrder)
         drawOrderBuffer.rewind()
 
-        val vertexArr = floatArrayOf(
-            -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-            1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 0.0f, 1.0f, 1.0f
-        )
+        val vertexArr = getVertices()
         val vertexBuffer = vertexArr.toNativeBuffer()
         vertexBuffer.put(vertexArr)
         vertexBuffer.rewind()
@@ -98,6 +101,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
             options.inScaled = false
 
             val bitmap = BitmapFactory.decodeResource(context.resources, resourceId, options)
+            imageWidth = bitmap.width
+            imageHeight = bitmap.height
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
 
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
@@ -110,5 +115,34 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
             throw RuntimeException("Error loading texture.")
         }
         return textureHandle[0]
+    }
+
+    /**
+     * 根据View和图片的宽高，算出纹理顶点坐标
+     * 计算方式是宽度占满，高度按图片比例垂直居中
+     */
+    private fun getVertices(): FloatArray {
+        val ratioView = viewWidth.toFloat() / viewHeight
+        val ratioImage = imageWidth.toFloat() / imageHeight
+        val vertices = if (ratioView > ratioImage) {
+            val height = viewHeight.toFloat()
+            val width = height * ratioImage
+            floatArrayOf(
+                -width / viewWidth, 1.0f, 0.0f, 0.0f, 1.0f,
+                -width / viewWidth, -1.0f, 0.0f, 0.0f, 0.0f,
+                width / viewWidth, -1.0f, 0.0f, 1.0f, 0.0f,
+                width / viewWidth, 1.0f, 0.0f, 1.0f, 1.0f
+            )
+        } else {
+            val width = viewWidth.toFloat()
+            val height = width / ratioImage
+            floatArrayOf(
+                -1.0f, height / viewHeight, 0.0f, 0.0f, 1.0f,
+                -1.0f, -height / viewHeight, 0.0f, 0.0f, 0.0f,
+                1.0f, -height / viewHeight, 0.0f, 1.0f, 0.0f,
+                1.0f, height / viewHeight, 0.0f, 1.0f, 1.0f
+            )
+        }
+        return vertices
     }
 }
