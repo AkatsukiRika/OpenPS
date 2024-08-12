@@ -1,5 +1,7 @@
 package com.akatsukirika.shadertest
 
+import android.content.Context
+import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -15,4 +17,18 @@ object Utils {
         .allocateDirect(this.size * 2)
         .order(ByteOrder.nativeOrder())
         .asShortBuffer()
+
+    fun getShaderCodeFromAssets(context: Context, fileName: String): String {
+        val shaderCode = StringBuilder()
+        try {
+            context.assets.open(fileName).bufferedReader().use { reader ->
+                reader.forEachLine {
+                    shaderCode.append(it).append("\n")
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return shaderCode.toString()
+    }
 }

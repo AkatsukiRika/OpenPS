@@ -10,25 +10,6 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
-    private val vertexShaderCode = """
-        attribute vec4 vPosition;
-        attribute vec2 aTexCoord;
-        varying vec2 vTexCoord;
-        void main() {
-            gl_Position = vPosition;
-            vTexCoord = aTexCoord;
-        }
-    """.trimIndent()
-
-    private val fragmentShaderCode = """
-        precision mediump float;
-        uniform sampler2D uTexture;
-        varying vec2 vTexCoord;
-        void main() {
-            gl_FragColor = texture2D(uTexture, vec2(vTexCoord.x, 1.0 - vTexCoord.y));
-        }
-    """.trimIndent()
-
     private var program = -1
     private var textureId = -1
 
@@ -41,8 +22,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(1f, 1f, 1f, 1f)
 
-        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
-        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
+        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utils.getShaderCodeFromAssets(context, "vertex_shader.glsl"))
+        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utils.getShaderCodeFromAssets(context, "texture_fragment_shader.glsl"))
 
         program = GLES20.glCreateProgram()
         GLES20.glAttachShader(program, vertexShader)
