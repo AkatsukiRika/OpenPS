@@ -23,7 +23,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         GLES20.glClearColor(1f, 1f, 1f, 1f)
 
         val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utils.getShaderCodeFromAssets(context, "vertex_shader.glsl"))
-        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utils.getShaderCodeFromAssets(context, "texture_fragment_shader.glsl"))
+        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utils.getShaderCodeFromAssets(context, "saturation_fragment_shader.glsl"))
 
         program = GLES20.glCreateProgram()
         GLES20.glAttachShader(program, vertexShader)
@@ -42,6 +42,9 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         GLES20.glUseProgram(program)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
+
+        val saturationLocation = GLES20.glGetUniformLocation(program, "saturation")
+        GLES20.glUniform1f(saturationLocation, 1.0f)
 
         val drawOrder = shortArrayOf(0, 1, 2, 0, 2, 3)
         val drawOrderBuffer = drawOrder.toNativeBuffer()
