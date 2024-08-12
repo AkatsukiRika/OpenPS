@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.GLUtils
+import android.opengl.Matrix
 import com.akatsukirika.shadertest.Utils.toNativeBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -19,8 +20,12 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private var imageWidth = -1
     private var imageHeight = -1
 
+    private var scaleFactor = 1.0f
+    private val modelMatrix = FloatArray(16)
+
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(1f, 1f, 1f, 1f)
+        Matrix.setIdentityM(modelMatrix, 0)
 
         val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utils.getShaderCodeFromAssets(context, "vertex_shader.glsl"))
         val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utils.getShaderCodeFromAssets(context, "saturation_fragment_shader.glsl"))
@@ -40,6 +45,12 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+
+        Matrix.setIdentityM(modelMatrix, 0)
+        Matrix.scaleM(modelMatrix, 0, scaleFactor, scaleFactor, 1.0f)
+        val mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
+        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, modelMatrix, 0)
+
         GLES20.glUseProgram(program)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
 
@@ -128,5 +139,9 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
             )
         }
         return vertices
+    }
+
+    fun setScaleFactor(scale: Float) {
+        scaleFactor = scale
     }
 }
