@@ -21,6 +21,10 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private var imageHeight = -1
 
     private var scaleFactor = 1.0f
+    private var distanceX = 0.0f
+    private var distanceY = 0.0f
+    private var totalNormalizedDistanceX = 0.0f
+    private var totalNormalizedDistanceY = 0.0f
     private val modelMatrix = FloatArray(16)
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
@@ -41,16 +45,16 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         textureId = loadTexture(R.drawable.test)
         viewWidth = width
         viewHeight = height
+        scaleFactor = 1f
+        distanceX = 0f
+        distanceY = 0f
+        totalNormalizedDistanceX = 0f
+        totalNormalizedDistanceY = 0f
     }
 
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-
-        Matrix.setIdentityM(modelMatrix, 0)
-        Matrix.scaleM(modelMatrix, 0, scaleFactor, scaleFactor, 1.0f)
-        val mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
-        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, modelMatrix, 0)
-
+        handleMVPMatrix()
         GLES20.glUseProgram(program)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
 
@@ -141,7 +145,26 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         return vertices
     }
 
+    private fun handleMVPMatrix() {
+        Matrix.setIdentityM(modelMatrix, 0)
+
+        val normalizedDistanceX = 2.0f * distanceX / viewWidth
+        val normalizedDistanceY = 2.0f * distanceY / viewHeight
+        totalNormalizedDistanceX -= normalizedDistanceX
+        totalNormalizedDistanceY += normalizedDistanceY
+
+        Matrix.translateM(modelMatrix, 0, totalNormalizedDistanceX, totalNormalizedDistanceY, 0.0f)
+        Matrix.scaleM(modelMatrix, 0, scaleFactor, scaleFactor, 1.0f)
+        val mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
+        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, modelMatrix, 0)
+    }
+
     fun setScaleFactor(scale: Float) {
         scaleFactor = scale
+    }
+
+    fun setTranslateDistance(x: Float, y: Float) {
+        distanceX = x
+        distanceY = y
     }
 }
