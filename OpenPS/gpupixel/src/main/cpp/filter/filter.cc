@@ -139,6 +139,7 @@ bool Filter::proceed(bool bUpdateTargets /* = true*/,
         texIdx == 0 ? "inputImageTexture"
                     : Util::str_format("inputImageTexture%d", texIdx),
         texIdx);
+    _filterProgram->setUniformValue("mvpMatrix", Matrix4::IDENTITY);
     // texcoord attribute
     GLuint filterTexCoordAttribute = _filterProgram->getAttribLocation(
         texIdx == 0 ? "inputTextureCoordinate"

@@ -16,9 +16,10 @@ const std::string FaceMakeupFilterVertexShaderString = R"(
     attribute vec3 position; attribute vec2 inputTextureCoordinate;
     varying vec2 textureCoordinate;
     varying vec2 textureCoordinate2;
+    uniform mat4 mvpMatrix;
 
     void main(void) {
-      gl_Position = vec4(position, 1.);
+      gl_Position = mvpMatrix * vec4(position, 1.);
       textureCoordinate = inputTextureCoordinate;
       textureCoordinate2 = position.xy * 0.5 + 0.5;  // landmark
     })";
@@ -240,6 +241,7 @@ bool FaceMakeupFilter::proceed(bool bUpdateTargets, int64_t frameTime) {
   CHECK_GL(glBindTexture(GL_TEXTURE_2D,
                          _inputFramebuffers[0].frameBuffer->getTexture()));
   _filterProgram2->setUniformValue("inputImageTexture", 4);
+  _filterProgram2->setUniformValue("mvpMatrix", Matrix4::IDENTITY);
 
   // vertex
   CHECK_GL(glEnableVertexAttribArray(_filterPositionAttribute2));
@@ -288,6 +290,7 @@ bool FaceMakeupFilter::proceed(bool bUpdateTargets, int64_t frameTime) {
   // assert(image_texture_);
   glBindTexture(GL_TEXTURE_2D, image_texture_->getFramebuffer()->getTexture());
   _filterProgram->setUniformValue("inputImageTexture2", 3);
+  _filterProgram->setUniformValue("mvpMatrix", Matrix4::IDENTITY);
 
   if (has_face_) {
     auto face_indexs = this->getFaceIndexs();

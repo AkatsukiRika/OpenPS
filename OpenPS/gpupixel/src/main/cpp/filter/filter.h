@@ -19,9 +19,10 @@ const std::string kDefaultVertexShader = R"(
     attribute vec4 position; attribute vec4 inputTextureCoordinate;
 
     varying vec2 textureCoordinate;
+    uniform mat4 mvpMatrix;
 
     void main() {
-      gl_Position = position;
+      gl_Position = mvpMatrix * position;
       textureCoordinate = inputTextureCoordinate.xy;
     })";
 

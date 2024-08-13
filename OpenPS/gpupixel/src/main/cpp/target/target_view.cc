@@ -19,7 +19,8 @@ TargetView::TargetView()
       _displayProgram(0),
       _positionAttribLocation(0),
       _texCoordAttribLocation(0),
-      _colorMapUniformLocation(0) {
+      _colorMapUniformLocation(0),
+      _mvpMatrixUniformLocation(0) {
   _backgroundColor.r = 0.0;
   _backgroundColor.g = 0.0;
   _backgroundColor.b = 0.0;
@@ -42,6 +43,8 @@ void TargetView::init() {
       _displayProgram->getAttribLocation("inputTextureCoordinate");
   _colorMapUniformLocation =
       _displayProgram->getUniformLocation("textureCoordinate");
+  _mvpMatrixUniformLocation =
+      _displayProgram->getUniformLocation("mvpMatrix");
   GPUPixelContext::getInstance()->setActiveShaderProgram(_displayProgram);
   CHECK_GL(glEnableVertexAttribArray(_positionAttribLocation));
   CHECK_GL(glEnableVertexAttribArray(_texCoordAttribLocation));
@@ -110,6 +113,8 @@ void TargetView::update(int64_t frameTime) {
   CHECK_GL(glBindTexture(GL_TEXTURE_2D,
                          _inputFramebuffers[0].frameBuffer->getTexture()));
   CHECK_GL(glUniform1i(_colorMapUniformLocation, 0));
+  auto identityMatrix = Matrix4::IDENTITY;
+  CHECK_GL(glUniformMatrix4fv(_mvpMatrixUniformLocation, 1, false, identityMatrix.m));
   CHECK_GL(glVertexAttribPointer(_positionAttribLocation, 2, GL_FLOAT, 0, 0,
                                  _displayVertices));
   CHECK_GL(glVertexAttribPointer(

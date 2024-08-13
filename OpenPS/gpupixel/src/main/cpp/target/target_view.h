@@ -45,6 +45,7 @@ class GPUPIXEL_API TargetView : public Target {
   GLuint _positionAttribLocation;
   GLuint _texCoordAttribLocation;
   GLuint _colorMapUniformLocation;
+  GLuint _mvpMatrixUniformLocation;
   struct {
     float r;
     float g;
