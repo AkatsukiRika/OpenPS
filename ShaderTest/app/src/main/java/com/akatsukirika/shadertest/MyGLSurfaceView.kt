@@ -10,7 +10,6 @@ import android.view.ScaleGestureDetector
 
 class MyGLSurfaceView(context: Context, attributeSet: AttributeSet) : GLSurfaceView(context, attributeSet) {
     private val renderer: MyGLRenderer
-    private var scaleFactor = 1.0f
     private val scaleGestureDetector: ScaleGestureDetector
     private val gestureDetector: GestureDetector
 
@@ -34,8 +33,7 @@ class MyGLSurfaceView(context: Context, attributeSet: AttributeSet) : GLSurfaceV
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
-            scaleFactor *= detector.scaleFactor
-            scaleFactor = scaleFactor.coerceIn(0.1f, 10.0f)
+            val scaleFactor = detector.scaleFactor
             queueEvent {
                 renderer.setScaleFactor(scaleFactor)
                 requestRender()
@@ -48,6 +46,14 @@ class MyGLSurfaceView(context: Context, attributeSet: AttributeSet) : GLSurfaceV
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
             queueEvent {
                 renderer.setTranslateDistance(distanceX, distanceY)
+                requestRender()
+            }
+            return true
+        }
+
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+            queueEvent {
+                renderer.resetMVPMatrix()
                 requestRender()
             }
             return true

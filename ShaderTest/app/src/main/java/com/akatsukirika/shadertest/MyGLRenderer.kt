@@ -25,6 +25,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private var distanceY = 0.0f
     private var totalNormalizedDistanceX = 0.0f
     private var totalNormalizedDistanceY = 0.0f
+    private var needResetMatrix = false
     private val modelMatrix = FloatArray(16)
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
@@ -147,6 +148,14 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
     private fun handleMVPMatrix() {
         Matrix.setIdentityM(modelMatrix, 0)
+        if (needResetMatrix) {
+            totalNormalizedDistanceX = 0.0f
+            totalNormalizedDistanceY = 0.0f
+            scaleFactor = 1.0f
+            distanceX = 0.0f
+            distanceY = 0.0f
+            needResetMatrix = false
+        }
 
         val normalizedDistanceX = 2.0f * distanceX / viewWidth
         val normalizedDistanceY = 2.0f * distanceY / viewHeight
@@ -160,11 +169,16 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     }
 
     fun setScaleFactor(scale: Float) {
-        scaleFactor = scale
+        scaleFactor *= scale
+        scaleFactor = scaleFactor.coerceIn(0.1f, 10.0f)
     }
 
     fun setTranslateDistance(x: Float, y: Float) {
         distanceX = x
         distanceY = y
+    }
+
+    fun resetMVPMatrix() {
+        needResetMatrix = true
     }
 }
