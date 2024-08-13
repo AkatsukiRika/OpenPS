@@ -9,6 +9,7 @@ import android.opengl.Matrix
 import com.akatsukirika.shadertest.Utils.toNativeBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.math.abs
 
 class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private var program = -1
@@ -19,6 +20,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
     private var imageWidth = -1
     private var imageHeight = -1
+    private var normalizedImageWidth = 1f
+    private var normalizedImageHeight = 1f
 
     private var scaleFactor = 1.0f
     private var distanceX = 0.0f
@@ -127,6 +130,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         val vertices = if (ratioView > ratioImage) {
             val height = viewHeight.toFloat()
             val width = height * ratioImage
+            normalizedImageWidth = width / viewWidth
             floatArrayOf(
                 -width / viewWidth, 1.0f, 0.0f, 0.0f, 1.0f,
                 -width / viewWidth, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -136,6 +140,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         } else {
             val width = viewWidth.toFloat()
             val height = width / ratioImage
+            normalizedImageHeight = height / viewHeight
             floatArrayOf(
                 -1.0f, height / viewHeight, 0.0f, 0.0f, 1.0f,
                 -1.0f, -height / viewHeight, 0.0f, 0.0f, 0.0f,
@@ -161,6 +166,14 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         val normalizedDistanceY = 2.0f * distanceY / viewHeight
         totalNormalizedDistanceX -= normalizedDistanceX
         totalNormalizedDistanceY += normalizedDistanceY
+        totalNormalizedDistanceX = totalNormalizedDistanceX.coerceIn(
+            -abs(normalizedImageWidth * scaleFactor - 1f),
+            abs(normalizedImageWidth * scaleFactor - 1f)
+        )
+        totalNormalizedDistanceY = totalNormalizedDistanceY.coerceIn(
+            -abs(normalizedImageHeight * scaleFactor - 1f),
+            abs(normalizedImageHeight * scaleFactor - 1f)
+        )
 
         Matrix.translateM(modelMatrix, 0, totalNormalizedDistanceX, totalNormalizedDistanceY, 0.0f)
         Matrix.scaleM(modelMatrix, 0, scaleFactor, scaleFactor, 1.0f)
