@@ -45,4 +45,10 @@ internal object OpenPS {
     external fun nativeCompareBegin()
 
     external fun nativeCompareEnd()
+
+    external fun nativeSetScaleFactor(scale: Float)
+
+    external fun nativeSetTranslateDistance(x: Float, y: Float)
+
+    external fun nativeResetMVPMatrix()
 }

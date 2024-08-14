@@ -50,6 +50,12 @@ public:
 
   void onCompareEnd();
 
+  void setScaleFactor(float scale);
+
+  void setTranslateDistance(float x, float y);
+
+  void resetMVPMatrix();
+
 private:
   std::shared_ptr<SourceImage> gpuSourceImage;
   std::shared_ptr<LipstickFilter> lipstickFilter;
@@ -65,6 +71,16 @@ private:
   float blusherLevel = 0;
   float eyeZoomLevel = 0;
   float faceSlimLevel = 0;
+
+  float scaleFactor = 1;
+  float distanceX = 0;
+  float distanceY = 0;
+  float totalNormalizedDistanceX = 0;
+  float totalNormalizedDistanceY = 0;
+  bool needResetMatrix = false;
+
+  Matrix4 modelMatrix;
+  void handleMVPMatrix();
 };
 
 NS_GPUPIXEL_END

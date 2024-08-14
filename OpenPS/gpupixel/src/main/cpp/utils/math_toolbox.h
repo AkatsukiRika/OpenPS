@@ -134,6 +134,9 @@ class GPUPIXEL_API Matrix4 {
   void multiply(const Matrix4& mat);
   static void multiply(const Matrix4& m1, const Matrix4& m2, Matrix4* dst);
 
+  void translate(int mOffset, float x, float y, float z);
+  void scale(int mOffset, float x, float y, float z);
+
   const Matrix4 operator+(const Matrix4& mat) const;
   Matrix4& operator+=(const Matrix4& mat);
   const Matrix4 operator-(const Matrix4& mat) const;

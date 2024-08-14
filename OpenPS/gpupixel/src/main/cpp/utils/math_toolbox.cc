@@ -449,6 +449,22 @@ void Matrix4::multiply(const Matrix4& m1, const Matrix4& m2, Matrix4* dst) {
   dst->m[15] = m1.m[15] * m2.m[15];
 }
 
+void Matrix4::translate(int mOffset, float x, float y, float z) {
+  for (int i = 0; i < 4; i++) {
+    int mi = mOffset + i;
+    m[12 + mi] += m[mi] * x + m[4 + mi] * y + m[8 + mi] * z;
+  }
+}
+
+void Matrix4::scale(int mOffset, float x, float y, float z) {
+  for (int i = 0; i < 4; i++) {
+    int mi = mOffset + i;
+    m[mi] *= x;
+    m[4 + mi] *= y;
+    m[8 + mi] *= z;
+  }
+}
+
 const Matrix4 Matrix4::operator+(const Matrix4& mat) const {
   Matrix4 result(*this);
   result.add(mat);

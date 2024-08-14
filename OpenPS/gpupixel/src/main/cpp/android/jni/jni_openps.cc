@@ -170,4 +170,25 @@ Java_com_pixpark_gpupixel_OpenPS_nativeCompareEnd(JNIEnv *env, jobject thiz) {
   }
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeSetScaleFactor(JNIEnv *env, jobject thiz, jfloat scale) {
+  if (openPSHelper) {
+    openPSHelper->setScaleFactor(scale);
+  }
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeSetTranslateDistance(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
+  if (openPSHelper) {
+    openPSHelper->setTranslateDistance(x, y);
+  }
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeResetMVPMatrix(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    openPSHelper->resetMVPMatrix();
+  }
+}
+
 #endif
