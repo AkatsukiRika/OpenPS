@@ -208,14 +208,7 @@ void gpupixel::OpenPSHelper::handleMVPMatrix() {
 
     modelMatrix.translate(0, totalNormalizedDistanceX, totalNormalizedDistanceY, 0);
     modelMatrix.scale(0, scaleFactor, scaleFactor, 1);
-    Util::Log(
-        "xuanTest-cpp",
-        "scaleFactor=%f, distanceX=%f, distanceY=%f",
-        scaleFactor, totalNormalizedDistanceX, totalNormalizedDistanceY
-    );
-    for (int i = 0; i < 4; i++) {
-      Util::Log("xuanTest-cpp", "%f\t%f\t%f\t%f", modelMatrix.m[i * 4], modelMatrix.m[i * 4 + 1], modelMatrix.m[i * 4 + 2], modelMatrix.m[i * 4 + 3]);
-    }
+    targetView->setMVPMatrix(modelMatrix);
   }
   delete[] targetViewInfo;
 }

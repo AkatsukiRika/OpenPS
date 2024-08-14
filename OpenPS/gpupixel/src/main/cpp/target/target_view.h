@@ -32,6 +32,7 @@ class GPUPIXEL_API TargetView : public Target {
   void setMirror(bool mirror);
   void onSizeChanged(int width, int height);
   void getViewInfo(float* info);
+  void setMVPMatrix(const Matrix4& mvpMatrix);
   virtual void update(int64_t frameTime) override;
 
  private:
@@ -54,6 +55,7 @@ class GPUPIXEL_API TargetView : public Target {
   } _backgroundColor;
 
   GLfloat _displayVertices[8];
+  Matrix4 _mvpMatrix = Matrix4::IDENTITY;
 
   void _updateDisplayVertices();
   const GLfloat* _getTexureCoordinate(RotationMode rotationMode);

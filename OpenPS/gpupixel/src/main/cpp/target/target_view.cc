@@ -101,6 +101,10 @@ void TargetView::getViewInfo(float *info) {
   info[3] = _scaledHeight;
 }
 
+void TargetView::setMVPMatrix(const Matrix4 &mvpMatrix) {
+  _mvpMatrix = mvpMatrix;
+}
+
 void TargetView::update(int64_t frameTime) {
   CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
@@ -113,8 +117,7 @@ void TargetView::update(int64_t frameTime) {
   CHECK_GL(glBindTexture(GL_TEXTURE_2D,
                          _inputFramebuffers[0].frameBuffer->getTexture()));
   CHECK_GL(glUniform1i(_colorMapUniformLocation, 0));
-  auto identityMatrix = Matrix4::IDENTITY;
-  CHECK_GL(glUniformMatrix4fv(_mvpMatrixUniformLocation, 1, false, identityMatrix.m));
+  CHECK_GL(glUniformMatrix4fv(_mvpMatrixUniformLocation, 1, false, _mvpMatrix.m));
   CHECK_GL(glVertexAttribPointer(_positionAttribLocation, 2, GL_FLOAT, 0, 0,
                                  _displayVertices));
   CHECK_GL(glVertexAttribPointer(
