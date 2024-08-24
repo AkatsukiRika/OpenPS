@@ -2,6 +2,7 @@ package com.pixpark.gpupixel.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Matrix
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.GestureDetector
@@ -10,6 +11,10 @@ import android.view.ScaleGestureDetector
 import com.pixpark.gpupixel.OpenPS
 
 class OpenPSRenderView : GLSurfaceView {
+    interface Callback {
+        fun onMatrixChanged(matrix: Matrix)
+    }
+
     constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
 
     constructor(context: Context) : super(context)
@@ -17,6 +22,8 @@ class OpenPSRenderView : GLSurfaceView {
     private val renderer: OpenPSRenderer
     private val scaleGestureDetector: ScaleGestureDetector
     private val gestureDetector: GestureDetector
+    private val matrix = Matrix()   // 上层记录手势变换的矩阵
+    private var callback: Callback? = null
 
     init {
         setEGLContextClientVersion(2)
@@ -41,9 +48,29 @@ class OpenPSRenderView : GLSurfaceView {
         queueEvent(runnable)
     }
 
+    fun setCallback(callback: Callback) {
+        this.callback = callback
+    }
+
+    private fun postScale(scale: Float) {
+        matrix.postScale(scale, scale)
+        callback?.onMatrixChanged(matrix)
+    }
+
+    private fun postTranslate(dx: Float, dy: Float) {
+        matrix.postTranslate(dx, dy)
+        callback?.onMatrixChanged(matrix)
+    }
+
+    private fun resetMatrix() {
+        matrix.reset()
+        callback?.onMatrixChanged(matrix)
+    }
+
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             val scale = detector.scaleFactor
+            postScale(scale)
             postOnGLThread {
                 OpenPS.nativeSetScaleFactor(scale)
                 requestRender()
@@ -54,6 +81,7 @@ class OpenPSRenderView : GLSurfaceView {
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+            postTranslate(-distanceX, -distanceY)
             postOnGLThread {
                 OpenPS.nativeSetTranslateDistance(distanceX, distanceY)
                 requestRender()
@@ -62,6 +90,7 @@ class OpenPSRenderView : GLSurfaceView {
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
+            resetMatrix()
             postOnGLThread {
                 OpenPS.nativeResetMVPMatrix()
                 requestRender()

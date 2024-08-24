@@ -3,6 +3,7 @@ package com.akatsukirika.openps.activity
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.graphics.RectF
 import android.net.Uri
 import android.os.Bundle
@@ -30,6 +31,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
 import com.pixpark.gpupixel.OpenPSHelper
+import com.pixpark.gpupixel.view.OpenPSRenderView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -64,6 +66,11 @@ class EditActivity : AppCompatActivity() {
         binding = ActivityEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.surfaceView.setCallback(object : OpenPSRenderView.Callback {
+            override fun onMatrixChanged(matrix: Matrix) {
+                binding.overlayView.matrix = matrix
+            }
+        })
         helper = OpenPSHelper(binding.surfaceView)
 
         imageUri = intent.getParcelableExtra(EXTRA_KEY_IMAGE_URI)

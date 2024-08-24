@@ -3,6 +3,7 @@ package com.akatsukirika.openps.view
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
@@ -22,9 +23,11 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
         style = Paint.Style.STROKE
         strokeWidth = context.resources.getDimensionPixelSize(R.dimen.overlay_rect_stroke_width).toFloat()
     }
+    private val matrix = Matrix()
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        canvas.concat(matrix)
         if (!actualBox.isEmpty) {
             canvas.drawRect(actualBox, paint)
         }
@@ -43,6 +46,11 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
         val actualBottom = (viewHeight * (1 - scaledHeight)) / 2 + viewHeight * scaledHeight * faceRect.bottom
 
         actualBox.set(actualLeft, actualTop, actualRight, actualBottom)
+        invalidate()
+    }
+
+    fun setMatrix(matrix: Matrix) {
+        this.matrix.set(matrix)
         invalidate()
     }
 }
