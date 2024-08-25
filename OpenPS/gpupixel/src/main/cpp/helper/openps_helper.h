@@ -56,6 +56,10 @@ public:
 
   void resetMVPMatrix();
 
+  float getDistanceX();
+
+  float getDistanceY();
+
 private:
   std::shared_ptr<SourceImage> gpuSourceImage;
   std::shared_ptr<LipstickFilter> lipstickFilter;

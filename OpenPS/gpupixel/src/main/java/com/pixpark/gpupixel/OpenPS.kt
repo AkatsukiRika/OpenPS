@@ -51,4 +51,8 @@ internal object OpenPS {
     external fun nativeSetTranslateDistance(x: Float, y: Float)
 
     external fun nativeResetMVPMatrix()
+
+    external fun nativeGetTranslateDistanceX(): Float
+
+    external fun nativeGetTranslateDistanceY(): Float
 }

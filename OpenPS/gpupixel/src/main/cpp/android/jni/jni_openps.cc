@@ -191,4 +191,20 @@ Java_com_pixpark_gpupixel_OpenPS_nativeResetMVPMatrix(JNIEnv *env, jobject thiz)
   }
 }
 
+extern "C" JNIEXPORT jfloat JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeGetTranslateDistanceX(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    return openPSHelper->getDistanceX();
+  }
+  return 0;
+}
+
+extern "C" JNIEXPORT jfloat JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeGetTranslateDistanceY(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    return openPSHelper->getDistanceY();
+  }
+  return 0;
+}
+
 #endif

@@ -81,9 +81,11 @@ class OpenPSRenderView : GLSurfaceView {
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-            postTranslate(-distanceX, -distanceY)
             postOnGLThread {
                 OpenPS.nativeSetTranslateDistance(distanceX, distanceY)
+                val realDistanceX = OpenPS.nativeGetTranslateDistanceX()
+                val realDistanceY = OpenPS.nativeGetTranslateDistanceY();
+                postTranslate(-realDistanceX, -realDistanceY);
                 requestRender()
             }
             return true

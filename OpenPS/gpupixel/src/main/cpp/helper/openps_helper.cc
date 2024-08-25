@@ -193,22 +193,40 @@ void gpupixel::OpenPSHelper::handleMVPMatrix() {
 
     float normalizedDistanceX = 2.0 * distanceX / viewWidth;
     float normalizedDistanceY = 2.0 * distanceY / viewHeight;
+    float beforeNormalizedDistanceX = totalNormalizedDistanceX;
+    float realNormalizedDistanceX = normalizedDistanceX;
     totalNormalizedDistanceX -= normalizedDistanceX;
     if (totalNormalizedDistanceX < minDistanceX) {
       totalNormalizedDistanceX = minDistanceX;
+      realNormalizedDistanceX = beforeNormalizedDistanceX - minDistanceX;
     } else if (totalNormalizedDistanceX > maxDistanceX) {
       totalNormalizedDistanceX = maxDistanceX;
+      realNormalizedDistanceX = maxDistanceX - beforeNormalizedDistanceX;
     }
+    float beforeNormalizedDistanceY = totalNormalizedDistanceY;
+    float realNormalizedDistanceY = normalizedDistanceY;
     totalNormalizedDistanceY += normalizedDistanceY;
     if (totalNormalizedDistanceY < minDistanceY) {
       totalNormalizedDistanceY = minDistanceY;
+      realNormalizedDistanceY = minDistanceY - beforeNormalizedDistanceY;
     } else if (totalNormalizedDistanceY > maxDistanceY) {
       totalNormalizedDistanceY = maxDistanceY;
+      realNormalizedDistanceY = maxDistanceY - beforeNormalizedDistanceY;
     }
+    distanceX = (realNormalizedDistanceX * viewWidth) / 2;
+    distanceY = (realNormalizedDistanceY * viewHeight) / 2;
 
     modelMatrix.translate(0, totalNormalizedDistanceX, totalNormalizedDistanceY, 0);
     modelMatrix.scale(0, scaleFactor, scaleFactor, 1);
     targetView->setMVPMatrix(modelMatrix);
   }
   delete[] targetViewInfo;
+}
+
+float gpupixel::OpenPSHelper::getDistanceX() {
+  return distanceX;
+}
+
+float gpupixel::OpenPSHelper::getDistanceY() {
+  return distanceY;
 }
