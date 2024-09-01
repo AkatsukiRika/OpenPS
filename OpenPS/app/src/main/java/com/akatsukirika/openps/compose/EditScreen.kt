@@ -23,10 +23,12 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,33 +55,26 @@ interface EditScreenCallback {
     fun onCompareEnd()
 }
 
+// 人像美颜
 const val INDEX_SMOOTH = 0
 const val INDEX_WHITE = 1
 const val INDEX_LIPSTICK = 2
 const val INDEX_BLUSHER = 3
 const val INDEX_EYE_ZOOM = 4
 const val INDEX_FACE_SLIM = 5
+// 编辑小项
+const val INDEX_CONTRAST = 0
+// 处理状态
 const val STATUS_IDLE = 10
 const val STATUS_LOADING = 11
 const val STATUS_SUCCESS = 12
 const val STATUS_ERROR = 13
+// 一级TAB
 const val TAB_BEAUTIFY = 0
 const val TAB_ADJUST = 1
 
 @Composable
 fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
-    val context = LocalContext.current
-    val itemList = remember {
-        listOf(
-            FunctionItem(index = INDEX_SMOOTH, icon = R.drawable.ic_smooth, name = context.getString(R.string.smooth)),
-            FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white)),
-            FunctionItem(index = INDEX_LIPSTICK, icon = R.drawable.ic_lipstick, name = context.getString(R.string.lipstick)),
-            FunctionItem(index = INDEX_BLUSHER, icon = R.drawable.ic_blusher, name = context.getString(R.string.blusher)),
-            FunctionItem(index = INDEX_EYE_ZOOM, icon = R.drawable.ic_eye_zoom, name = context.getString(R.string.eye_zoom)),
-            FunctionItem(index = INDEX_FACE_SLIM, icon = R.drawable.ic_face_slim, name = context.getString(R.string.face_slim))
-        )
-    }
-
     Column(modifier = Modifier.fillMaxWidth()) {
         Icon(
             painter = painterResource(id = R.drawable.ic_compare),
@@ -98,20 +93,81 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
                 }
         )
 
-        MainColumn(itemList, loadStatus, callback)
+        MainColumn(loadStatus, callback)
     }
 }
 
 @Composable
-private fun MainColumn(
-    itemList: List<FunctionItem>,
-    loadStatus: Int,
-    callback: EditScreenCallback
-) {
+private fun MainColumn(loadStatus: Int, callback: EditScreenCallback) {
+    val context = LocalContext.current
     val levelMap = remember { mutableStateMapOf<Int, Float>() }
+    val adjustLevelMap = remember { mutableStateMapOf<Int, Float>() }
     var currentLevel by remember { mutableFloatStateOf(0f) }
     var selectedFunctionIndex by remember { mutableIntStateOf(-1) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+    var lastSelectedTabIndex by remember { mutableIntStateOf(0) }
+    var itemList by remember { mutableStateOf(listOf<FunctionItem>()) }
+
+    LaunchedEffect(key1 = selectedTabIndex) {
+        when (selectedTabIndex) {
+            TAB_BEAUTIFY -> {
+                itemList = listOf(
+                    FunctionItem(index = INDEX_SMOOTH, icon = R.drawable.ic_smooth, name = context.getString(R.string.smooth)),
+                    FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white)),
+                    FunctionItem(index = INDEX_LIPSTICK, icon = R.drawable.ic_lipstick, name = context.getString(R.string.lipstick)),
+                    FunctionItem(index = INDEX_BLUSHER, icon = R.drawable.ic_blusher, name = context.getString(R.string.blusher)),
+                    FunctionItem(index = INDEX_EYE_ZOOM, icon = R.drawable.ic_eye_zoom, name = context.getString(R.string.eye_zoom)),
+                    FunctionItem(index = INDEX_FACE_SLIM, icon = R.drawable.ic_face_slim, name = context.getString(R.string.face_slim))
+                )
+            }
+
+            TAB_ADJUST -> {
+                itemList = listOf(
+                    FunctionItem(index = INDEX_CONTRAST, icon = R.drawable.ic_contrast, name = context.getString(R.string.contrast))
+                )
+            }
+        }
+        if (selectedTabIndex != lastSelectedTabIndex) {
+            selectedFunctionIndex = -1
+        }
+        lastSelectedTabIndex = selectedTabIndex
+    }
+
+    fun onValueChange(value: Float) {
+        currentLevel = value
+        when (selectedTabIndex) {
+            TAB_BEAUTIFY -> {
+                levelMap[selectedFunctionIndex] = value
+                when (selectedFunctionIndex) {
+                    INDEX_SMOOTH -> callback.onSetSmoothLevel(currentLevel)
+                    INDEX_WHITE -> callback.onSetWhiteLevel(currentLevel)
+                    INDEX_LIPSTICK -> callback.onSetLipstickLevel(currentLevel)
+                    INDEX_BLUSHER -> callback.onSetBlusherLevel(currentLevel)
+                    INDEX_EYE_ZOOM -> callback.onSetEyeZoomLevel(currentLevel)
+                    INDEX_FACE_SLIM -> callback.onSetFaceSlimLevel(currentLevel)
+                }
+            }
+
+            TAB_ADJUST -> {
+                adjustLevelMap[selectedFunctionIndex] = value
+            }
+        }
+    }
+
+    fun onSelect(index: Int) {
+        selectedFunctionIndex = if (selectedFunctionIndex == -1 || index != selectedFunctionIndex) index else -1
+        if (selectedFunctionIndex != -1) {
+            when (selectedTabIndex) {
+                TAB_BEAUTIFY -> {
+                    currentLevel = levelMap[selectedFunctionIndex] ?: 0f
+                }
+
+                TAB_ADJUST -> {
+                    currentLevel = adjustLevelMap[selectedFunctionIndex] ?: 0f
+                }
+            }
+        }
+    }
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -121,19 +177,7 @@ private fun MainColumn(
         if (selectedFunctionIndex != -1) {
             Slider(
                 value = currentLevel,
-                onValueChange = {
-                    currentLevel = it
-                    levelMap[selectedFunctionIndex] = it
-
-                    when (selectedFunctionIndex) {
-                        INDEX_SMOOTH -> callback.onSetSmoothLevel(currentLevel)
-                        INDEX_WHITE -> callback.onSetWhiteLevel(currentLevel)
-                        INDEX_LIPSTICK -> callback.onSetLipstickLevel(currentLevel)
-                        INDEX_BLUSHER -> callback.onSetBlusherLevel(currentLevel)
-                        INDEX_EYE_ZOOM -> callback.onSetEyeZoomLevel(currentLevel)
-                        INDEX_FACE_SLIM -> callback.onSetFaceSlimLevel(currentLevel)
-                    }
-                },
+                onValueChange = ::onValueChange,
                 modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),
                 colors = SliderDefaults.colors(
                     thumbColor = AppColors.Green500,
@@ -148,12 +192,7 @@ private fun MainColumn(
                     modifier = Modifier.height(84.dp),
                     itemList = itemList,
                     selectedIndex = selectedFunctionIndex,
-                    onSelect = {
-                        selectedFunctionIndex = if (selectedFunctionIndex == -1 || it != selectedFunctionIndex) it else -1
-                        if (selectedFunctionIndex != -1) {
-                            currentLevel = levelMap[selectedFunctionIndex] ?: 0f
-                        }
-                    }
+                    onSelect = ::onSelect
                 )
 
                 BottomTabRow(
