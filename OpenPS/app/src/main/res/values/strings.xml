@@ -21,6 +21,8 @@
     <string name="show_face_rect">Show Face Rect</string>
     <string name="save_to_gallery">Save to Gallery</string>
     <string name="back_to_home">Back to Home</string>
+    <string name="beautify">Beautify</string>
+    <string name="adjust">Adjust</string>
     <string name="size_4k" translatable="false">4K</string>
     <string name="size_2k" translatable="false">2K</string>
     <string name="size_1k" translatable="false">1K</string>

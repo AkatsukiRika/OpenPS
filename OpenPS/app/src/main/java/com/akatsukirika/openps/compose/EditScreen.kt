@@ -19,6 +19,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,6 +63,8 @@ const val STATUS_IDLE = 10
 const val STATUS_LOADING = 11
 const val STATUS_SUCCESS = 12
 const val STATUS_ERROR = 13
+const val TAB_BEAUTIFY = 0
+const val TAB_ADJUST = 1
 
 @Composable
 fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
@@ -106,6 +111,7 @@ private fun MainColumn(
     val levelMap = remember { mutableStateMapOf<Int, Float>() }
     var currentLevel by remember { mutableFloatStateOf(0f) }
     var selectedFunctionIndex by remember { mutableIntStateOf(-1) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -137,25 +143,69 @@ private fun MainColumn(
         }
 
         Box {
-            FunctionList(
-                modifier = Modifier.height(84.dp),
-                itemList = itemList,
-                selectedIndex = selectedFunctionIndex,
-                onSelect = {
-                    selectedFunctionIndex = if (selectedFunctionIndex == -1 || it != selectedFunctionIndex) it else -1
-                    if (selectedFunctionIndex != -1) {
-                        currentLevel = levelMap[selectedFunctionIndex] ?: 0f
+            Column {
+                FunctionList(
+                    modifier = Modifier.height(84.dp),
+                    itemList = itemList,
+                    selectedIndex = selectedFunctionIndex,
+                    onSelect = {
+                        selectedFunctionIndex = if (selectedFunctionIndex == -1 || it != selectedFunctionIndex) it else -1
+                        if (selectedFunctionIndex != -1) {
+                            currentLevel = levelMap[selectedFunctionIndex] ?: 0f
+                        }
                     }
-                }
-            )
+                )
+
+                BottomTabRow(
+                    modifier = Modifier.height(28.dp),
+                    selectedIndex = selectedTabIndex,
+                    onSelect = {
+                        selectedTabIndex = it
+                    }
+                )
+            }
 
             if (loadStatus == STATUS_LOADING) {
                 LoadingMask(modifier = Modifier
                     .fillMaxWidth()
-                    .height(84.dp)
-                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {}
+                    .height((84 + 28).dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {}
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun BottomTabRow(
+    modifier: Modifier = Modifier,
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit
+) {
+    TabRow(modifier = modifier, selectedTabIndex = selectedIndex, backgroundColor = AppColors.DarkBG) {
+        Tab(selected = selectedIndex == TAB_BEAUTIFY, onClick = {
+            onSelect(TAB_BEAUTIFY)
+        }) {
+            Text(
+                text = stringResource(id = R.string.beautify),
+                color = if (selectedIndex == TAB_BEAUTIFY) Color.White else Color.Gray,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Tab(selected = selectedIndex == TAB_ADJUST, onClick = {
+            onSelect(TAB_ADJUST)
+        }) {
+            Text(
+                text = stringResource(id = R.string.adjust),
+                color = if (selectedIndex == TAB_ADJUST) Color.White else Color.Gray,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
