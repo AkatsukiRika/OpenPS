@@ -51,6 +51,7 @@ interface EditScreenCallback {
     fun onSetBlusherLevel(level: Float)
     fun onSetEyeZoomLevel(level: Float)
     fun onSetFaceSlimLevel(level: Float)
+    fun onSetContrastLevel(level: Float)
     fun onCompareBegin()
     fun onCompareEnd()
 }
@@ -123,7 +124,7 @@ private fun MainColumn(loadStatus: Int, callback: EditScreenCallback) {
 
             TAB_ADJUST -> {
                 itemList = listOf(
-                    FunctionItem(index = INDEX_CONTRAST, icon = R.drawable.ic_contrast, name = context.getString(R.string.contrast))
+                    FunctionItem(index = INDEX_CONTRAST, icon = R.drawable.ic_contrast, name = context.getString(R.string.contrast), hasTwoWaySlider = true)
                 )
             }
         }
@@ -150,6 +151,9 @@ private fun MainColumn(loadStatus: Int, callback: EditScreenCallback) {
 
             TAB_ADJUST -> {
                 adjustLevelMap[selectedFunctionIndex] = value
+                when (selectedFunctionIndex) {
+                    INDEX_CONTRAST -> callback.onSetContrastLevel(currentLevel)
+                }
             }
         }
     }
@@ -174,16 +178,27 @@ private fun MainColumn(loadStatus: Int, callback: EditScreenCallback) {
         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
         .background(AppColors.DarkBG)
     ) {
-        if (selectedFunctionIndex != -1) {
-            Slider(
-                value = currentLevel,
-                onValueChange = ::onValueChange,
-                modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),
-                colors = SliderDefaults.colors(
-                    thumbColor = AppColors.Green500,
-                    activeTrackColor = AppColors.Green500
+        val selectedItem = itemList.getOrNull(selectedFunctionIndex)
+        if (selectedItem != null) {
+            if (selectedItem.hasTwoWaySlider) {
+                BidirectionalSlider(
+                    value = currentLevel,
+                    onValueChange = ::onValueChange,
+                    modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),
+                    trackColor = AppColors.Green500.copy(alpha = SliderDefaults.InactiveTrackAlpha),
+                    highlightColor = AppColors.Green500
                 )
-            )
+            } else {
+                Slider(
+                    value = currentLevel,
+                    onValueChange = ::onValueChange,
+                    modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),
+                    colors = SliderDefaults.colors(
+                        thumbColor = AppColors.Green500,
+                        activeTrackColor = AppColors.Green500
+                    )
+                )
+            }
         }
 
         Box {
@@ -314,5 +329,6 @@ private fun LoadingMask(modifier: Modifier = Modifier) {
 data class FunctionItem(
     val index: Int,
     val icon: Int,
-    val name: String
+    val name: String,
+    val hasTwoWaySlider: Boolean = false
 )

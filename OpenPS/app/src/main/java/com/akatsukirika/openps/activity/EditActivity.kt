@@ -109,6 +109,10 @@ class EditActivity : AppCompatActivity() {
                     helper.setFaceSlimLevel(level)
                 }
 
+                override fun onSetContrastLevel(level: Float) {
+                    helper.setContrastLevel(level)
+                }
+
                 override fun onCompareBegin() {
                     helper.onCompareBegin()
                 }

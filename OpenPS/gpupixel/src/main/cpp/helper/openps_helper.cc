@@ -39,6 +39,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   lipstickFilter = LipstickFilter::create();
   blusherFilter = BlusherFilter::create();
   faceReshapeFilter = FaceReshapeFilter::create();
+  contrastFilter = ContrastFilter::create();
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
@@ -46,6 +47,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
     faceReshapeFilter->SetFaceLandmarks(landmarks);
   });
   gpuSourceImage
+      ->addTarget(contrastFilter)
       ->addTarget(lipstickFilter)
       ->addTarget(blusherFilter)
       ->addTarget(faceReshapeFilter)
@@ -112,6 +114,17 @@ void gpupixel::OpenPSHelper::setFaceSlimLevel(float level) {
   }
 }
 
+void gpupixel::OpenPSHelper::setContrastLevel(float level) {
+  if (contrastFilter) {
+    if (level < 0) {
+      contrastLevel = 1.0 - 0.5 * abs(level);
+    } else {
+      contrastLevel = 1.0 + abs(level);
+    }
+    contrastFilter->setContrast(contrastLevel);
+  }
+}
+
 void gpupixel::OpenPSHelper::onCompareBegin() {
   if (beautyFaceFilter) {
     beautyFaceFilter->setBlurAlpha(0);
@@ -126,6 +139,9 @@ void gpupixel::OpenPSHelper::onCompareBegin() {
   if (faceReshapeFilter) {
     faceReshapeFilter->setEyeZoomLevel(0);
     faceReshapeFilter->setFaceSlimLevel(0);
+  }
+  if (contrastFilter) {
+    contrastFilter->setContrast(1);
   }
 }
 
@@ -143,6 +159,9 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   if (faceReshapeFilter) {
     faceReshapeFilter->setEyeZoomLevel(eyeZoomLevel);
     faceReshapeFilter->setFaceSlimLevel(faceSlimLevel);
+  }
+  if (contrastFilter) {
+    contrastFilter->setContrast(contrastLevel);
   }
 }
 

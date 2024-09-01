@@ -85,6 +85,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun setContrastLevel(level: Float) {
+        renderView.postOnGLThread {
+            OpenPS.nativeSetContrastLevel(level)
+            requestRender()
+        }
+    }
+
     fun onCompareBegin() {
         renderView.postOnGLThread {
             OpenPS.nativeCompareBegin()

@@ -42,6 +42,8 @@ internal object OpenPS {
 
     external fun nativeSetFaceSlimLevel(level: Float)
 
+    external fun nativeSetContrastLevel(level: Float)
+
     external fun nativeCompareBegin()
 
     external fun nativeCompareEnd()
