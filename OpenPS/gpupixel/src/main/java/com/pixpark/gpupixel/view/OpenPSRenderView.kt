@@ -8,7 +8,6 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
-import com.pixpark.gpupixel.OpenPS
 
 class OpenPSRenderView : GLSurfaceView {
     interface Callback {
@@ -52,8 +51,8 @@ class OpenPSRenderView : GLSurfaceView {
         this.callback = callback
     }
 
-    private fun postScale(scale: Float) {
-        matrix.postScale(scale, scale)
+    private fun postScale(scale: Float, focusX: Float, focusY: Float) {
+        matrix.postScale(scale, scale, focusX, focusY)
         callback?.onMatrixChanged(matrix)
     }
 
@@ -69,34 +68,19 @@ class OpenPSRenderView : GLSurfaceView {
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
-            val scale = detector.scaleFactor
-            postScale(scale)
-            postOnGLThread {
-                OpenPS.nativeSetScaleFactor(scale)
-                requestRender()
-            }
+            postScale(detector.scaleFactor, detector.focusX, detector.focusY)
             return true
         }
     }
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-            postOnGLThread {
-                OpenPS.nativeSetTranslateDistance(distanceX, distanceY)
-                val realDistanceX = OpenPS.nativeGetTranslateDistanceX()
-                val realDistanceY = OpenPS.nativeGetTranslateDistanceY();
-                postTranslate(-realDistanceX, -realDistanceY);
-                requestRender()
-            }
+            postTranslate(-distanceX, -distanceY)
             return true
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
             resetMatrix()
-            postOnGLThread {
-                OpenPS.nativeResetMVPMatrix()
-                requestRender()
-            }
             return true
         }
     }

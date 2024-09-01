@@ -5,19 +5,23 @@
     android:layout_height="match_parent"
     android:background="@color/dark_bg">
 
-    <com.pixpark.gpupixel.view.OpenPSRenderView
-        android:id="@+id/surface_view"
+    <com.akatsukirika.openps.view.TransformLayout
+        android:id="@+id/transform_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:background="@color/black">
 
-    <com.akatsukirika.openps.view.OverlayView
-        android:id="@+id/overlay_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <com.pixpark.gpupixel.view.OpenPSRenderView
+            android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.akatsukirika.openps.view.OverlayView
+            android:id="@+id/overlay_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.akatsukirika.openps.view.TransformLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/debug_image_view"

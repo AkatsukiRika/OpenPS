@@ -68,7 +68,7 @@ class EditActivity : AppCompatActivity() {
 
         binding.surfaceView.setCallback(object : OpenPSRenderView.Callback {
             override fun onMatrixChanged(matrix: Matrix) {
-                binding.overlayView.matrix = matrix
+                binding.transformLayout.setTransform(matrix)
             }
         })
         helper = OpenPSHelper(binding.surfaceView)
