@@ -24,6 +24,7 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,18 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
-
-interface EditScreenCallback {
-    fun onSetSmoothLevel(level: Float)
-    fun onSetWhiteLevel(level: Float)
-    fun onSetLipstickLevel(level: Float)
-    fun onSetBlusherLevel(level: Float)
-    fun onSetEyeZoomLevel(level: Float)
-    fun onSetFaceSlimLevel(level: Float)
-    fun onSetContrastLevel(level: Float)
-    fun onCompareBegin()
-    fun onCompareEnd()
-}
+import com.akatsukirika.openps.viewmodel.EditViewModel
 
 // 人像美颜
 const val INDEX_SMOOTH = 0
@@ -75,7 +65,7 @@ const val TAB_BEAUTIFY = 0
 const val TAB_ADJUST = 1
 
 @Composable
-fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
+fun EditScreen(viewModel: EditViewModel) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Icon(
             painter = painterResource(id = R.drawable.ic_compare),
@@ -87,19 +77,19 @@ fun EditScreen(callback: EditScreenCallback, loadStatus: Int) {
                 .size(24.dp)
                 .pointerInput(Unit) {
                     detectTapGestures(onPress = {
-                        callback.onCompareBegin()
+                        viewModel.helper?.onCompareBegin()
                         tryAwaitRelease()
-                        callback.onCompareEnd()
+                        viewModel.helper?.onCompareEnd()
                     })
                 }
         )
 
-        MainColumn(loadStatus, callback)
+        MainColumn(viewModel)
     }
 }
 
 @Composable
-private fun MainColumn(loadStatus: Int, callback: EditScreenCallback) {
+private fun MainColumn(viewModel: EditViewModel) {
     val context = LocalContext.current
     val levelMap = remember { mutableStateMapOf<Int, Float>() }
     val adjustLevelMap = remember { mutableStateMapOf<Int, Float>() }
@@ -108,6 +98,7 @@ private fun MainColumn(loadStatus: Int, callback: EditScreenCallback) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     var lastSelectedTabIndex by remember { mutableIntStateOf(0) }
     var itemList by remember { mutableStateOf(listOf<FunctionItem>()) }
+    val loadStatus = viewModel.loadStatus.collectAsState(initial = STATUS_IDLE).value
 
     LaunchedEffect(key1 = selectedTabIndex) {
         when (selectedTabIndex) {
@@ -140,19 +131,19 @@ private fun MainColumn(loadStatus: Int, callback: EditScreenCallback) {
             TAB_BEAUTIFY -> {
                 levelMap[selectedFunctionIndex] = value
                 when (selectedFunctionIndex) {
-                    INDEX_SMOOTH -> callback.onSetSmoothLevel(currentLevel)
-                    INDEX_WHITE -> callback.onSetWhiteLevel(currentLevel)
-                    INDEX_LIPSTICK -> callback.onSetLipstickLevel(currentLevel)
-                    INDEX_BLUSHER -> callback.onSetBlusherLevel(currentLevel)
-                    INDEX_EYE_ZOOM -> callback.onSetEyeZoomLevel(currentLevel)
-                    INDEX_FACE_SLIM -> callback.onSetFaceSlimLevel(currentLevel)
+                    INDEX_SMOOTH -> viewModel.helper?.setSmoothLevel(currentLevel)
+                    INDEX_WHITE -> viewModel.helper?.setWhiteLevel(currentLevel)
+                    INDEX_LIPSTICK -> viewModel.helper?.setLipstickLevel(currentLevel)
+                    INDEX_BLUSHER -> viewModel.helper?.setBlusherLevel(currentLevel)
+                    INDEX_EYE_ZOOM -> viewModel.helper?.setEyeZoomLevel(currentLevel)
+                    INDEX_FACE_SLIM -> viewModel.helper?.setFaceSlimLevel(currentLevel)
                 }
             }
 
             TAB_ADJUST -> {
                 adjustLevelMap[selectedFunctionIndex] = value
                 when (selectedFunctionIndex) {
-                    INDEX_CONTRAST -> callback.onSetContrastLevel(currentLevel)
+                    INDEX_CONTRAST -> viewModel.helper?.setContrastLevel(currentLevel)
                 }
             }
         }
