@@ -114,6 +114,7 @@ class EditViewModel : ViewModel() {
     }
 
     fun destroy() {
+        helper?.destroy()
         helper = null
     }
 
