@@ -7,10 +7,20 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.R
+import com.akatsukirika.openps.compose.FunctionItem
+import com.akatsukirika.openps.compose.INDEX_BLUSHER
+import com.akatsukirika.openps.compose.INDEX_CONTRAST
+import com.akatsukirika.openps.compose.INDEX_EYE_ZOOM
+import com.akatsukirika.openps.compose.INDEX_FACE_SLIM
+import com.akatsukirika.openps.compose.INDEX_LIPSTICK
+import com.akatsukirika.openps.compose.INDEX_SMOOTH
+import com.akatsukirika.openps.compose.INDEX_WHITE
 import com.akatsukirika.openps.compose.STATUS_ERROR
 import com.akatsukirika.openps.compose.STATUS_IDLE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
+import com.akatsukirika.openps.compose.TAB_ADJUST
+import com.akatsukirika.openps.compose.TAB_BEAUTIFY
 import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.BitmapUtils
@@ -25,6 +35,7 @@ import com.pixpark.gpupixel.view.OpenPSRenderView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
@@ -45,6 +56,24 @@ class EditViewModel : ViewModel() {
     private val _loadStatus = MutableStateFlow(STATUS_IDLE)
     val loadStatus: StateFlow<Int> = _loadStatus
 
+    private val beautifyLevelMap = MutableStateFlow(mapOf<Int, Float>())
+
+    private val adjustLevelMap = MutableStateFlow(mapOf<Int, Float>())
+
+    private val _currentLevel = MutableStateFlow(0f)
+    val currentLevel: StateFlow<Float> = _currentLevel
+
+    private val _selectedFunctionIndex = MutableStateFlow(-1)
+    val selectedFunctionIndex: StateFlow<Int> = _selectedFunctionIndex
+
+    private val _selectedTabIndex = MutableStateFlow(0)
+    val selectedTabIndex: StateFlow<Int> = _selectedTabIndex
+
+    private val lastSelectedTabIndex = MutableStateFlow(0)
+
+    private val _itemList = MutableStateFlow(listOf<FunctionItem>())
+    val itemList: StateFlow<List<FunctionItem>> = _itemList
+
     // Face Rect
     private var faceRectLeft: Float = 0f
     private var faceRectTop: Float = 0f
@@ -55,6 +84,33 @@ class EditViewModel : ViewModel() {
     fun init(renderView: OpenPSRenderView, callback: Callback? = null) {
         helper = OpenPSHelper(renderView)
         this.callback = callback
+        viewModelScope.launch {
+            val context = renderView.context
+            selectedTabIndex.collect {
+                when (selectedTabIndex.value) {
+                    TAB_BEAUTIFY -> {
+                        _itemList.value = listOf(
+                            FunctionItem(index = INDEX_SMOOTH, icon = R.drawable.ic_smooth, name = context.getString(R.string.smooth)),
+                            FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white)),
+                            FunctionItem(index = INDEX_LIPSTICK, icon = R.drawable.ic_lipstick, name = context.getString(R.string.lipstick)),
+                            FunctionItem(index = INDEX_BLUSHER, icon = R.drawable.ic_blusher, name = context.getString(R.string.blusher)),
+                            FunctionItem(index = INDEX_EYE_ZOOM, icon = R.drawable.ic_eye_zoom, name = context.getString(R.string.eye_zoom)),
+                            FunctionItem(index = INDEX_FACE_SLIM, icon = R.drawable.ic_face_slim, name = context.getString(R.string.face_slim))
+                        )
+                    }
+
+                    TAB_ADJUST -> {
+                        _itemList.value = listOf(
+                            FunctionItem(index = INDEX_CONTRAST, icon = R.drawable.ic_contrast, name = context.getString(R.string.contrast), hasTwoWaySlider = true)
+                        )
+                    }
+                }
+                if (selectedTabIndex.value != lastSelectedTabIndex.value) {
+                    _selectedFunctionIndex.value = -1
+                }
+                lastSelectedTabIndex.value = selectedTabIndex.value
+            }
+        }
     }
 
     fun destroy() {
@@ -83,6 +139,53 @@ class EditViewModel : ViewModel() {
             }
             startImageFilter(context, bitmap)
         }
+    }
+
+    fun onSelect(index: Int) {
+        _selectedFunctionIndex.value = if (selectedFunctionIndex.value == -1 || index != selectedFunctionIndex.value) index else -1
+        if (selectedFunctionIndex.value != -1) {
+            when (selectedTabIndex.value) {
+                TAB_BEAUTIFY -> {
+                    _currentLevel.value = beautifyLevelMap.value[selectedFunctionIndex.value] ?: 0f
+                }
+
+                TAB_ADJUST -> {
+                    _currentLevel.value = adjustLevelMap.value[selectedFunctionIndex.value] ?: 0f
+                }
+            }
+        }
+    }
+
+    fun onValueChange(value: Float) {
+        _currentLevel.value = value
+        when (selectedTabIndex.value) {
+            TAB_BEAUTIFY -> {
+                beautifyLevelMap.update {
+                    it + (selectedFunctionIndex.value to value)
+                }
+                when (selectedFunctionIndex.value) {
+                    INDEX_SMOOTH -> helper?.setSmoothLevel(currentLevel.value)
+                    INDEX_WHITE -> helper?.setWhiteLevel(currentLevel.value)
+                    INDEX_LIPSTICK -> helper?.setLipstickLevel(currentLevel.value)
+                    INDEX_BLUSHER -> helper?.setBlusherLevel(currentLevel.value)
+                    INDEX_EYE_ZOOM -> helper?.setEyeZoomLevel(currentLevel.value)
+                    INDEX_FACE_SLIM -> helper?.setFaceSlimLevel(currentLevel.value)
+                }
+            }
+
+            TAB_ADJUST -> {
+                adjustLevelMap.update {
+                    it + (selectedFunctionIndex.value to value)
+                }
+                when (selectedFunctionIndex.value) {
+                    INDEX_CONTRAST -> helper?.setContrastLevel(currentLevel.value)
+                }
+            }
+        }
+    }
+
+    fun updateSelectedTab(tabIndex: Int) {
+        _selectedTabIndex.value = tabIndex
     }
 
     private fun startImageFilter(context: Context, bitmap: Bitmap) {

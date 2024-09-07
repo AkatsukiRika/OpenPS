@@ -23,21 +23,13 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -90,79 +82,11 @@ fun EditScreen(viewModel: EditViewModel) {
 
 @Composable
 private fun MainColumn(viewModel: EditViewModel) {
-    val context = LocalContext.current
-    val levelMap = remember { mutableStateMapOf<Int, Float>() }
-    val adjustLevelMap = remember { mutableStateMapOf<Int, Float>() }
-    var currentLevel by remember { mutableFloatStateOf(0f) }
-    var selectedFunctionIndex by remember { mutableIntStateOf(-1) }
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-    var lastSelectedTabIndex by remember { mutableIntStateOf(0) }
-    var itemList by remember { mutableStateOf(listOf<FunctionItem>()) }
+    val currentLevel = viewModel.currentLevel.collectAsState(initial = 0f).value
+    val selectedFunctionIndex = viewModel.selectedFunctionIndex.collectAsState(initial = -1).value
+    val selectedTabIndex = viewModel.selectedTabIndex.collectAsState(initial = 0).value
+    val itemList = viewModel.itemList.collectAsState(initial = emptyList()).value
     val loadStatus = viewModel.loadStatus.collectAsState(initial = STATUS_IDLE).value
-
-    LaunchedEffect(key1 = selectedTabIndex) {
-        when (selectedTabIndex) {
-            TAB_BEAUTIFY -> {
-                itemList = listOf(
-                    FunctionItem(index = INDEX_SMOOTH, icon = R.drawable.ic_smooth, name = context.getString(R.string.smooth)),
-                    FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white)),
-                    FunctionItem(index = INDEX_LIPSTICK, icon = R.drawable.ic_lipstick, name = context.getString(R.string.lipstick)),
-                    FunctionItem(index = INDEX_BLUSHER, icon = R.drawable.ic_blusher, name = context.getString(R.string.blusher)),
-                    FunctionItem(index = INDEX_EYE_ZOOM, icon = R.drawable.ic_eye_zoom, name = context.getString(R.string.eye_zoom)),
-                    FunctionItem(index = INDEX_FACE_SLIM, icon = R.drawable.ic_face_slim, name = context.getString(R.string.face_slim))
-                )
-            }
-
-            TAB_ADJUST -> {
-                itemList = listOf(
-                    FunctionItem(index = INDEX_CONTRAST, icon = R.drawable.ic_contrast, name = context.getString(R.string.contrast), hasTwoWaySlider = true)
-                )
-            }
-        }
-        if (selectedTabIndex != lastSelectedTabIndex) {
-            selectedFunctionIndex = -1
-        }
-        lastSelectedTabIndex = selectedTabIndex
-    }
-
-    fun onValueChange(value: Float) {
-        currentLevel = value
-        when (selectedTabIndex) {
-            TAB_BEAUTIFY -> {
-                levelMap[selectedFunctionIndex] = value
-                when (selectedFunctionIndex) {
-                    INDEX_SMOOTH -> viewModel.helper?.setSmoothLevel(currentLevel)
-                    INDEX_WHITE -> viewModel.helper?.setWhiteLevel(currentLevel)
-                    INDEX_LIPSTICK -> viewModel.helper?.setLipstickLevel(currentLevel)
-                    INDEX_BLUSHER -> viewModel.helper?.setBlusherLevel(currentLevel)
-                    INDEX_EYE_ZOOM -> viewModel.helper?.setEyeZoomLevel(currentLevel)
-                    INDEX_FACE_SLIM -> viewModel.helper?.setFaceSlimLevel(currentLevel)
-                }
-            }
-
-            TAB_ADJUST -> {
-                adjustLevelMap[selectedFunctionIndex] = value
-                when (selectedFunctionIndex) {
-                    INDEX_CONTRAST -> viewModel.helper?.setContrastLevel(currentLevel)
-                }
-            }
-        }
-    }
-
-    fun onSelect(index: Int) {
-        selectedFunctionIndex = if (selectedFunctionIndex == -1 || index != selectedFunctionIndex) index else -1
-        if (selectedFunctionIndex != -1) {
-            when (selectedTabIndex) {
-                TAB_BEAUTIFY -> {
-                    currentLevel = levelMap[selectedFunctionIndex] ?: 0f
-                }
-
-                TAB_ADJUST -> {
-                    currentLevel = adjustLevelMap[selectedFunctionIndex] ?: 0f
-                }
-            }
-        }
-    }
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -174,7 +98,9 @@ private fun MainColumn(viewModel: EditViewModel) {
             if (selectedItem.hasTwoWaySlider) {
                 BidirectionalSlider(
                     value = currentLevel,
-                    onValueChange = ::onValueChange,
+                    onValueChange = {
+                        viewModel.onValueChange(it)
+                    },
                     modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),
                     trackColor = AppColors.Green500.copy(alpha = SliderDefaults.InactiveTrackAlpha),
                     highlightColor = AppColors.Green500
@@ -182,7 +108,9 @@ private fun MainColumn(viewModel: EditViewModel) {
             } else {
                 Slider(
                     value = currentLevel,
-                    onValueChange = ::onValueChange,
+                    onValueChange = {
+                        viewModel.onValueChange(it)
+                    },
                     modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),
                     colors = SliderDefaults.colors(
                         thumbColor = AppColors.Green500,
@@ -198,14 +126,16 @@ private fun MainColumn(viewModel: EditViewModel) {
                     modifier = Modifier.height(84.dp),
                     itemList = itemList,
                     selectedIndex = selectedFunctionIndex,
-                    onSelect = ::onSelect
+                    onSelect = {
+                        viewModel.onSelect(it)
+                    }
                 )
 
                 BottomTabRow(
                     modifier = Modifier.height(28.dp),
                     selectedIndex = selectedTabIndex,
                     onSelect = {
-                        selectedTabIndex = it
+                        viewModel.updateSelectedTab(it)
                     }
                 )
             }
