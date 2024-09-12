@@ -46,6 +46,8 @@ internal object OpenPS {
 
     external fun nativeSetExposureLevel(level: Float)
 
+    external fun nativeSetSaturationLevel(level: Float)
+
     external fun nativeCompareBegin()
 
     external fun nativeCompareEnd()

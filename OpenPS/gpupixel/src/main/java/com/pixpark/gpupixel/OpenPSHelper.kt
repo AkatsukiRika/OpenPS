@@ -99,6 +99,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun setSaturationLevel(level: Float) {
+        renderView.postOnGLThread {
+            OpenPS.nativeSetSaturationLevel(level)
+            requestRender()
+        }
+    }
+
     fun onCompareBegin() {
         renderView.postOnGLThread {
             OpenPS.nativeCompareBegin()

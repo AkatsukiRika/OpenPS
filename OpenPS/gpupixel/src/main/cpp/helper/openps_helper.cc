@@ -11,7 +11,11 @@ gpupixel::OpenPSHelper::~OpenPSHelper() {
   lipstickFilter.reset();
   blusherFilter.reset();
   faceReshapeFilter.reset();
+  contrastFilter.reset();
+  exposureFilter.reset();
+  saturationFilter.reset();
   targetView.reset();
+  targetRawDataOutput.reset();
   GPUPixelContext::destroy();
 }
 
@@ -41,6 +45,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   faceReshapeFilter = FaceReshapeFilter::create();
   contrastFilter = ContrastFilter::create();
   exposureFilter = ExposureFilter::create();
+  saturationFilter = SaturationFilter::create();
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
@@ -50,6 +55,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   gpuSourceImage
       ->addTarget(contrastFilter)
       ->addTarget(exposureFilter)
+      ->addTarget(saturationFilter)
       ->addTarget(lipstickFilter)
       ->addTarget(blusherFilter)
       ->addTarget(faceReshapeFilter)
@@ -136,6 +142,13 @@ void gpupixel::OpenPSHelper::setExposureLevel(float level) {
   }
 }
 
+void gpupixel::OpenPSHelper::setSaturationLevel(float level) {
+  if (saturationFilter) {
+    saturationLevel = level + 1.0;
+    saturationFilter->setSaturation(saturationLevel);
+  }
+}
+
 void gpupixel::OpenPSHelper::onCompareBegin() {
   if (beautyFaceFilter) {
     beautyFaceFilter->setBlurAlpha(0);
@@ -156,6 +169,9 @@ void gpupixel::OpenPSHelper::onCompareBegin() {
   }
   if (exposureFilter) {
     exposureFilter->setExposure(0);
+  }
+  if (saturationFilter) {
+    saturationFilter->setSaturation(1);
   }
 }
 
@@ -179,6 +195,9 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   }
   if (exposureFilter) {
     exposureFilter->setExposure(exposureLevel);
+  }
+  if (saturationFilter) {
+    saturationFilter->setSaturation(saturationLevel);
   }
 }
 

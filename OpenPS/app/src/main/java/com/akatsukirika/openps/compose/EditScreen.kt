@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +34,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
@@ -48,6 +50,7 @@ const val INDEX_FACE_SLIM = 5
 // 编辑小项
 const val INDEX_CONTRAST = 0
 const val INDEX_EXPOSURE = 1
+const val INDEX_SATURATION = 2
 // 处理状态
 const val STATUS_IDLE = 10
 const val STATUS_LOADING = 11
@@ -97,27 +100,9 @@ private fun MainColumn(viewModel: EditViewModel) {
         val selectedItem = itemList.getOrNull(selectedFunctionIndex)
         if (selectedItem != null) {
             if (selectedItem.hasTwoWaySlider) {
-                BidirectionalSlider(
-                    value = currentLevel,
-                    onValueChange = {
-                        viewModel.onValueChange(it)
-                    },
-                    modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),
-                    trackColor = AppColors.Green500.copy(alpha = SliderDefaults.InactiveTrackAlpha),
-                    highlightColor = AppColors.Green500
-                )
+                BidirectionalSliderLayout(viewModel, currentLevel)
             } else {
-                Slider(
-                    value = currentLevel,
-                    onValueChange = {
-                        viewModel.onValueChange(it)
-                    },
-                    modifier = Modifier.padding(top = 8.dp, start = 32.dp, end = 32.dp),
-                    colors = SliderDefaults.colors(
-                        thumbColor = AppColors.Green500,
-                        activeTrackColor = AppColors.Green500
-                    )
-                )
+                SliderLayout(viewModel, currentLevel)
             }
         }
 
@@ -152,6 +137,62 @@ private fun MainColumn(viewModel: EditViewModel) {
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun BidirectionalSliderLayout(viewModel: EditViewModel, currentLevel: Float) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 24.dp)
+    ) {
+        Text(
+            text = if (currentLevel >= 0.01f) "+${(currentLevel * 100).toInt()}" else "${(currentLevel * 100).toInt()}",
+            color = Color.White,
+            modifier = Modifier.width(32.dp),
+            textAlign = TextAlign.End
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        BidirectionalSlider(
+            value = currentLevel,
+            onValueChange = {
+                viewModel.onValueChange(it)
+            },
+            modifier = Modifier.weight(1f),
+            trackColor = AppColors.Green500.copy(alpha = SliderDefaults.InactiveTrackAlpha),
+            highlightColor = AppColors.Green500
+        )
+    }
+}
+
+@Composable
+private fun SliderLayout(viewModel: EditViewModel, currentLevel: Float) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 24.dp)
+    ) {
+        Text(
+            text = "${(currentLevel * 100).toInt()}",
+            color = Color.White,
+            modifier = Modifier.width(32.dp),
+            textAlign = TextAlign.End
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Slider(
+            value = currentLevel,
+            onValueChange = {
+                viewModel.onValueChange(it)
+            },
+            modifier = Modifier.weight(1f),
+            colors = SliderDefaults.colors(
+                thumbColor = AppColors.Green500,
+                activeTrackColor = AppColors.Green500
+            )
+        )
     }
 }
 

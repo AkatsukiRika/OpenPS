@@ -50,6 +50,8 @@ public:
 
   void setExposureLevel(float level);
 
+  void setSaturationLevel(float level);
+
   void onCompareBegin();
 
   void onCompareEnd();
@@ -72,6 +74,7 @@ private:
   std::shared_ptr<BeautyFaceFilter> beautyFaceFilter;
   std::shared_ptr<ContrastFilter> contrastFilter;
   std::shared_ptr<ExposureFilter> exposureFilter;
+  std::shared_ptr<SaturationFilter> saturationFilter;
   std::shared_ptr<TargetView> targetView;
   std::shared_ptr<TargetRawDataOutput> targetRawDataOutput;
 
@@ -83,6 +86,7 @@ private:
   float faceSlimLevel = 0;
   float contrastLevel = 1.0;
   float exposureLevel = 0;
+  float saturationLevel = 1.0;
 
   float scaleFactor = 1;
   float distanceX = 0;
