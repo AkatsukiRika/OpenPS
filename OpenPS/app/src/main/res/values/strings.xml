@@ -16,6 +16,7 @@
     <string name="settings">Settings</string>
     <string name="debug_mode">Debug Mode</string>
     <string name="show_skin_mask">Show Skin Mask</string>
+    <string name="show_frame_rate">Show Frame Rate</string>
     <string name="image_size_limit">Photo Size Limit</string>
     <string name="size_no_limit">No Limit</string>
     <string name="show_face_rect">Show Face Rect</string>

@@ -12,6 +12,7 @@ import android.view.ScaleGestureDetector
 class OpenPSRenderView : GLSurfaceView {
     interface Callback {
         fun onMatrixChanged(matrix: Matrix)
+        fun onFrameRateChanged(fps: Double)
     }
 
     constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
@@ -27,7 +28,11 @@ class OpenPSRenderView : GLSurfaceView {
     init {
         setEGLContextClientVersion(2)
         preserveEGLContextOnPause = true
-        renderer = OpenPSRenderer()
+        renderer = OpenPSRenderer(object : OpenPSRenderer.Callback {
+            override fun onFrameRateChanged(fps: Double) {
+                callback?.onFrameRateChanged(fps)
+            }
+        })
         setRenderer(renderer)
         renderMode = RENDERMODE_WHEN_DIRTY
         scaleGestureDetector = ScaleGestureDetector(context, ScaleListener())

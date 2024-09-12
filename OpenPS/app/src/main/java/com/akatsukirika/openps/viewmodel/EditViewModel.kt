@@ -75,6 +75,12 @@ class EditViewModel : ViewModel() {
     private val _itemList = MutableStateFlow(listOf<FunctionItem>())
     val itemList: StateFlow<List<FunctionItem>> = _itemList
 
+    val showFrameRate = MutableStateFlow(false)
+
+    val uiFrameRate = MutableStateFlow(0.0)
+
+    val glFrameRate = MutableStateFlow(0.0)
+
     // Face Rect
     private var faceRectLeft: Float = 0f
     private var faceRectTop: Float = 0f
@@ -190,6 +196,10 @@ class EditViewModel : ViewModel() {
 
     fun updateSelectedTab(tabIndex: Int) {
         _selectedTabIndex.value = tabIndex
+    }
+
+    fun updateLoadStatus(status: Int) {
+        _loadStatus.value = status
     }
 
     private fun startImageFilter(context: Context, bitmap: Bitmap) {

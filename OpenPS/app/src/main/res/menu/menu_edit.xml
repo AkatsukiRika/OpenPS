@@ -15,4 +15,8 @@
         android:id="@+id/show_skin_mask"
         android:title="@string/show_skin_mask"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/show_frame_rate"
+        android:title="@string/show_frame_rate"
+        app:showAsAction="never" />
 </menu>

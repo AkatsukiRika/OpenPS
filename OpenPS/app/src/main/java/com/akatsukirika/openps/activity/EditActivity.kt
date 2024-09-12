@@ -16,17 +16,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.EditScreen
-import com.akatsukirika.openps.compose.STATUS_IDLE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.databinding.ActivityEditBinding
 import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.store.SettingsStore
+import com.akatsukirika.openps.utils.FrameRateObserver
 import com.akatsukirika.openps.viewmodel.EditViewModel
 import com.pixpark.gpupixel.model.RenderViewInfo
 import com.pixpark.gpupixel.view.OpenPSRenderView
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -36,14 +37,20 @@ class EditActivity : AppCompatActivity() {
 
     private var showFaceRect: Boolean = true
 
-    private val loadStatus = MutableStateFlow(STATUS_IDLE)
-
     private val viewModel: EditViewModel by viewModels()
 
     private val startExportForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
             finish()
         }
+    }
+
+    private val frameRateObserver by lazy {
+        FrameRateObserver(object : FrameRateObserver.Callback {
+            override fun onFrameRateChanged(fps: Double) {
+                viewModel.uiFrameRate.value = fps
+            }
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +61,10 @@ class EditActivity : AppCompatActivity() {
         binding.surfaceView.setCallback(object : OpenPSRenderView.Callback {
             override fun onMatrixChanged(matrix: Matrix) {
                 binding.transformLayout.setTransform(matrix)
+            }
+
+            override fun onFrameRateChanged(fps: Double) {
+                viewModel.glFrameRate.value = fps
             }
         })
         viewModel.init(
@@ -86,6 +97,26 @@ class EditActivity : AppCompatActivity() {
             setTitle(R.string.image_edit)
         }
 
+        lifecycleScope.launch {
+            launch {
+                viewModel.showFrameRate.collect {
+                    if (it) {
+                        frameRateObserver.startObserve()
+                    } else {
+                        frameRateObserver.endObserve()
+                    }
+                }
+            }
+
+            launch {
+                viewModel.uiFrameRate.combine(viewModel.glFrameRate) { uiFps, glFps ->
+                    "UI: ${uiFps.toInt()}\nGL: ${glFps.toInt()}"
+                }.collect {
+                    binding.tvFrameRate.text = it
+                }
+            }
+        }
+
         binding.composeView.setContent {
             EditScreen(viewModel)
         }
@@ -105,11 +136,13 @@ class EditActivity : AppCompatActivity() {
         super.onDestroy()
         viewModel.destroy()
         NativeLib.releaseBitmap()
+        frameRateObserver.endObserve()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_edit, menu)
         menu?.findItem(R.id.show_skin_mask)?.setVisible(SettingsStore.isDebugMode)
+        menu?.findItem(R.id.show_frame_rate)?.setVisible(SettingsStore.isDebugMode)
         return true
     }
 
@@ -128,7 +161,7 @@ class EditActivity : AppCompatActivity() {
                 true
             }
             R.id.show_face_rect -> {
-                if (loadStatus.value == STATUS_LOADING) {
+                if (viewModel.loadStatus.value == STATUS_LOADING) {
                     return true
                 }
                 showFaceRect = !showFaceRect
@@ -141,6 +174,11 @@ class EditActivity : AppCompatActivity() {
                 }
                 true
             }
+            R.id.show_frame_rate -> {
+                viewModel.showFrameRate.update { !it }
+                binding.tvFrameRate.visibility = if (viewModel.showFrameRate.value) View.VISIBLE else View.GONE
+                true
+            }
             R.id.save_to_gallery -> {
                 saveToGallery()
                 true
@@ -151,9 +189,9 @@ class EditActivity : AppCompatActivity() {
 
     private fun saveToGallery() {
         lifecycleScope.launch(Dispatchers.IO) {
-            loadStatus.emit(STATUS_LOADING)
+            viewModel.updateLoadStatus(STATUS_LOADING)
             ExportActivity.pixelsResult = viewModel.helper?.getResultPixels()
-            loadStatus.emit(STATUS_SUCCESS)
+            viewModel.updateLoadStatus(STATUS_SUCCESS)
             withContext(Dispatchers.Main) {
                 startExportForResult.launch(Intent(this@EditActivity, ExportActivity::class.java))
             }
