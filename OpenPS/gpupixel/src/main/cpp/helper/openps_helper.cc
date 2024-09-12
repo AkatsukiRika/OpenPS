@@ -40,6 +40,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   blusherFilter = BlusherFilter::create();
   faceReshapeFilter = FaceReshapeFilter::create();
   contrastFilter = ContrastFilter::create();
+  exposureFilter = ExposureFilter::create();
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
@@ -48,6 +49,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   });
   gpuSourceImage
       ->addTarget(contrastFilter)
+      ->addTarget(exposureFilter)
       ->addTarget(lipstickFilter)
       ->addTarget(blusherFilter)
       ->addTarget(faceReshapeFilter)
@@ -116,12 +118,21 @@ void gpupixel::OpenPSHelper::setFaceSlimLevel(float level) {
 
 void gpupixel::OpenPSHelper::setContrastLevel(float level) {
   if (contrastFilter) {
+    // 滤镜本身支持0～4，为避免极端效果限制在0.5～2
     if (level < 0) {
       contrastLevel = 1.0 - 0.5 * abs(level);
     } else {
       contrastLevel = 1.0 + abs(level);
     }
     contrastFilter->setContrast(contrastLevel);
+  }
+}
+
+void gpupixel::OpenPSHelper::setExposureLevel(float level) {
+  if (exposureFilter) {
+    // 滤镜本身支持-10～10，为避免极端效果限制在-1.5～1.5
+    exposureLevel = level * 1.5;
+    exposureFilter->setExposure(exposureLevel);
   }
 }
 
@@ -143,6 +154,9 @@ void gpupixel::OpenPSHelper::onCompareBegin() {
   if (contrastFilter) {
     contrastFilter->setContrast(1);
   }
+  if (exposureFilter) {
+    exposureFilter->setExposure(0);
+  }
 }
 
 void gpupixel::OpenPSHelper::onCompareEnd() {
@@ -162,6 +176,9 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   }
   if (contrastFilter) {
     contrastFilter->setContrast(contrastLevel);
+  }
+  if (exposureFilter) {
+    exposureFilter->setExposure(exposureLevel);
   }
 }
 

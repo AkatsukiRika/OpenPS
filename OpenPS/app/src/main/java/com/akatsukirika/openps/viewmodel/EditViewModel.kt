@@ -10,6 +10,7 @@ import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.FunctionItem
 import com.akatsukirika.openps.compose.INDEX_BLUSHER
 import com.akatsukirika.openps.compose.INDEX_CONTRAST
+import com.akatsukirika.openps.compose.INDEX_EXPOSURE
 import com.akatsukirika.openps.compose.INDEX_EYE_ZOOM
 import com.akatsukirika.openps.compose.INDEX_FACE_SLIM
 import com.akatsukirika.openps.compose.INDEX_LIPSTICK
@@ -101,7 +102,8 @@ class EditViewModel : ViewModel() {
 
                     TAB_ADJUST -> {
                         _itemList.value = listOf(
-                            FunctionItem(index = INDEX_CONTRAST, icon = R.drawable.ic_contrast, name = context.getString(R.string.contrast), hasTwoWaySlider = true)
+                            FunctionItem(index = INDEX_CONTRAST, icon = R.drawable.ic_contrast, name = context.getString(R.string.contrast), hasTwoWaySlider = true),
+                            FunctionItem(index = INDEX_EXPOSURE, icon = R.drawable.ic_exposure, name = context.getString(R.string.exposure), hasTwoWaySlider = true)
                         )
                     }
                 }
@@ -180,6 +182,7 @@ class EditViewModel : ViewModel() {
                 }
                 when (selectedFunctionIndex.value) {
                     INDEX_CONTRAST -> helper?.setContrastLevel(currentLevel.value)
+                    INDEX_EXPOSURE -> helper?.setExposureLevel(currentLevel.value)
                 }
             }
         }

@@ -164,6 +164,13 @@ Java_com_pixpark_gpupixel_OpenPS_nativeSetContrastLevel(JNIEnv *env, jobject thi
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeSetExposureLevel(JNIEnv *env, jobject thiz, jfloat level) {
+  if (openPSHelper) {
+    openPSHelper->setExposureLevel(level);
+  }
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeCompareBegin(JNIEnv *env, jobject thiz) {
   if (openPSHelper) {
     openPSHelper->onCompareBegin();

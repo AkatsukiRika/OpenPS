@@ -19,7 +19,11 @@ fun BidirectionalSlider(
     trackColor: Color = Color.LightGray,
     highlightColor: Color = Color.Blue
 ) {
-    var sliderPosition by remember { mutableStateOf(value) }
+    var sliderPosition by remember { mutableFloatStateOf(value) }
+
+    LaunchedEffect(key1 = value) {
+        sliderPosition = value
+    }
 
     Box(modifier = modifier.height(40.dp)) {
         Canvas(modifier = Modifier.fillMaxSize()) {
