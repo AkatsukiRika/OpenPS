@@ -97,4 +97,18 @@ object BitmapUtils {
         canvas.drawBitmap(cropped, null, Rect(x, y, x + width, y + height), null)
         return resultBitmap
     }
+
+    /**
+     * @param maxSize 长边像素数
+     */
+    fun Bitmap.scaleToMaxLongSide(maxSize: Int): Bitmap {
+        val scale = if (width > height) {
+            maxSize.toFloat() / width
+        } else {
+            maxSize.toFloat() / height
+        }
+        val scaledWidth = (width * scale).toInt()
+        val scaledHeight = (height * scale).toInt()
+        return Bitmap.createScaledBitmap(this, scaledWidth, scaledHeight, true)
+    }
 }

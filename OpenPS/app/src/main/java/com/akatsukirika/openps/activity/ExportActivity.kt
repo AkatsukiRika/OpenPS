@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.databinding.ActivityExportBinding
 import com.akatsukirika.openps.utils.BitmapUtils
+import com.akatsukirika.openps.utils.BitmapUtils.scaleToMaxLongSide
 import com.akatsukirika.openps.utils.ToastUtils
 import com.pixpark.gpupixel.model.PixelsResult
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +48,11 @@ class ExportActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        pixelsResult = null
+    }
+
     private fun pixelsResultToBitmap() {
         lifecycleScope.launch(Dispatchers.IO) {
             pixelsResult?.let {
@@ -67,7 +73,7 @@ class ExportActivity : AppCompatActivity() {
                     if (uri == null) {
                         ToastUtils.showToast(this@ExportActivity, getString(R.string.msg_image_save_fail))
                     }
-                    binding.resultImage.setImageBitmap(resultBitmap)
+                    binding.resultImage.setImageBitmap(resultBitmap.scaleToMaxLongSide(MAX_SIZE))
                     binding.llBack.visibility = View.VISIBLE
                 }
             }
@@ -77,6 +83,7 @@ class ExportActivity : AppCompatActivity() {
     private fun generateFileName() = "OpenPS_${System.currentTimeMillis() / 1000}.jpg"
 
     companion object {
+        private const val MAX_SIZE = 1024
         var pixelsResult: PixelsResult? = null
     }
 }
