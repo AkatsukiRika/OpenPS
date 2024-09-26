@@ -15,6 +15,7 @@ gpupixel::OpenPSHelper::~OpenPSHelper() {
   exposureFilter.reset();
   saturationFilter.reset();
   sharpenFilter.reset();
+  brightnessFilter.reset();
   targetView.reset();
   targetRawDataOutput.reset();
   GPUPixelContext::destroy();
@@ -51,6 +52,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   saturationFilter = SaturationFilter::create();
   sharpenFilter = SharpenFilter::create();
   sharpenFilter->setTexelSize(imageWidth, imageHeight);
+  brightnessFilter = BrightnessFilter::create();
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
@@ -62,6 +64,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
       ->addTarget(exposureFilter)
       ->addTarget(saturationFilter)
       ->addTarget(sharpenFilter)
+      ->addTarget(brightnessFilter)
       ->addTarget(lipstickFilter)
       ->addTarget(blusherFilter)
       ->addTarget(faceReshapeFilter)
@@ -158,7 +161,15 @@ void gpupixel::OpenPSHelper::setSaturationLevel(float level) {
 void gpupixel::OpenPSHelper::setSharpenLevel(float level) {
   if (sharpenFilter) {
     sharpnessLevel = level * 2;
-    sharpenFilter->setSharpness(level);
+    sharpenFilter->setSharpness(sharpnessLevel);
+  }
+}
+
+void gpupixel::OpenPSHelper::setBrightnessLevel(float level) {
+  if (brightnessFilter) {
+    // 滤镜支持-1～1，为避免极端效果限制在-0.5～0.5
+    brightnessLevel = level * 0.5;
+    brightnessFilter->setBrightness(brightnessLevel);
   }
 }
 
@@ -189,6 +200,9 @@ void gpupixel::OpenPSHelper::onCompareBegin() {
   if (sharpenFilter) {
     sharpenFilter->setSharpness(0);
   }
+  if (brightnessFilter) {
+    brightnessFilter->setBrightness(0);
+  }
 }
 
 void gpupixel::OpenPSHelper::onCompareEnd() {
@@ -217,6 +231,9 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   }
   if (sharpenFilter) {
     sharpenFilter->setSharpness(sharpnessLevel);
+  }
+  if (brightnessFilter) {
+    brightnessFilter->setBrightness(brightnessLevel);
   }
 }
 

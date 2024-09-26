@@ -40,8 +40,15 @@ fun BidirectionalSlider(
             )
 
             // Draw highlight
-            val highlightStart = if (sliderPosition < 0f) centerX + (sliderPosition * centerX) else centerX
-            val highlightEnd = if (sliderPosition > 0f) centerX + (sliderPosition * centerX) else centerX
+            val highlightStart: Float
+            val highlightEnd: Float
+            if (valueRange.start < 0f) {
+                highlightStart = if (sliderPosition < 0f) centerX + (sliderPosition * centerX) else centerX
+                highlightEnd = if (sliderPosition > 0f) centerX + (sliderPosition * centerX) else centerX
+            } else {
+                highlightStart = 0f
+                highlightEnd = sliderPosition * canvasWidth
+            }
             drawLine(
                 color = highlightColor,
                 start = Offset(highlightStart, canvasHeight / 2),

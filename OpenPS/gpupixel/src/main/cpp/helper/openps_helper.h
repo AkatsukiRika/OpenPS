@@ -54,6 +54,8 @@ public:
 
   void setSharpenLevel(float level);
 
+  void setBrightnessLevel(float level);
+
   void onCompareBegin();
 
   void onCompareEnd();
@@ -78,6 +80,7 @@ private:
   std::shared_ptr<ExposureFilter> exposureFilter;
   std::shared_ptr<SaturationFilter> saturationFilter;
   std::shared_ptr<SharpenFilter> sharpenFilter;
+  std::shared_ptr<BrightnessFilter> brightnessFilter;
   std::shared_ptr<TargetView> targetView;
   std::shared_ptr<TargetRawDataOutput> targetRawDataOutput;
 
@@ -91,6 +94,7 @@ private:
   float exposureLevel = 0;
   float saturationLevel = 1.0;
   float sharpnessLevel = 0;
+  float brightnessLevel = 0;
 
   int imageWidth = 0;
   int imageHeight = 0;

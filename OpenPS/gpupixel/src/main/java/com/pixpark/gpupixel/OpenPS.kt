@@ -50,6 +50,8 @@ internal object OpenPS {
 
     external fun nativeSetSharpenLevel(level: Float)
 
+    external fun nativeSetBrightnessLevel(level: Float)
+
     external fun nativeCompareBegin()
 
     external fun nativeCompareEnd()

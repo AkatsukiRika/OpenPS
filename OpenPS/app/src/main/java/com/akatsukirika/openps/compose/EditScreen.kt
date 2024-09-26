@@ -52,6 +52,7 @@ const val INDEX_CONTRAST = 0
 const val INDEX_EXPOSURE = 1
 const val INDEX_SATURATION = 2
 const val INDEX_SHARPEN = 3
+const val INDEX_BRIGHTNESS = 4
 // 处理状态
 const val STATUS_IDLE = 10
 const val STATUS_LOADING = 11
@@ -183,16 +184,15 @@ private fun SliderLayout(viewModel: EditViewModel, currentLevel: Float) {
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        Slider(
+        BidirectionalSlider(
             value = currentLevel,
             onValueChange = {
                 viewModel.onValueChange(it)
             },
             modifier = Modifier.weight(1f),
-            colors = SliderDefaults.colors(
-                thumbColor = AppColors.Green500,
-                activeTrackColor = AppColors.Green500
-            )
+            trackColor = AppColors.Green500.copy(alpha = SliderDefaults.InactiveTrackAlpha),
+            highlightColor = AppColors.Green500,
+            valueRange = 0f..1f
         )
     }
 }
