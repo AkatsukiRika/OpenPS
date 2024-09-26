@@ -14,6 +14,7 @@ gpupixel::OpenPSHelper::~OpenPSHelper() {
   contrastFilter.reset();
   exposureFilter.reset();
   saturationFilter.reset();
+  sharpenFilter.reset();
   targetView.reset();
   targetRawDataOutput.reset();
   GPUPixelContext::destroy();
@@ -23,6 +24,8 @@ void gpupixel::OpenPSHelper::initWithImage(int width, int height,
                                            int channelCount,
                                            const unsigned char *pixels) {
   gpuSourceImage = SourceImage::create_from_memory(width, height, channelCount, pixels);
+  imageWidth = width;
+  imageHeight = height;
 }
 
 void gpupixel::OpenPSHelper::onTargetViewSizeChanged(int width, int height) {
@@ -46,6 +49,8 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   contrastFilter = ContrastFilter::create();
   exposureFilter = ExposureFilter::create();
   saturationFilter = SaturationFilter::create();
+  sharpenFilter = SharpenFilter::create();
+  sharpenFilter->setTexelSize(imageWidth, imageHeight);
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
@@ -56,6 +61,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
       ->addTarget(contrastFilter)
       ->addTarget(exposureFilter)
       ->addTarget(saturationFilter)
+      ->addTarget(sharpenFilter)
       ->addTarget(lipstickFilter)
       ->addTarget(blusherFilter)
       ->addTarget(faceReshapeFilter)
@@ -149,6 +155,13 @@ void gpupixel::OpenPSHelper::setSaturationLevel(float level) {
   }
 }
 
+void gpupixel::OpenPSHelper::setSharpenLevel(float level) {
+  if (sharpenFilter) {
+    sharpnessLevel = level * 2;
+    sharpenFilter->setSharpness(level);
+  }
+}
+
 void gpupixel::OpenPSHelper::onCompareBegin() {
   if (beautyFaceFilter) {
     beautyFaceFilter->setBlurAlpha(0);
@@ -172,6 +185,9 @@ void gpupixel::OpenPSHelper::onCompareBegin() {
   }
   if (saturationFilter) {
     saturationFilter->setSaturation(1);
+  }
+  if (sharpenFilter) {
+    sharpenFilter->setSharpness(0);
   }
 }
 
@@ -198,6 +214,9 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   }
   if (saturationFilter) {
     saturationFilter->setSaturation(saturationLevel);
+  }
+  if (sharpenFilter) {
+    sharpenFilter->setSharpness(sharpnessLevel);
   }
 }
 

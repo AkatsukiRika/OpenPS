@@ -51,6 +51,7 @@ const val INDEX_FACE_SLIM = 5
 const val INDEX_CONTRAST = 0
 const val INDEX_EXPOSURE = 1
 const val INDEX_SATURATION = 2
+const val INDEX_SHARPEN = 3
 // 处理状态
 const val STATUS_IDLE = 10
 const val STATUS_LOADING = 11

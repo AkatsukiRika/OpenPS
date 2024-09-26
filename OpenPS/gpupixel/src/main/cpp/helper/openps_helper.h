@@ -52,6 +52,8 @@ public:
 
   void setSaturationLevel(float level);
 
+  void setSharpenLevel(float level);
+
   void onCompareBegin();
 
   void onCompareEnd();
@@ -75,6 +77,7 @@ private:
   std::shared_ptr<ContrastFilter> contrastFilter;
   std::shared_ptr<ExposureFilter> exposureFilter;
   std::shared_ptr<SaturationFilter> saturationFilter;
+  std::shared_ptr<SharpenFilter> sharpenFilter;
   std::shared_ptr<TargetView> targetView;
   std::shared_ptr<TargetRawDataOutput> targetRawDataOutput;
 
@@ -87,6 +90,10 @@ private:
   float contrastLevel = 1.0;
   float exposureLevel = 0;
   float saturationLevel = 1.0;
+  float sharpnessLevel = 0;
+
+  int imageWidth = 0;
+  int imageHeight = 0;
 
   float scaleFactor = 1;
   float distanceX = 0;

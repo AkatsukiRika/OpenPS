@@ -15,6 +15,7 @@ import com.akatsukirika.openps.compose.INDEX_EYE_ZOOM
 import com.akatsukirika.openps.compose.INDEX_FACE_SLIM
 import com.akatsukirika.openps.compose.INDEX_LIPSTICK
 import com.akatsukirika.openps.compose.INDEX_SATURATION
+import com.akatsukirika.openps.compose.INDEX_SHARPEN
 import com.akatsukirika.openps.compose.INDEX_SMOOTH
 import com.akatsukirika.openps.compose.INDEX_WHITE
 import com.akatsukirika.openps.compose.STATUS_ERROR
@@ -111,7 +112,8 @@ class EditViewModel : ViewModel() {
                         _itemList.value = listOf(
                             FunctionItem(index = INDEX_CONTRAST, icon = R.drawable.ic_contrast, name = context.getString(R.string.contrast), hasTwoWaySlider = true),
                             FunctionItem(index = INDEX_EXPOSURE, icon = R.drawable.ic_exposure, name = context.getString(R.string.exposure), hasTwoWaySlider = true),
-                            FunctionItem(index = INDEX_SATURATION, icon = R.drawable.ic_saturation, name = context.getString(R.string.saturation), hasTwoWaySlider = true)
+                            FunctionItem(index = INDEX_SATURATION, icon = R.drawable.ic_saturation, name = context.getString(R.string.saturation), hasTwoWaySlider = true),
+                            FunctionItem(index = INDEX_SHARPEN, icon = R.drawable.ic_sharpen, name = context.getString(R.string.sharpen))
                         )
                     }
                 }
@@ -192,6 +194,7 @@ class EditViewModel : ViewModel() {
                     INDEX_CONTRAST -> helper?.setContrastLevel(currentLevel.value)
                     INDEX_EXPOSURE -> helper?.setExposureLevel(currentLevel.value)
                     INDEX_SATURATION -> helper?.setSaturationLevel(currentLevel.value)
+                    INDEX_SHARPEN -> helper?.setSharpenLevel(currentLevel.value)
                 }
             }
         }

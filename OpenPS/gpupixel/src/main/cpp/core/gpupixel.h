@@ -87,3 +87,4 @@
 #include "toon_filter.h"
 #include "weak_pixel_inclusion_filter.h"
 #include "white_balance_filter.h"
+#include "sharpen_filter.h"
