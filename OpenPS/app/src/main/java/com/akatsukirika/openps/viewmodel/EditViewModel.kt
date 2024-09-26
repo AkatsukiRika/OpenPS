@@ -288,7 +288,13 @@ class EditViewModel : ViewModel() {
             } else {
                 // 人脸识别失败
                 _loadStatus.emit(STATUS_ERROR)
+                _selectedTabIndex.emit(TAB_ADJUST)
                 ToastUtils.showToast(context, context.getString(R.string.msg_face_detect_fail))
+                withContext(Dispatchers.Main) {
+                    // 搭建一套不支持美颜的渲染管线
+                    helper?.buildNoFaceRenderPipeline()
+                    helper?.requestRender()
+                }
             }
         }
     }

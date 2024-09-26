@@ -39,6 +39,12 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun buildNoFaceRenderPipeline() {
+        renderView.postOnGLThread {
+            OpenPS.nativeBuildNoFaceRenderPipeline()
+        }
+    }
+
     fun requestRender() {
         renderView.requestRender()
     }

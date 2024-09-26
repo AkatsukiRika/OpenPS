@@ -24,6 +24,8 @@ internal object OpenPS {
 
     external fun nativeBuildRealRenderPipeline()
 
+    external fun nativeBuildNoFaceRenderPipeline()
+
     external fun nativeRequestRender()
 
     external fun nativeSetLandmarkCallback(receiver: Any)

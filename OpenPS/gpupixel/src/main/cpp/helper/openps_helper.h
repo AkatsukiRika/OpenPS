@@ -28,6 +28,8 @@ public:
 
   void buildRealRenderPipeline();
 
+  void buildNoFaceRenderPipeline();
+
   void requestRender();
 
   void setLandmarkCallback(FaceDetectorCallback callback);

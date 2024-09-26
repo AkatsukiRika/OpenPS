@@ -122,6 +122,7 @@ private fun MainColumn(viewModel: EditViewModel) {
                 BottomTabRow(
                     modifier = Modifier.height(28.dp),
                     selectedIndex = selectedTabIndex,
+                    loadStatus = loadStatus,
                     onSelect = {
                         viewModel.updateSelectedTab(it)
                     }
@@ -201,12 +202,13 @@ private fun SliderLayout(viewModel: EditViewModel, currentLevel: Float) {
 private fun BottomTabRow(
     modifier: Modifier = Modifier,
     selectedIndex: Int,
+    loadStatus: Int,
     onSelect: (Int) -> Unit
 ) {
     TabRow(modifier = modifier, selectedTabIndex = selectedIndex, backgroundColor = AppColors.DarkBG) {
         Tab(selected = selectedIndex == TAB_BEAUTIFY, onClick = {
             onSelect(TAB_BEAUTIFY)
-        }) {
+        }, enabled = loadStatus != STATUS_ERROR) {
             Text(
                 text = stringResource(id = R.string.beautify),
                 color = if (selectedIndex == TAB_BEAUTIFY) Color.White else Color.Gray,

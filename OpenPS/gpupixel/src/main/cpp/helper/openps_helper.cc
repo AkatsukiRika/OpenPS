@@ -73,6 +73,27 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   beautyFaceFilter->addTarget(targetRawDataOutput);
 }
 
+void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
+  if (gpuSourceImage) {
+    gpuSourceImage->removeAllTargets();
+    contrastFilter = ContrastFilter::create();
+    exposureFilter = ExposureFilter::create();
+    saturationFilter = SaturationFilter::create();
+    sharpenFilter = SharpenFilter::create();
+    sharpenFilter->setTexelSize(imageWidth, imageHeight);
+    brightnessFilter = BrightnessFilter::create();
+    targetRawDataOutput = TargetRawDataOutput::create();
+    gpuSourceImage
+        ->addTarget(contrastFilter)
+        ->addTarget(exposureFilter)
+        ->addTarget(saturationFilter)
+        ->addTarget(sharpenFilter)
+        ->addTarget(brightnessFilter)
+        ->addTarget(targetView);
+    brightnessFilter->addTarget(targetRawDataOutput);
+  }
+}
+
 void gpupixel::OpenPSHelper::requestRender() {
   if (gpuSourceImage) {
     gpuSourceImage->Render();

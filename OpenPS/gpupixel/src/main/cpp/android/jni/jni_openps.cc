@@ -70,6 +70,13 @@ Java_com_pixpark_gpupixel_OpenPS_nativeBuildRealRenderPipeline(JNIEnv *env, jobj
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeBuildNoFaceRenderPipeline(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    openPSHelper->buildNoFaceRenderPipeline();
+  }
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeRequestRender(JNIEnv *env, jobject thiz) {
   if (openPSHelper) {
     openPSHelper->requestRender();
