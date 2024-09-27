@@ -16,11 +16,17 @@ NS_GPUPIXEL_BEGIN
 
 class GPUPIXEL_API UndoRedoHelper {
 public:
+  UndoRedoHelper();
+
   void addRecord(const OpenPSRecord& record);
+  bool canUndo();
+  bool canRedo();
 
 private:
   std::vector<OpenPSRecord> recordList;
   int currentIndex = 0;
+
+  void addEmptyRecord();
 };
 
 NS_GPUPIXEL_END

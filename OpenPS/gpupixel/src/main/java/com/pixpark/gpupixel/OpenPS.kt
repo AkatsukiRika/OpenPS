@@ -58,6 +58,10 @@ internal object OpenPS {
 
     external fun nativeCompareEnd()
 
+    external fun nativeCanUndo(): Boolean
+
+    external fun nativeCanRedo(): Boolean
+
     external fun nativeSetScaleFactor(scale: Float)
 
     external fun nativeSetTranslateDistance(x: Float, y: Float)

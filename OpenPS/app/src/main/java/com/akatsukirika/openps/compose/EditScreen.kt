@@ -18,7 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
-import androidx.compose.material.Slider
+import androidx.compose.material.IconButton
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -65,13 +65,50 @@ const val TAB_ADJUST = 1
 @Composable
 fun EditScreen(viewModel: EditViewModel) {
     Column(modifier = Modifier.fillMaxWidth()) {
+        OperationRow(
+            viewModel = viewModel,
+            modifier = Modifier.align(Alignment.End)
+        )
+
+        MainColumn(viewModel)
+    }
+}
+
+@Composable
+private fun OperationRow(modifier: Modifier = Modifier, viewModel: EditViewModel) {
+    val canUndo = viewModel.canUndo.collectAsState(initial = false).value
+    val canRedo = viewModel.canRedo.collectAsState(initial = false).value
+
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.Bottom
+    ) {
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_undo),
+                contentDescription = null,
+                tint = if (canUndo) Color.White else Color.Gray,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_redo),
+                contentDescription = null,
+                tint = if (canRedo) Color.White else Color.Gray,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
         Icon(
             painter = painterResource(id = R.drawable.ic_compare),
             contentDescription = null,
             tint = Color.White,
             modifier = Modifier
-                .align(Alignment.End)
-                .padding(end = 16.dp, bottom = 16.dp)
+                .padding(bottom = 16.dp, end = 16.dp)
                 .size(24.dp)
                 .pointerInput(Unit) {
                     detectTapGestures(onPress = {
@@ -81,8 +118,6 @@ fun EditScreen(viewModel: EditViewModel) {
                     })
                 }
         )
-
-        MainColumn(viewModel)
     }
 }
 

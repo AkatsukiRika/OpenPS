@@ -73,6 +73,12 @@ class EditViewModel : ViewModel() {
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: StateFlow<Int> = _selectedTabIndex
 
+    private val _canUndo = MutableStateFlow(false)
+    val canUndo: StateFlow<Boolean> = _canUndo
+
+    private val _canRedo = MutableStateFlow(false)
+    val canRedo: StateFlow<Boolean> = _canRedo
+
     private val lastSelectedTabIndex = MutableStateFlow(0)
 
     private val _itemList = MutableStateFlow(listOf<FunctionItem>())

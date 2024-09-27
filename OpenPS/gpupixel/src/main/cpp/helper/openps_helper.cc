@@ -292,6 +292,14 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   }
 }
 
+bool gpupixel::OpenPSHelper::canUndo() {
+  return undoRedoHelper.canUndo();
+}
+
+bool gpupixel::OpenPSHelper::canRedo() {
+  return undoRedoHelper.canRedo();
+}
+
 void gpupixel::OpenPSHelper::setScaleFactor(float scale) {
   scaleFactor *= scale;
   if (scaleFactor < 0.1) {

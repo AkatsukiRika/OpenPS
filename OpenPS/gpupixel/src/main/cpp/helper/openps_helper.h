@@ -64,6 +64,10 @@ public:
 
   void onCompareEnd();
 
+  bool canUndo();
+
+  bool canRedo();
+
   void setScaleFactor(float scale);
 
   void setTranslateDistance(float x, float y);

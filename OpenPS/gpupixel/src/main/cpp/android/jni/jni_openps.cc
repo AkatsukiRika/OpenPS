@@ -212,6 +212,22 @@ Java_com_pixpark_gpupixel_OpenPS_nativeCompareEnd(JNIEnv *env, jobject thiz) {
   }
 }
 
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeCanUndo(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    return openPSHelper->canUndo();
+  }
+  return false;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeCanRedo(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    return openPSHelper->canRedo();
+  }
+  return false;
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeSetScaleFactor(JNIEnv *env, jobject thiz, jfloat scale) {
   if (openPSHelper) {
