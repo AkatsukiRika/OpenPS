@@ -68,6 +68,10 @@ public:
 
   bool canRedo();
 
+  OpenPSRecord undo();
+
+  OpenPSRecord redo();
+
   void setScaleFactor(float scale);
 
   void setTranslateDistance(float x, float y);
@@ -119,6 +123,7 @@ private:
 
   UndoRedoHelper undoRedoHelper;
   void addUndoRedoRecord();
+  void setLevels(OpenPSRecord record);
 };
 
 NS_GPUPIXEL_END

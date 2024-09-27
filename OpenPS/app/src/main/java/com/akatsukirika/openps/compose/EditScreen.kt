@@ -83,7 +83,9 @@ private fun OperationRow(modifier: Modifier = Modifier, viewModel: EditViewModel
         modifier = modifier,
         verticalAlignment = Alignment.Bottom
     ) {
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = {
+            viewModel.undo()
+        }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_undo),
                 contentDescription = null,
@@ -92,7 +94,9 @@ private fun OperationRow(modifier: Modifier = Modifier, viewModel: EditViewModel
             )
         }
 
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = {
+            viewModel.redo()
+        }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_redo),
                 contentDescription = null,

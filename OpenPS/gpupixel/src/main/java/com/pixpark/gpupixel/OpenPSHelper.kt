@@ -140,6 +140,34 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    suspend fun canUndo() = suspendCoroutine {
+        renderView.postOnGLThread {
+            val result = OpenPS.nativeCanUndo()
+            requestRender()
+            it.resume(result)
+        }
+    }
+
+    suspend fun canRedo() = suspendCoroutine {
+        renderView.postOnGLThread {
+            val result = OpenPS.nativeCanRedo()
+            requestRender()
+            it.resume(result)
+        }
+    }
+
+    suspend fun undo() = suspendCoroutine {
+        renderView.postOnGLThread {
+            it.resume(OpenPS.nativeUndo())
+        }
+    }
+
+    suspend fun redo() = suspendCoroutine {
+        renderView.postOnGLThread {
+            it.resume(OpenPS.nativeRedo())
+        }
+    }
+
     fun destroy() {
         OpenPS.nativeDestroy()
     }

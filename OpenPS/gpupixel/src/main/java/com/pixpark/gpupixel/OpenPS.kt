@@ -1,6 +1,7 @@
 package com.pixpark.gpupixel
 
 import android.graphics.Bitmap
+import com.pixpark.gpupixel.model.OpenPSRecord
 
 internal object OpenPS {
     init {
@@ -61,6 +62,10 @@ internal object OpenPS {
     external fun nativeCanUndo(): Boolean
 
     external fun nativeCanRedo(): Boolean
+
+    external fun nativeUndo(): OpenPSRecord?
+
+    external fun nativeRedo(): OpenPSRecord?
 
     external fun nativeSetScaleFactor(scale: Float)
 

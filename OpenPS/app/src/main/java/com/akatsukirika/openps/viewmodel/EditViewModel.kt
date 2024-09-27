@@ -34,6 +34,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
 import com.pixpark.gpupixel.OpenPSHelper
+import com.pixpark.gpupixel.model.OpenPSRecord
 import com.pixpark.gpupixel.model.RenderViewInfo
 import com.pixpark.gpupixel.view.OpenPSRenderView
 import kotlinx.coroutines.Dispatchers
@@ -184,6 +185,9 @@ class EditViewModel : ViewModel() {
 
     fun onValueChangeFinished() {
         updateHelperValue(addRecord = true)
+        viewModelScope.launch {
+            refreshUndoRedo()
+        }
     }
 
     private fun updateHelperValue(addRecord: Boolean = false) {
@@ -223,6 +227,49 @@ class EditViewModel : ViewModel() {
 
     fun updateLoadStatus(status: Int) {
         _loadStatus.value = status
+    }
+
+    fun undo() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val record = helper?.undo()
+            record?.let {
+                updateMap(it)
+            }
+            refreshUndoRedo()
+        }
+    }
+
+    fun redo() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val record = helper?.redo()
+            record?.let {
+                updateMap(it)
+            }
+            refreshUndoRedo()
+        }
+    }
+
+    private fun updateMap(record: OpenPSRecord) {
+        beautifyLevelMap.update {
+            mapOf(
+                INDEX_SMOOTH to record.smoothLevel,
+                INDEX_WHITE to record.whiteLevel,
+                INDEX_LIPSTICK to record.lipstickLevel,
+                INDEX_BLUSHER to record.blusherLevel,
+                INDEX_EYE_ZOOM to record.eyeZoomLevel,
+                INDEX_FACE_SLIM to record.faceSlimLevel
+            )
+        }
+        adjustLevelMap.update {
+            mapOf(
+                INDEX_CONTRAST to record.contrastLevel,
+                INDEX_EXPOSURE to record.exposureLevel,
+                INDEX_SATURATION to record.saturationLevel,
+                INDEX_SHARPEN to record.sharpenLevel,
+                INDEX_BRIGHTNESS to record.brightnessLevel
+            )
+        }
+        _selectedFunctionIndex.value = -1
     }
 
     private fun startImageFilter(context: Context, bitmap: Bitmap) {
@@ -318,5 +365,10 @@ class EditViewModel : ViewModel() {
         SettingsStore.PHOTO_SIZE_LIMIT_2K -> 2048
         SettingsStore.PHOTO_SIZE_LIMIT_1K -> 1024
         else -> Int.MAX_VALUE
+    }
+
+    private suspend fun refreshUndoRedo() {
+        _canUndo.emit(helper?.canUndo() ?: false)
+        _canRedo.emit(helper?.canRedo() ?: false)
     }
 }

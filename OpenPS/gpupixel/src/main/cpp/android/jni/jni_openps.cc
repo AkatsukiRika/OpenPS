@@ -228,6 +228,36 @@ Java_com_pixpark_gpupixel_OpenPS_nativeCanRedo(JNIEnv *env, jobject thiz) {
   return false;
 }
 
+extern "C" JNIEXPORT jobject JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeUndo(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    OpenPSRecord record = openPSHelper->undo();
+    jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFF)V");
+    jobject kotlinObject = env->NewObject(kotlinClass, constructor, record.smoothLevel, record.whiteLevel,
+                                          record.lipstickLevel, record.blusherLevel, record.eyeZoomLevel,
+                                          record.faceSlimLevel, record.contrastLevel, record.exposureLevel,
+                                          record.saturationLevel, record.sharpnessLevel, record.brightnessLevel);
+    return kotlinObject;
+  }
+  return nullptr;
+}
+
+extern "C" JNIEXPORT jobject JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeRedo(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    OpenPSRecord record = openPSHelper->redo();
+    jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFF)V");
+    jobject kotlinObject = env->NewObject(kotlinClass, constructor, record.smoothLevel, record.whiteLevel,
+                                          record.lipstickLevel, record.blusherLevel, record.eyeZoomLevel,
+                                          record.faceSlimLevel, record.contrastLevel, record.exposureLevel,
+                                          record.saturationLevel, record.sharpnessLevel, record.brightnessLevel);
+    return kotlinObject;
+  }
+  return nullptr;
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeSetScaleFactor(JNIEnv *env, jobject thiz, jfloat scale) {
   if (openPSHelper) {

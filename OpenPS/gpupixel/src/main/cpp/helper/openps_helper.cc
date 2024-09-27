@@ -300,6 +300,24 @@ bool gpupixel::OpenPSHelper::canRedo() {
   return undoRedoHelper.canRedo();
 }
 
+gpupixel::OpenPSRecord gpupixel::OpenPSHelper::undo() {
+  bool check = canUndo();
+  auto result = undoRedoHelper.undo();
+  if (check) {
+    setLevels(result);
+  }
+  return result;
+}
+
+gpupixel::OpenPSRecord gpupixel::OpenPSHelper::redo() {
+  bool check = canRedo();
+  auto result = undoRedoHelper.redo();
+  if (check) {
+    setLevels(result);
+  }
+  return result;
+}
+
 void gpupixel::OpenPSHelper::setScaleFactor(float scale) {
   scaleFactor *= scale;
   if (scaleFactor < 0.1) {
@@ -386,8 +404,40 @@ float gpupixel::OpenPSHelper::getDistanceY() {
 }
 
 void gpupixel::OpenPSHelper::addUndoRedoRecord() {
-  auto record = OpenPSRecord(smoothLevel, whiteLevel, lipstickLevel, blusherLevel, eyeZoomLevel,
-                             faceSlimLevel, contrastLevel, exposureLevel, saturationLevel,
-                             sharpnessLevel, brightnessLevel);
+  float smoothRecordLevel = smoothLevel;
+  float whiteRecordLevel = whiteLevel * 2;
+  float lipstickRecordLevel = lipstickLevel;
+  float blusherRecordLevel = blusherLevel;
+  float eyeZoomRecordLevel = eyeZoomLevel * 5;
+  float faceSlimRecordLevel = faceSlimLevel * 10;
+  float contrastRecordLevel;
+  if (contrastLevel < 1) {
+    contrastRecordLevel = (contrastLevel - 1) * 2;
+  } else {
+    contrastRecordLevel = contrastLevel - 1;
+  }
+  float exposureRecordLevel = exposureLevel / 1.5;
+  float saturationRecordLevel = saturationLevel - 1;
+  float sharpnessRecordLevel = sharpnessLevel / 2;
+  float brightnessRecordLevel = brightnessLevel / 0.5;
+  auto record = OpenPSRecord(
+      smoothRecordLevel, whiteRecordLevel, lipstickRecordLevel,
+      blusherRecordLevel, eyeZoomRecordLevel, faceSlimRecordLevel,
+      contrastRecordLevel, exposureRecordLevel, saturationRecordLevel,
+      sharpnessRecordLevel, brightnessRecordLevel);
   undoRedoHelper.addRecord(record);
+}
+
+void gpupixel::OpenPSHelper::setLevels(gpupixel::OpenPSRecord record) {
+  setSmoothLevel(record.smoothLevel, false);
+  setWhiteLevel(record.whiteLevel, false);
+  setLipstickLevel(record.lipstickLevel, false);
+  setBlusherLevel(record.blusherLevel, false);
+  setEyeZoomLevel(record.eyeZoomLevel, false);
+  setFaceSlimLevel(record.faceSlimLevel, false);
+  setContrastLevel(record.contrastLevel, false);
+  setExposureLevel(record.exposureLevel, false);
+  setSaturationLevel(record.saturationLevel, false);
+  setSharpenLevel(record.sharpnessLevel, false);
+  setBrightnessLevel(record.brightnessLevel, false);
 }

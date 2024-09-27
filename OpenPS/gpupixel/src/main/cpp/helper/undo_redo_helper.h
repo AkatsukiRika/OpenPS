@@ -21,12 +21,15 @@ public:
   void addRecord(const OpenPSRecord& record);
   bool canUndo();
   bool canRedo();
+  OpenPSRecord undo();
+  OpenPSRecord redo();
 
 private:
   std::vector<OpenPSRecord> recordList;
   int currentIndex = 0;
 
   void addEmptyRecord();
+  OpenPSRecord getEmptyRecord();
 };
 
 NS_GPUPIXEL_END

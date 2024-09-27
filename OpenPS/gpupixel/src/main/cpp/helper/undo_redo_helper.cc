@@ -3,12 +3,12 @@
 void gpupixel::UndoRedoHelper::addRecord(const gpupixel::OpenPSRecord &record) {
   int lastIndex = recordList.size() - 1;
   if (currentIndex < lastIndex) {
-    for (int i = lastIndex + 1; i < lastIndex; i++) {
+    for (int i = currentIndex + 1; i <= lastIndex; i++) {
       recordList.pop_back();
     }
   }
   recordList.emplace_back(record);
-  currentIndex++;
+  currentIndex = recordList.size() - 1;
   Util::Log("UndoRedoHelper", "addRecord {%s}", record.toString().c_str());
   Util::Log("UndoRedoHelper", "currentIndex: %d", currentIndex);
 }
@@ -30,11 +30,30 @@ bool gpupixel::UndoRedoHelper::canRedo() {
   return currentIndex < lastIndex;
 }
 
+gpupixel::OpenPSRecord gpupixel::UndoRedoHelper::undo() {
+  if (canUndo()) {
+    currentIndex--;
+    return recordList[currentIndex];
+  }
+  return getEmptyRecord();
+}
+
+gpupixel::OpenPSRecord gpupixel::UndoRedoHelper::redo() {
+  if (canRedo()) {
+    currentIndex++;
+    return recordList[currentIndex];
+  }
+  return getEmptyRecord();
+}
+
 void gpupixel::UndoRedoHelper::addEmptyRecord() {
-  auto emptyRecord = OpenPSRecord(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  addRecord(emptyRecord);
+  addRecord(getEmptyRecord());
 }
 
 gpupixel::UndoRedoHelper::UndoRedoHelper() {
   addEmptyRecord();
+}
+
+gpupixel::OpenPSRecord gpupixel::UndoRedoHelper::getEmptyRecord() {
+  return gpupixel::OpenPSRecord(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
