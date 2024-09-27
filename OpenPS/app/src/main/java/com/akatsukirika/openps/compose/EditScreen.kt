@@ -163,6 +163,9 @@ private fun BidirectionalSliderLayout(viewModel: EditViewModel, currentLevel: Fl
             onValueChange = {
                 viewModel.onValueChange(it)
             },
+            onValueChangeFinished = {
+                viewModel.onValueChangeFinished()
+            },
             modifier = Modifier.weight(1f),
             trackColor = AppColors.Green500.copy(alpha = SliderDefaults.InactiveTrackAlpha),
             highlightColor = AppColors.Green500
@@ -189,6 +192,9 @@ private fun SliderLayout(viewModel: EditViewModel, currentLevel: Float) {
             value = currentLevel,
             onValueChange = {
                 viewModel.onValueChange(it)
+            },
+            onValueChangeFinished = {
+                viewModel.onValueChangeFinished()
             },
             modifier = Modifier.weight(1f),
             trackColor = AppColors.Green500.copy(alpha = SliderDefaults.InactiveTrackAlpha),

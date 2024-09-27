@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 fun BidirectionalSlider(
     value: Float,
     onValueChange: (Float) -> Unit,
+    onValueChangeFinished: () -> Unit,
     modifier: Modifier = Modifier,
     valueRange: ClosedFloatingPointRange<Float> = -1f..1f,
     trackColor: Color = Color.LightGray,
@@ -63,6 +64,7 @@ fun BidirectionalSlider(
                 sliderPosition = it
                 onValueChange(it)
             },
+            onValueChangeFinished = onValueChangeFinished,
             valueRange = valueRange,
             colors = SliderDefaults.colors(
                 thumbColor = highlightColor,

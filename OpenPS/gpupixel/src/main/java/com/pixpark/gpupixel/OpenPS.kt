@@ -32,27 +32,27 @@ internal object OpenPS {
 
     external fun nativeSetRawOutputCallback(receiver: Any)
 
-    external fun nativeSetSmoothLevel(level: Float)
+    external fun nativeSetSmoothLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetWhiteLevel(level: Float)
+    external fun nativeSetWhiteLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetLipstickLevel(level: Float)
+    external fun nativeSetLipstickLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetBlusherLevel(level: Float)
+    external fun nativeSetBlusherLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetEyeZoomLevel(level: Float)
+    external fun nativeSetEyeZoomLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetFaceSlimLevel(level: Float)
+    external fun nativeSetFaceSlimLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetContrastLevel(level: Float)
+    external fun nativeSetContrastLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetExposureLevel(level: Float)
+    external fun nativeSetExposureLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetSaturationLevel(level: Float)
+    external fun nativeSetSaturationLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetSharpenLevel(level: Float)
+    external fun nativeSetSharpenLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeSetBrightnessLevel(level: Float)
+    external fun nativeSetBrightnessLevel(level: Float, addRecord: Boolean = false)
 
     external fun nativeCompareBegin()
 

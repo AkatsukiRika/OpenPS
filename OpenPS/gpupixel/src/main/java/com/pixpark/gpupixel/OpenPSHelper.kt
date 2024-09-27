@@ -49,79 +49,79 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         renderView.requestRender()
     }
 
-    fun setSmoothLevel(level: Float) {
+    fun setSmoothLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetSmoothLevel(level)
+            OpenPS.nativeSetSmoothLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setWhiteLevel(level: Float) {
+    fun setWhiteLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetWhiteLevel(level)
+            OpenPS.nativeSetWhiteLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setLipstickLevel(level: Float) {
+    fun setLipstickLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetLipstickLevel(level)
+            OpenPS.nativeSetLipstickLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setBlusherLevel(level: Float) {
+    fun setBlusherLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetBlusherLevel(level)
+            OpenPS.nativeSetBlusherLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setEyeZoomLevel(level: Float) {
+    fun setEyeZoomLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetEyeZoomLevel(level)
+            OpenPS.nativeSetEyeZoomLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setFaceSlimLevel(level: Float) {
+    fun setFaceSlimLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetFaceSlimLevel(level)
+            OpenPS.nativeSetFaceSlimLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setContrastLevel(level: Float) {
+    fun setContrastLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetContrastLevel(level)
+            OpenPS.nativeSetContrastLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setExposureLevel(level: Float) {
+    fun setExposureLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetExposureLevel(level)
+            OpenPS.nativeSetExposureLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setSaturationLevel(level: Float) {
+    fun setSaturationLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetSaturationLevel(level)
+            OpenPS.nativeSetSaturationLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setSharpenLevel(level: Float) {
+    fun setSharpenLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetSharpenLevel(level)
+            OpenPS.nativeSetSharpenLevel(level, addRecord)
             requestRender()
         }
     }
 
-    fun setBrightnessLevel(level: Float) {
+    fun setBrightnessLevel(level: Float, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeSetBrightnessLevel(level)
+            OpenPS.nativeSetBrightnessLevel(level, addRecord)
             requestRender()
         }
     }

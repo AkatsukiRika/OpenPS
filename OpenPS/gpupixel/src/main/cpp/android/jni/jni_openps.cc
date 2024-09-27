@@ -122,79 +122,79 @@ Java_com_pixpark_gpupixel_OpenPS_nativeSetRawOutputCallback(JNIEnv *env, jobject
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetSmoothLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetSmoothLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setSmoothLevel(level);
+    openPSHelper->setSmoothLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetWhiteLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetWhiteLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setWhiteLevel(level);
+    openPSHelper->setWhiteLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetLipstickLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetLipstickLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setLipstickLevel(level);
+    openPSHelper->setLipstickLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetBlusherLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetBlusherLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setBlusherLevel(level);
+    openPSHelper->setBlusherLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetEyeZoomLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetEyeZoomLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setEyeZoomLevel(level);
+    openPSHelper->setEyeZoomLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetFaceSlimLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetFaceSlimLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setFaceSlimLevel(level);
+    openPSHelper->setFaceSlimLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetContrastLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetContrastLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setContrastLevel(level);
+    openPSHelper->setContrastLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetExposureLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetExposureLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setExposureLevel(level);
+    openPSHelper->setExposureLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetSaturationLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetSaturationLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setSaturationLevel(level);
+    openPSHelper->setSaturationLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetSharpenLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetSharpenLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setSharpenLevel(level);
+    openPSHelper->setSharpenLevel(level, addRecord);
   }
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetBrightnessLevel(JNIEnv *env, jobject thiz, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeSetBrightnessLevel(JNIEnv *env, jobject thiz, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->setBrightnessLevel(level);
+    openPSHelper->setBrightnessLevel(level, addRecord);
   }
 }
 

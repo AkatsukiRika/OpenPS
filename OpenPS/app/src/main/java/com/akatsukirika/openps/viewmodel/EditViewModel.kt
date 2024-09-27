@@ -173,31 +173,39 @@ class EditViewModel : ViewModel() {
 
     fun onValueChange(value: Float) {
         _currentLevel.value = value
+        updateHelperValue()
+    }
+
+    fun onValueChangeFinished() {
+        updateHelperValue(addRecord = true)
+    }
+
+    private fun updateHelperValue(addRecord: Boolean = false) {
         when (selectedTabIndex.value) {
             TAB_BEAUTIFY -> {
                 beautifyLevelMap.update {
-                    it + (selectedFunctionIndex.value to value)
+                    it + (selectedFunctionIndex.value to currentLevel.value)
                 }
                 when (selectedFunctionIndex.value) {
-                    INDEX_SMOOTH -> helper?.setSmoothLevel(currentLevel.value)
-                    INDEX_WHITE -> helper?.setWhiteLevel(currentLevel.value)
-                    INDEX_LIPSTICK -> helper?.setLipstickLevel(currentLevel.value)
-                    INDEX_BLUSHER -> helper?.setBlusherLevel(currentLevel.value)
-                    INDEX_EYE_ZOOM -> helper?.setEyeZoomLevel(currentLevel.value)
-                    INDEX_FACE_SLIM -> helper?.setFaceSlimLevel(currentLevel.value)
+                    INDEX_SMOOTH -> helper?.setSmoothLevel(currentLevel.value, addRecord)
+                    INDEX_WHITE -> helper?.setWhiteLevel(currentLevel.value, addRecord)
+                    INDEX_LIPSTICK -> helper?.setLipstickLevel(currentLevel.value, addRecord)
+                    INDEX_BLUSHER -> helper?.setBlusherLevel(currentLevel.value, addRecord)
+                    INDEX_EYE_ZOOM -> helper?.setEyeZoomLevel(currentLevel.value, addRecord)
+                    INDEX_FACE_SLIM -> helper?.setFaceSlimLevel(currentLevel.value, addRecord)
                 }
             }
 
             TAB_ADJUST -> {
                 adjustLevelMap.update {
-                    it + (selectedFunctionIndex.value to value)
+                    it + (selectedFunctionIndex.value to currentLevel.value)
                 }
                 when (selectedFunctionIndex.value) {
-                    INDEX_CONTRAST -> helper?.setContrastLevel(currentLevel.value)
-                    INDEX_EXPOSURE -> helper?.setExposureLevel(currentLevel.value)
-                    INDEX_SATURATION -> helper?.setSaturationLevel(currentLevel.value)
-                    INDEX_SHARPEN -> helper?.setSharpenLevel(currentLevel.value)
-                    INDEX_BRIGHTNESS -> helper?.setBrightnessLevel(currentLevel.value)
+                    INDEX_CONTRAST -> helper?.setContrastLevel(currentLevel.value, addRecord)
+                    INDEX_EXPOSURE -> helper?.setExposureLevel(currentLevel.value, addRecord)
+                    INDEX_SATURATION -> helper?.setSaturationLevel(currentLevel.value, addRecord)
+                    INDEX_SHARPEN -> helper?.setSharpenLevel(currentLevel.value, addRecord)
+                    INDEX_BRIGHTNESS -> helper?.setBrightnessLevel(currentLevel.value, addRecord)
                 }
             }
         }

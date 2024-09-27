@@ -3,6 +3,7 @@
 
 gpupixel::OpenPSHelper::OpenPSHelper() {
   targetView = std::make_shared<TargetView>();
+  undoRedoHelper = UndoRedoHelper();
 }
 
 gpupixel::OpenPSHelper::~OpenPSHelper() {
@@ -110,49 +111,67 @@ void gpupixel::OpenPSHelper::setRawOutputCallback(gpupixel::RawOutputCallback ca
   }
 }
 
-void gpupixel::OpenPSHelper::setSmoothLevel(float level) {
+void gpupixel::OpenPSHelper::setSmoothLevel(float level, bool addRecord) {
   if (beautyFaceFilter) {
     smoothLevel = level;
     beautyFaceFilter->setBlurAlpha(level);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setWhiteLevel(float level) {
+void gpupixel::OpenPSHelper::setWhiteLevel(float level, bool addRecord) {
   if (beautyFaceFilter) {
     whiteLevel = level / 2;
     beautyFaceFilter->setWhite(whiteLevel);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setLipstickLevel(float level) {
+void gpupixel::OpenPSHelper::setLipstickLevel(float level, bool addRecord) {
   if (lipstickFilter) {
     lipstickLevel = level;
     lipstickFilter->setBlendLevel(level);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setBlusherLevel(float level) {
+void gpupixel::OpenPSHelper::setBlusherLevel(float level, bool addRecord) {
   if (blusherFilter) {
     blusherLevel = level;
     blusherFilter->setBlendLevel(level);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setEyeZoomLevel(float level) {
+void gpupixel::OpenPSHelper::setEyeZoomLevel(float level, bool addRecord) {
   if (faceReshapeFilter) {
     eyeZoomLevel = level / 5;
     faceReshapeFilter->setEyeZoomLevel(eyeZoomLevel);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setFaceSlimLevel(float level) {
+void gpupixel::OpenPSHelper::setFaceSlimLevel(float level, bool addRecord) {
   if (faceReshapeFilter) {
     faceSlimLevel = level / 10;
     faceReshapeFilter->setFaceSlimLevel(faceSlimLevel);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setContrastLevel(float level) {
+void gpupixel::OpenPSHelper::setContrastLevel(float level, bool addRecord) {
   if (contrastFilter) {
     // 滤镜本身支持0～4，为避免极端效果限制在0.5～2
     if (level < 0) {
@@ -161,36 +180,51 @@ void gpupixel::OpenPSHelper::setContrastLevel(float level) {
       contrastLevel = 1.0 + abs(level);
     }
     contrastFilter->setContrast(contrastLevel);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setExposureLevel(float level) {
+void gpupixel::OpenPSHelper::setExposureLevel(float level, bool addRecord) {
   if (exposureFilter) {
     // 滤镜本身支持-10～10，为避免极端效果限制在-1.5～1.5
     exposureLevel = level * 1.5;
     exposureFilter->setExposure(exposureLevel);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setSaturationLevel(float level) {
+void gpupixel::OpenPSHelper::setSaturationLevel(float level, bool addRecord) {
   if (saturationFilter) {
     saturationLevel = level + 1.0;
     saturationFilter->setSaturation(saturationLevel);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setSharpenLevel(float level) {
+void gpupixel::OpenPSHelper::setSharpenLevel(float level, bool addRecord) {
   if (sharpenFilter) {
     sharpnessLevel = level * 2;
     sharpenFilter->setSharpness(sharpnessLevel);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
-void gpupixel::OpenPSHelper::setBrightnessLevel(float level) {
+void gpupixel::OpenPSHelper::setBrightnessLevel(float level, bool addRecord) {
   if (brightnessFilter) {
     // 滤镜支持-1～1，为避免极端效果限制在-0.5～0.5
     brightnessLevel = level * 0.5;
     brightnessFilter->setBrightness(brightnessLevel);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
   }
 }
 
@@ -341,4 +375,11 @@ float gpupixel::OpenPSHelper::getDistanceX() {
 
 float gpupixel::OpenPSHelper::getDistanceY() {
   return distanceY;
+}
+
+void gpupixel::OpenPSHelper::addUndoRedoRecord() {
+  auto record = OpenPSRecord(smoothLevel, whiteLevel, lipstickLevel, blusherLevel, eyeZoomLevel,
+                             faceSlimLevel, contrastLevel, exposureLevel, saturationLevel,
+                             sharpnessLevel, brightnessLevel);
+  undoRedoHelper.addRecord(record);
 }

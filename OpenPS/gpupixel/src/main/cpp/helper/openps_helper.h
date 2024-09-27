@@ -9,6 +9,8 @@
 
 #include "gpupixel_macros.h"
 #include "gpupixel.h"
+#include "undo_redo_helper.h"
+#include "openps_record.h"
 
 NS_GPUPIXEL_BEGIN
 
@@ -36,27 +38,27 @@ public:
 
   void setRawOutputCallback(RawOutputCallback callback);
 
-  void setSmoothLevel(float level);
+  void setSmoothLevel(float level, bool addRecord = false);
 
-  void setWhiteLevel(float level);
+  void setWhiteLevel(float level, bool addRecord = false);
 
-  void setLipstickLevel(float level);
+  void setLipstickLevel(float level, bool addRecord = false);
 
-  void setBlusherLevel(float level);
+  void setBlusherLevel(float level, bool addRecord = false);
 
-  void setEyeZoomLevel(float level);
+  void setEyeZoomLevel(float level, bool addRecord = false);
 
-  void setFaceSlimLevel(float level);
+  void setFaceSlimLevel(float level, bool addRecord = false);
 
-  void setContrastLevel(float level);
+  void setContrastLevel(float level, bool addRecord = false);
 
-  void setExposureLevel(float level);
+  void setExposureLevel(float level, bool addRecord = false);
 
-  void setSaturationLevel(float level);
+  void setSaturationLevel(float level, bool addRecord = false);
 
-  void setSharpenLevel(float level);
+  void setSharpenLevel(float level, bool addRecord = false);
 
-  void setBrightnessLevel(float level);
+  void setBrightnessLevel(float level, bool addRecord = false);
 
   void onCompareBegin();
 
@@ -110,6 +112,9 @@ private:
 
   Matrix4 modelMatrix;
   void handleMVPMatrix();
+
+  UndoRedoHelper undoRedoHelper;
+  void addUndoRedoRecord();
 };
 
 NS_GPUPIXEL_END
