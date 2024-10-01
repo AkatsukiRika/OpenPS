@@ -19,4 +19,8 @@
         android:id="@+id/show_frame_rate"
         android:title="@string/show_frame_rate"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/show_matrix_info"
+        android:title="@string/show_matrix_info"
+        app:showAsAction="never" />
 </menu>

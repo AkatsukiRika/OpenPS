@@ -143,6 +143,7 @@ class EditActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_edit, menu)
         menu?.findItem(R.id.show_skin_mask)?.setVisible(SettingsStore.isDebugMode)
         menu?.findItem(R.id.show_frame_rate)?.setVisible(SettingsStore.isDebugMode)
+        menu?.findItem(R.id.show_matrix_info)?.setVisible(SettingsStore.isDebugMode)
         return true
     }
 
@@ -177,6 +178,11 @@ class EditActivity : AppCompatActivity() {
             R.id.show_frame_rate -> {
                 viewModel.showFrameRate.update { !it }
                 binding.tvFrameRate.visibility = if (viewModel.showFrameRate.value) View.VISIBLE else View.GONE
+                true
+            }
+            R.id.show_matrix_info -> {
+                viewModel.showMatrixInfo.update { !it }
+                binding.transformLayout.setDebug(viewModel.showMatrixInfo.value)
                 true
             }
             R.id.save_to_gallery -> {

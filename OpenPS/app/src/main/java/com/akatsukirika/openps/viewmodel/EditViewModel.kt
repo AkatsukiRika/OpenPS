@@ -87,6 +87,8 @@ class EditViewModel : ViewModel() {
 
     val showFrameRate = MutableStateFlow(false)
 
+    val showMatrixInfo = MutableStateFlow(false)
+
     val uiFrameRate = MutableStateFlow(0.0)
 
     val glFrameRate = MutableStateFlow(0.0)
