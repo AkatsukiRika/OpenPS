@@ -59,6 +59,8 @@ internal object OpenPS {
 
     external fun nativeCompareEnd()
 
+    external fun nativeUpdateMVPMatrix(matrix: FloatArray)
+
     external fun nativeCanUndo(): Boolean
 
     external fun nativeCanRedo(): Boolean

@@ -140,6 +140,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun updateMVPMatrix(matrix: FloatArray) {
+        renderView.postOnGLThread {
+            OpenPS.nativeUpdateMVPMatrix(matrix)
+            requestRender()
+        }
+    }
+
     suspend fun canUndo() = suspendCoroutine {
         renderView.postOnGLThread {
             val result = OpenPS.nativeCanUndo()

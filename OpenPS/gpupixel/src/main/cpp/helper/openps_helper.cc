@@ -292,6 +292,12 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   }
 }
 
+void gpupixel::OpenPSHelper::updateMVPMatrix(float *matrix) {
+  if (targetView) {
+    targetView->setMVPMatrix(Matrix4(matrix));
+  }
+}
+
 bool gpupixel::OpenPSHelper::canUndo() {
   return undoRedoHelper.canUndo();
 }

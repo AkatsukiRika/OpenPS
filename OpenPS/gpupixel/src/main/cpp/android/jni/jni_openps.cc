@@ -212,6 +212,15 @@ Java_com_pixpark_gpupixel_OpenPS_nativeCompareEnd(JNIEnv *env, jobject thiz) {
   }
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeUpdateMVPMatrix(JNIEnv *env, jobject thiz, jfloatArray matrix) {
+  if (openPSHelper) {
+    jfloat *matrixData = env->GetFloatArrayElements(matrix, nullptr);
+    openPSHelper->updateMVPMatrix(matrixData);
+    env->ReleaseFloatArrayElements(matrix, matrixData, 0);
+  }
+}
+
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeCanUndo(JNIEnv *env, jobject thiz) {
   if (openPSHelper) {

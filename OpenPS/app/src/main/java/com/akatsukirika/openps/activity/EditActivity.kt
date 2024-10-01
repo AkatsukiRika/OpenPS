@@ -63,6 +63,10 @@ class EditActivity : AppCompatActivity() {
                 binding.transformLayout.setTransform(matrix)
             }
 
+            override fun onGLMatrixChanged(glMatrix: FloatArray) {
+                viewModel.helper?.updateMVPMatrix(glMatrix)
+            }
+
             override fun onFrameRateChanged(fps: Double) {
                 viewModel.glFrameRate.value = fps
             }
@@ -79,6 +83,7 @@ class EditActivity : AppCompatActivity() {
                         faceRectF
                     )
                     binding.overlayView.visibility = View.VISIBLE
+                    binding.surfaceView.transformHelper.setViewportSize(info.viewWidth, info.viewHeight)
                 }
 
                 override fun setDebugImage(bitmap: Bitmap) {

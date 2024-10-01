@@ -64,6 +64,8 @@ public:
 
   void onCompareEnd();
 
+  void updateMVPMatrix(float* matrix);
+
   bool canUndo();
 
   bool canRedo();

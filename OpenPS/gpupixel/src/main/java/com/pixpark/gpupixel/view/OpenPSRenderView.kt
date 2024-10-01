@@ -8,10 +8,12 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
+import com.pixpark.gpupixel.OpenGLTransformHelper
 
 class OpenPSRenderView : GLSurfaceView {
     interface Callback {
         fun onMatrixChanged(matrix: Matrix)
+        fun onGLMatrixChanged(glMatrix: FloatArray)
         fun onFrameRateChanged(fps: Double)
     }
 
@@ -24,6 +26,9 @@ class OpenPSRenderView : GLSurfaceView {
     private val gestureDetector: GestureDetector
     private val matrix = Matrix()   // 上层记录手势变换的矩阵
     private var callback: Callback? = null
+    val transformHelper by lazy {
+        OpenGLTransformHelper()
+    }
 
     init {
         setEGLContextClientVersion(2)
@@ -73,19 +78,25 @@ class OpenPSRenderView : GLSurfaceView {
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
-            postScale(detector.scaleFactor, detector.focusX, detector.focusY)
+            transformHelper.postScale(detector.scaleFactor, detector.focusX, detector.focusY)
+            callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+//            postScale(detector.scaleFactor, detector.focusX, detector.focusY)
             return true
         }
     }
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-            postTranslate(-distanceX, -distanceY)
+//            postTranslate(-distanceX, -distanceY)
+            transformHelper.postTranslate(-distanceX, -distanceY)
+            callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
             return true
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-            resetMatrix()
+//            resetMatrix()
+            transformHelper.reset()
+            callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
             return true
         }
     }
