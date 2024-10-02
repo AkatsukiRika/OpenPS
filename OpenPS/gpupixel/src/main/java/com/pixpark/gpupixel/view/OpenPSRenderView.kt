@@ -78,23 +78,23 @@ class OpenPSRenderView : GLSurfaceView {
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
+            postScale(detector.scaleFactor, detector.focusX, detector.focusY)
             transformHelper.postScale(detector.scaleFactor, detector.focusX, detector.focusY)
             callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
-//            postScale(detector.scaleFactor, detector.focusX, detector.focusY)
             return true
         }
     }
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-//            postTranslate(-distanceX, -distanceY)
+            postTranslate(-distanceX, -distanceY)
             transformHelper.postTranslate(-distanceX, -distanceY)
             callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
             return true
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-//            resetMatrix()
+            resetMatrix()
             transformHelper.reset()
             callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
             return true

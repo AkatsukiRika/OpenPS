@@ -89,6 +89,10 @@ class EditActivity : AppCompatActivity() {
                 override fun setDebugImage(bitmap: Bitmap) {
                     binding.debugImageView.setImageBitmap(bitmap)
                 }
+
+                override fun onRenderViewInfoReady(info: RenderViewInfo) {
+                    binding.surfaceView.transformHelper.setViewportSize(info.viewWidth, info.viewHeight)
+                }
             }
         )
 

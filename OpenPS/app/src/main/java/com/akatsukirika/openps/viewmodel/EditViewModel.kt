@@ -49,6 +49,7 @@ class EditViewModel : ViewModel() {
     interface Callback {
         fun showOverlayView(info: RenderViewInfo, faceRectF: RectF)
         fun setDebugImage(bitmap: Bitmap)
+        fun onRenderViewInfoReady(info: RenderViewInfo)
     }
 
     var helper: OpenPSHelper? = null
@@ -353,6 +354,11 @@ class EditViewModel : ViewModel() {
                 _loadStatus.emit(STATUS_ERROR)
                 _selectedTabIndex.emit(TAB_ADJUST)
                 ToastUtils.showToast(context, context.getString(R.string.msg_face_detect_fail))
+                // 设置RenderViewInfo
+                val renderViewInfo = helper?.getRenderViewInfo()
+                renderViewInfo?.let { info ->
+                    callback?.onRenderViewInfoReady(info)
+                }
                 withContext(Dispatchers.Main) {
                     // 搭建一套不支持美颜的渲染管线
                     helper?.buildNoFaceRenderPipeline()
