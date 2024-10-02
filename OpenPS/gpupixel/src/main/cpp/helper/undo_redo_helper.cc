@@ -7,9 +7,17 @@ void gpupixel::UndoRedoHelper::addRecord(const gpupixel::OpenPSRecord &record) {
       recordList.pop_back();
     }
   }
-  recordList.emplace_back(record);
+  if (recordList.empty()) {
+    recordList.emplace_back(record);
+    Util::Log("UndoRedoHelper", "addRecord {%s}", record.toString().c_str());
+  } else {
+    auto currentLatestRecord = recordList.back();
+    if (!record.equals(currentLatestRecord)) {
+      recordList.emplace_back(record);
+      Util::Log("UndoRedoHelper", "addRecord {%s}", record.toString().c_str());
+    }
+  }
   currentIndex = recordList.size() - 1;
-  Util::Log("UndoRedoHelper", "addRecord {%s}", record.toString().c_str());
   Util::Log("UndoRedoHelper", "currentIndex: %d", currentIndex);
 }
 

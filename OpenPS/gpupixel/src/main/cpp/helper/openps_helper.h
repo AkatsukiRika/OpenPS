@@ -74,16 +74,6 @@ public:
 
   OpenPSRecord redo();
 
-  void setScaleFactor(float scale);
-
-  void setTranslateDistance(float x, float y);
-
-  void resetMVPMatrix();
-
-  float getDistanceX();
-
-  float getDistanceY();
-
 private:
   std::shared_ptr<SourceImage> gpuSourceImage;
   std::shared_ptr<LipstickFilter> lipstickFilter;
@@ -112,16 +102,6 @@ private:
 
   int imageWidth = 0;
   int imageHeight = 0;
-
-  float scaleFactor = 1;
-  float distanceX = 0;
-  float distanceY = 0;
-  float totalNormalizedDistanceX = 0;
-  float totalNormalizedDistanceY = 0;
-  bool needResetMatrix = false;
-
-  Matrix4 modelMatrix;
-  void handleMVPMatrix();
 
   UndoRedoHelper undoRedoHelper;
   void addUndoRedoRecord();

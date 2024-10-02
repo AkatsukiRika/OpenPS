@@ -68,14 +68,4 @@ internal object OpenPS {
     external fun nativeUndo(): OpenPSRecord?
 
     external fun nativeRedo(): OpenPSRecord?
-
-    external fun nativeSetScaleFactor(scale: Float)
-
-    external fun nativeSetTranslateDistance(x: Float, y: Float)
-
-    external fun nativeResetMVPMatrix()
-
-    external fun nativeGetTranslateDistanceX(): Float
-
-    external fun nativeGetTranslateDistanceY(): Float
 }

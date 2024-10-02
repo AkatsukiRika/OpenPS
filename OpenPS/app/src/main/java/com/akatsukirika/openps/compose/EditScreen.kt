@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.viewmodel.EditViewModel
+import kotlin.math.roundToInt
 
 // 人像美颜
 const val INDEX_SMOOTH = 0
@@ -200,7 +201,7 @@ private fun BidirectionalSliderLayout(viewModel: EditViewModel, currentLevel: Fl
         BidirectionalSlider(
             value = currentLevel,
             onValueChange = {
-                viewModel.onValueChange(it)
+                viewModel.onValueChange((it * 100).roundToInt() / 100f)
             },
             onValueChangeFinished = {
                 viewModel.onValueChangeFinished()
@@ -230,7 +231,7 @@ private fun SliderLayout(viewModel: EditViewModel, currentLevel: Float) {
         BidirectionalSlider(
             value = currentLevel,
             onValueChange = {
-                viewModel.onValueChange(it)
+                viewModel.onValueChange((it * 100).roundToInt() / 100f)
             },
             onValueChangeFinished = {
                 viewModel.onValueChangeFinished()

@@ -38,6 +38,20 @@ public:
         sharpnessLevel, brightnessLevel);
   }
 
+  bool equals(const OpenPSRecord& anotherRecord) const {
+    return smoothLevel == anotherRecord.smoothLevel &&
+           whiteLevel == anotherRecord.whiteLevel &&
+           lipstickLevel == anotherRecord.lipstickLevel &&
+           blusherLevel == anotherRecord.blusherLevel &&
+           eyeZoomLevel == anotherRecord.eyeZoomLevel &&
+           faceSlimLevel == anotherRecord.faceSlimLevel &&
+           contrastLevel == anotherRecord.contrastLevel &&
+           exposureLevel == anotherRecord.exposureLevel &&
+           saturationLevel == anotherRecord.saturationLevel &&
+           sharpnessLevel == anotherRecord.sharpnessLevel &&
+           brightnessLevel == anotherRecord.brightnessLevel;
+  }
+
   OpenPSRecord(float smoothLevel, float whiteLevel, float lipstickLevel,
                float blusherLevel, float eyeZoomLevel, float faceSlimLevel,
                float contrastLevel, float exposureLevel, float saturationLevel,

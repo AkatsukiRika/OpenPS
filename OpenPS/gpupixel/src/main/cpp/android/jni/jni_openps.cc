@@ -267,41 +267,4 @@ Java_com_pixpark_gpupixel_OpenPS_nativeRedo(JNIEnv *env, jobject thiz) {
   return nullptr;
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetScaleFactor(JNIEnv *env, jobject thiz, jfloat scale) {
-  if (openPSHelper) {
-    openPSHelper->setScaleFactor(scale);
-  }
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeSetTranslateDistance(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
-  if (openPSHelper) {
-    openPSHelper->setTranslateDistance(x, y);
-  }
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeResetMVPMatrix(JNIEnv *env, jobject thiz) {
-  if (openPSHelper) {
-    openPSHelper->resetMVPMatrix();
-  }
-}
-
-extern "C" JNIEXPORT jfloat JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeGetTranslateDistanceX(JNIEnv *env, jobject thiz) {
-  if (openPSHelper) {
-    return openPSHelper->getDistanceX();
-  }
-  return 0;
-}
-
-extern "C" JNIEXPORT jfloat JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeGetTranslateDistanceY(JNIEnv *env, jobject thiz) {
-  if (openPSHelper) {
-    return openPSHelper->getDistanceY();
-  }
-  return 0;
-}
-
 #endif
