@@ -79,11 +79,13 @@ void SourceImage::init(int width, int height, int channel_count, const unsigned 
 void SourceImage::Render() {
   GPUPIXEL_FRAME_TYPE type;
   if(_face_detector) {
+    Util::Log("MitakeRan", "FaceDetector Detect");
     _face_detector->Detect(image_bytes.data(),
                            _framebuffer->getWidth(),
                            _framebuffer->getHeight(),
                            GPUPIXEL_MODE_FMT_PICTURE,
                            GPUPIXEL_FRAME_TYPE_RGBA8888);
+    _face_detector.reset();
   }
   
   Source::proceed();
