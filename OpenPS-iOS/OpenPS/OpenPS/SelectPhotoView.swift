@@ -32,7 +32,7 @@ struct SelectPhotoView: View {
                 Spacer()
                 
                 // When the image is selected, navigate to the editor
-                NavigationLink(destination: PhotoEditView(image: selectedImage), isActive: $navigateToEditor) {
+                NavigationLink(destination: PhotoEditView(image: selectedImage, isActive: $navigateToEditor), isActive: $navigateToEditor) {
                     EmptyView()
                 }
             }
