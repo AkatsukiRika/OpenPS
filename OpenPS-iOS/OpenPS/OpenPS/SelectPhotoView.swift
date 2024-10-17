@@ -4,19 +4,12 @@ import PhotosUI
 struct SelectPhotoView: View {
     @State private var selectedImage: UIImage? = nil
     @State private var showPhotoPicker = false
+    @State private var navigateToEditor = false
     
     var body: some View {
         NavigationView {
             VStack {
                 Spacer()
-                
-                if let image = selectedImage {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxHeight: 300)
-                        .padding()
-                }
                 
                 Button(action: {
                     showPhotoPicker = true
@@ -33,10 +26,15 @@ struct SelectPhotoView: View {
                 }
                 .padding(.horizontal, 32)
                 .sheet(isPresented: $showPhotoPicker) {
-                    PhotoPicker(selectedImage: $selectedImage)
+                    PhotoPicker(selectedImage: $selectedImage, navigateToEditor: $navigateToEditor)
                 }
                 
                 Spacer()
+                
+                // When the image is selected, navigate to the editor
+                NavigationLink(destination: PhotoEditView(image: selectedImage), isActive: $navigateToEditor) {
+                    EmptyView()
+                }
             }
             .background(Color(hex: "#212121"))
             .navigationBarTitle("Open Photo Studio", displayMode: .inline)
@@ -54,11 +52,12 @@ struct SelectPhotoView: View {
 
 struct PhotoPicker: UIViewControllerRepresentable {
     @Binding var selectedImage: UIImage?
+    @Binding var navigateToEditor: Bool
 
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var configuration = PHPickerConfiguration()
-        configuration.filter = .images // Only allow images
-        configuration.selectionLimit = 1 // Limit to one selection
+        configuration.filter = .images
+        configuration.selectionLimit = 1
         
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = context.coordinator
@@ -88,6 +87,7 @@ struct PhotoPicker: UIViewControllerRepresentable {
                     if let uiImage = image as? UIImage {
                         DispatchQueue.main.async {
                             self.parent.selectedImage = uiImage
+                            self.parent.navigateToEditor = true
                         }
                     }
                 }
