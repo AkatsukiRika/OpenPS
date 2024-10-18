@@ -102,6 +102,7 @@ private:
 
   int imageWidth = 0;
   int imageHeight = 0;
+  bool matrixUpdated = false;
 
   UndoRedoHelper undoRedoHelper;
   void addUndoRedoRecord();

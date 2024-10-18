@@ -105,6 +105,29 @@ void TargetView::setMVPMatrix(const Matrix4 &mvpMatrix) {
   _mvpMatrix = mvpMatrix;
 }
 
+void TargetView::updateMatrixState() {
+  GPUPixelContext::getInstance()->setActiveShaderProgram(_displayProgram);
+  CHECK_GL(glUniformMatrix4fv(_mvpMatrixUniformLocation, 1, false, _mvpMatrix.m));
+
+  // 可能需要触发一个最小化的重绘操作
+  // 这里我们只更新与 MVP 矩阵相关的部分
+  CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+  CHECK_GL(glViewport(0, 0, _viewWidth, _viewHeight));
+
+  CHECK_GL(glActiveTexture(GL_TEXTURE0));
+  CHECK_GL(glBindTexture(GL_TEXTURE_2D,
+                         _inputFramebuffers[0].frameBuffer->getTexture()));
+  CHECK_GL(glUniform1i(_colorMapUniformLocation, 0));
+
+  CHECK_GL(glVertexAttribPointer(_positionAttribLocation, 2, GL_FLOAT, 0, 0,
+                                 _displayVertices));
+  CHECK_GL(glVertexAttribPointer(
+      _texCoordAttribLocation, 2, GL_FLOAT, 0, 0,
+      _getTexureCoordinate(_inputFramebuffers[0].rotationMode)));
+
+  CHECK_GL(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+}
+
 void TargetView::update(int64_t frameTime) {
   CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
@@ -112,18 +135,8 @@ void TargetView::update(int64_t frameTime) {
   CHECK_GL(glClearColor(_backgroundColor.r, _backgroundColor.g,
                         _backgroundColor.b, _backgroundColor.a));
   CHECK_GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-  GPUPixelContext::getInstance()->setActiveShaderProgram(_displayProgram);
-  CHECK_GL(glActiveTexture(GL_TEXTURE0));
-  CHECK_GL(glBindTexture(GL_TEXTURE_2D,
-                         _inputFramebuffers[0].frameBuffer->getTexture()));
-  CHECK_GL(glUniform1i(_colorMapUniformLocation, 0));
-  CHECK_GL(glUniformMatrix4fv(_mvpMatrixUniformLocation, 1, false, _mvpMatrix.m));
-  CHECK_GL(glVertexAttribPointer(_positionAttribLocation, 2, GL_FLOAT, 0, 0,
-                                 _displayVertices));
-  CHECK_GL(glVertexAttribPointer(
-      _texCoordAttribLocation, 2, GL_FLOAT, 0, 0,
-      _getTexureCoordinate(_inputFramebuffers[0].rotationMode)));
-  CHECK_GL(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+
+  updateMatrixState();
 }
 
 void TargetView::_updateDisplayVertices() {

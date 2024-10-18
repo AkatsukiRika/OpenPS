@@ -97,7 +97,12 @@ void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
 
 void gpupixel::OpenPSHelper::requestRender() {
   if (gpuSourceImage) {
-    gpuSourceImage->Render();
+    if (matrixUpdated && beautyFaceFilter) {
+      targetView->updateMatrixState();
+      matrixUpdated = false;
+    } else {
+      gpuSourceImage->Render();
+    }
   }
 }
 
@@ -295,6 +300,7 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
 void gpupixel::OpenPSHelper::updateMVPMatrix(float *matrix) {
   if (targetView) {
     targetView->setMVPMatrix(Matrix4(matrix));
+    matrixUpdated = true;
   }
 }
 

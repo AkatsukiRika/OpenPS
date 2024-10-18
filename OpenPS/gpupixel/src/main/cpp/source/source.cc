@@ -80,7 +80,8 @@ void Source::updateTargets(int64_t frameTime) {
                                 _targets[target]);
     if (target->isPrepared()) {
       target->update(frameTime);
-      target->unPrepear();
+      // FIXME
+//      target->unPrepear();
     }
   }
 }
