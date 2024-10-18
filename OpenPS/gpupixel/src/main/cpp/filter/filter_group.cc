@@ -158,9 +158,9 @@ void FilterGroup::update(int64_t frameTime) {
   }
 }
 
-void FilterGroup::updateTargets(int64_t frameTime) {
+void FilterGroup::updateTargets(int64_t frameTime, bool unPrepare) {
   if (_terminalFilter) {
-    _terminalFilter->updateTargets(frameTime);
+    _terminalFilter->updateTargets(frameTime, unPrepare);
   }
 }
 

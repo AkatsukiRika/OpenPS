@@ -49,7 +49,7 @@ class GPUPIXEL_API Source {
   int getRotatedFramebufferHeight() const;
 
   virtual bool proceed(bool bUpdateTargets = true, int64_t frameTime = 0);
-  virtual void updateTargets(int64_t frameTime);
+  virtual void updateTargets(int64_t frameTime, bool unPrepare = true);
 
   virtual unsigned char* captureAProcessedFrameData(
       std::shared_ptr<Filter> upToFilter,

@@ -50,7 +50,7 @@ class GPUPIXEL_API FilterGroup : public Filter {
   virtual bool proceed(bool bUpdateTargets = true,
                        int64_t frameTime = 0) override;
   virtual void update(int64_t frameTime) override;
-  virtual void updateTargets(int64_t frameTime) override;
+  virtual void updateTargets(int64_t frameTime, bool unPrepare = true) override;
   virtual void setFramebuffer(
       std::shared_ptr<Framebuffer> fb,
       RotationMode outputRotation = RotationMode::NoRotation) override;

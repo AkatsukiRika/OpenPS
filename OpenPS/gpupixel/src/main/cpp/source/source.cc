@@ -73,15 +73,16 @@ bool Source::proceed(bool bUpdateTargets /* = true*/,
   return true;
 }
 
-void Source::updateTargets(int64_t frameTime) {
+void Source::updateTargets(int64_t frameTime, bool unPrepare) {
   for (auto& it : _targets) {
     auto target = it.first;
     target->setInputFramebuffer(_framebuffer, _outputRotation,
                                 _targets[target]);
     if (target->isPrepared()) {
       target->update(frameTime);
-      // FIXME
-//      target->unPrepear();
+      if (unPrepare) {
+        target->unPrepear();
+      }
     }
   }
 }
