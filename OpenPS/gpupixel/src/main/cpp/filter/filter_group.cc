@@ -172,9 +172,10 @@ void FilterGroup::setFramebuffer(
 }
 
 std::shared_ptr<Framebuffer> FilterGroup::getFramebuffer() const {
-  // if (_terminalFilter)
-  //     return _terminalFilter->getFramebuffer();
-  return 0;
+  if (_terminalFilter) {
+    return _terminalFilter->getFramebuffer();
+  }
+  return nullptr;
 }
 
 void FilterGroup::setInputFramebuffer(

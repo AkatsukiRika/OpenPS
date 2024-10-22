@@ -97,7 +97,7 @@ void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
 
 void gpupixel::OpenPSHelper::requestRender() {
   if (gpuSourceImage) {
-    if (matrixUpdated && beautyFaceFilter) {
+    if (matrixUpdated && beautyFaceFilter && beautyFaceFilter->getFramebuffer()) {
       beautyFaceFilter->updateTargets(0, false);
       targetView->updateMatrixState();
       matrixUpdated = false;
