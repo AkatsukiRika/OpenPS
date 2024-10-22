@@ -2,6 +2,7 @@
     <string name="app_name">Open Photo Studio</string>
     <string name="select_image">Select Photo</string>
     <string name="image_edit">Photo Edit</string>
+    <string name="gallery">Gallery</string>
     <string name="image_save">Photo Export</string>
     <string name="msg_image_load_fail">An error occurred while loading the photo.</string>
     <string name="msg_image_process_fail">An error occurred while analyzing the photo.</string>
@@ -30,6 +31,7 @@
     <string name="saturation">Saturation</string>
     <string name="sharpen">Sharpen</string>
     <string name="brightness">Brightness</string>
+    <string name="version_x">Version %s</string>
     <string name="size_4k" translatable="false">4K</string>
     <string name="size_2k" translatable="false">2K</string>
     <string name="size_1k" translatable="false">1K</string>

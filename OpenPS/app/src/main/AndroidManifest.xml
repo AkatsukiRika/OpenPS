@@ -32,6 +32,9 @@
 
         <activity android:name=".activity.ExportActivity"
             android:screenOrientation="portrait" />
+
+        <activity android:name=".activity.GalleryActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

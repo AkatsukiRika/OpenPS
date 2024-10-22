@@ -12,6 +12,7 @@ import androidx.appcompat.widget.PopupMenu
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.databinding.ActivityMainBinding
 import com.akatsukirika.openps.store.SettingsStore
+import com.akatsukirika.openps.utils.AppUtils
 import com.akatsukirika.openps.utils.PermissionUtils
 import com.pixpark.gpupixel.GPUPixel
 
@@ -39,9 +40,12 @@ class MainActivity : AppCompatActivity() {
 
         binding.llSelectImage.setOnClickListener {
             if (PermissionUtils.checkAndRequestGalleryPermission(this, PERMISSION_REQUEST_CODE)) {
-                selectImageLauncher?.launch("image/*")
+//                selectImageLauncher?.launch("image/*")
+                GalleryActivity.startMe(this)
             }
         }
+
+        binding.tvVersion.text = resources.getString(R.string.version_x).format(AppUtils.getAppVersionName(this))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
