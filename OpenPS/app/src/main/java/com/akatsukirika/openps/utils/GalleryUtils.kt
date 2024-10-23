@@ -3,6 +3,7 @@ package com.akatsukirika.openps.utils
 import android.content.ContentUris
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.MediaStore
@@ -60,7 +61,23 @@ object GalleryUtils {
                 val contentUri = ContentUris.withAppendedId(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id
                 )
-                images.add(GalleryImage(name, contentUri, dateAdded, size))
+
+                var width = 0
+                var height = 0
+                runCatching {
+                    val options = BitmapFactory.Options().apply {
+                        inJustDecodeBounds = true
+                    }
+                    context.contentResolver.openInputStream(contentUri)?.use { input ->
+                        BitmapFactory.decodeStream(input, null, options)
+                    }
+                    width = options.outWidth
+                    height = options.outHeight
+                }.onFailure {
+                    it.printStackTrace()
+                }
+
+                images.add(GalleryImage(name, contentUri, dateAdded, size, width, height))
             }
         }
 

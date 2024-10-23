@@ -1,13 +1,10 @@
 package com.akatsukirika.openps.activity
 
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.databinding.ActivityMainBinding
@@ -22,7 +19,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityMainBinding
-    private var selectImageLauncher: ActivityResultLauncher<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,15 +28,8 @@ class MainActivity : AppCompatActivity() {
 
         GPUPixel.setContext(this)
 
-        selectImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let {
-                onImageSelected(it)
-            }
-        }
-
         binding.llSelectImage.setOnClickListener {
             if (PermissionUtils.checkAndRequestGalleryPermission(this, PERMISSION_REQUEST_CODE)) {
-//                selectImageLauncher?.launch("image/*")
                 GalleryActivity.startMe(this)
             }
         }
@@ -108,12 +97,8 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                selectImageLauncher?.launch("image/*")
+                GalleryActivity.startMe(this)
             }
         }
-    }
-
-    private fun onImageSelected(uri: Uri) {
-        EditActivity.startMe(this, uri)
     }
 }

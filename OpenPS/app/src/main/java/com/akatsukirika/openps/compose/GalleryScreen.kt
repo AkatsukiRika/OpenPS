@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -72,6 +73,7 @@ fun GalleryScreen(viewModel: GalleryViewModel) {
                 } else {
                     PreviewLayout(
                         viewModel = viewModel,
+                        previewImage = targetState,
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this@AnimatedContent
                     )
@@ -111,31 +113,51 @@ private fun GalleryLayout(
 @Composable
 private fun PreviewLayout(
     viewModel: GalleryViewModel,
+    previewImage: GalleryImage,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val previewImage = viewModel.previewImage.collectAsState(null).value
-
-    if (previewImage != null) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            with(sharedTransitionScope) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(previewImage.uri)
-                        .crossfade(false)
-                        .size(Size.ORIGINAL)
-                        .build(),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .sharedElement(
-                            rememberSharedContentState(key = SHARED_ELEMENT_KEY_IMAGE + "_" + previewImage.uri),
-                            animatedVisibilityScope
-                        ),
-                    contentScale = ContentScale.Fit
-                )
-            }
+    Box(modifier = Modifier.fillMaxSize()) {
+        with(sharedTransitionScope) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(previewImage.uri)
+                    .crossfade(false)
+                    .size(Size.ORIGINAL)
+                    .build(),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .sharedElement(
+                        rememberSharedContentState(key = SHARED_ELEMENT_KEY_IMAGE + "_" + previewImage.uri),
+                        animatedVisibilityScope
+                    ),
+                contentScale = ContentScale.Fit
+            )
         }
+
+        IconButton(onClick = {
+            viewModel.updatePreviewImage(null)
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_cancel),
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.75f),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = 4.dp)
+                    .size(20.dp)
+            )
+        }
+
+        Text(
+            text = "JPEG | ${previewImage.width} x ${previewImage.height} | ${previewImage.getHumanizedSize()}",
+            color = Color.White.copy(0.5f),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 4.dp),
+            fontSize = 14.sp
+        )
     }
 }
 
