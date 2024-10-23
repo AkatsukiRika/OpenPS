@@ -151,7 +151,7 @@ private fun PreviewLayout(
         }
 
         Text(
-            text = "JPEG | ${previewImage.width} x ${previewImage.height} | ${previewImage.getHumanizedSize()}",
+            text = "${previewImage.format.displayName} | ${previewImage.width} x ${previewImage.height} | ${previewImage.getHumanizedSize()}",
             color = Color.White.copy(0.5f),
             modifier = Modifier
                 .align(Alignment.BottomCenter)

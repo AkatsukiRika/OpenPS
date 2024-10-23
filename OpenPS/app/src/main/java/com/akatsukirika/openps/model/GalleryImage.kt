@@ -8,7 +8,8 @@ data class GalleryImage(
     val dateAdded: Long,
     val size: Long,
     val width: Int,
-    val height: Int
+    val height: Int,
+    val format: ImageFormat
 ) {
     fun getHumanizedSize(): String {
         val kb = size / 1024

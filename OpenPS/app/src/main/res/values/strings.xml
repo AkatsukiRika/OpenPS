@@ -3,6 +3,7 @@
     <string name="select_image">Select Photo</string>
     <string name="image_edit">Photo Edit</string>
     <string name="gallery">Gallery</string>
+    <string name="unknown">Unknown</string>
     <string name="image_save">Photo Export</string>
     <string name="msg_image_load_fail">An error occurred while loading the photo.</string>
     <string name="msg_image_process_fail">An error occurred while analyzing the photo.</string>

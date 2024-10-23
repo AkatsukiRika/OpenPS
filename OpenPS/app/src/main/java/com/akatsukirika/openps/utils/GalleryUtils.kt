@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.MediaStore
 import com.akatsukirika.openps.model.GalleryImage
+import com.akatsukirika.openps.model.ImageFormat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -64,6 +65,7 @@ object GalleryUtils {
 
                 var width = 0
                 var height = 0
+                var format = ImageFormat.UNKNOWN
                 runCatching {
                     val options = BitmapFactory.Options().apply {
                         inJustDecodeBounds = true
@@ -73,11 +75,20 @@ object GalleryUtils {
                     }
                     width = options.outWidth
                     height = options.outHeight
+                    format = when (options.outMimeType) {
+                        "image/jpeg" -> ImageFormat.JPEG
+                        "image/png" -> ImageFormat.PNG
+                        "image/gif" -> ImageFormat.GIF
+                        "image/webp" -> ImageFormat.WEBP
+                        "image/heic", "image/heif" -> ImageFormat.HEIC
+                        "image/bmp" -> ImageFormat.BMP
+                        else -> ImageFormat.UNKNOWN
+                    }
                 }.onFailure {
                     it.printStackTrace()
                 }
 
-                images.add(GalleryImage(name, contentUri, dateAdded, size, width, height))
+                images.add(GalleryImage(name, contentUri, dateAdded, size, width, height, format))
             }
         }
 
