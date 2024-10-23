@@ -13,13 +13,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +41,9 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Size
+import com.akatsukirika.openps.R
 import com.akatsukirika.openps.model.GalleryImage
+import com.akatsukirika.openps.utils.clickableNoIndication
 import com.akatsukirika.openps.viewmodel.GalleryViewModel
 
 @Composable
@@ -114,20 +120,23 @@ private fun ImagesGrid(modifier: Modifier = Modifier, viewModel: GalleryViewMode
                     it.uri.toString()
                 }
             ) {
-                ImageGridItem(image = it)
+                ImageGridItem(image = it, viewModel)
             }
         }
     }
 }
 
 @Composable
-private fun ImageGridItem(image: GalleryImage) {
+private fun ImageGridItem(image: GalleryImage, viewModel: GalleryViewModel) {
     val context = LocalContext.current
     
     Box(modifier = Modifier
         .aspectRatio(1f)
         .fillMaxWidth()
         .clip(RoundedCornerShape(4.dp))
+        .clickable {
+            viewModel.selectImage(image.uri)
+        }
     ) {
         AsyncImage(
             model = ImageRequest.Builder(context)
@@ -138,6 +147,27 @@ private fun ImageGridItem(image: GalleryImage) {
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
+        )
+
+        MagnifyButton(modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .padding(bottom = 2.dp, end = 2.dp)
+        )
+    }
+}
+
+@Composable
+private fun MagnifyButton(modifier: Modifier = Modifier) {
+    Box(modifier = modifier
+        .size(24.dp)
+        .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+        .clickableNoIndication {}
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_preview_magnify),
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.padding(4.dp)
         )
     }
 }

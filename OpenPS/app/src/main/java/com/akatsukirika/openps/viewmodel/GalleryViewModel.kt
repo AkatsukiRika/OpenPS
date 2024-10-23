@@ -1,6 +1,7 @@
 package com.akatsukirika.openps.viewmodel
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.model.GalleryAlbum
@@ -23,7 +24,10 @@ class GalleryViewModel : ViewModel() {
     private val _selectedAlbum = MutableStateFlow<GalleryAlbum?>(null)
     val selectedAlbum: StateFlow<GalleryAlbum?> = _selectedAlbum
 
-    fun init(context: Context) {
+    private var selectImageCallback: ((Uri) -> Unit)? = null
+
+    fun init(context: Context, selectImageCallback: ((Uri) -> Unit)? = null) {
+        this.selectImageCallback = selectImageCallback
         viewModelScope.launch {
             updateAlbumList(context)
         }
@@ -34,6 +38,10 @@ class GalleryViewModel : ViewModel() {
         viewModelScope.launch {
             loadThumbnails(context, album)
         }
+    }
+
+    fun selectImage(uri: Uri) {
+        selectImageCallback?.invoke(uri)
     }
 
     private suspend fun updateAlbumList(context: Context) = withContext(Dispatchers.IO) {

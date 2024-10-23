@@ -25,7 +25,12 @@ class GalleryActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
             setTitle(R.string.gallery)
         }
-        viewModel.init(this)
+        viewModel.init(
+            this,
+            selectImageCallback = {
+                EditActivity.startMe(this, it)
+            }
+        )
 
         binding.composeView.setContent {
             GalleryScreen(viewModel)
