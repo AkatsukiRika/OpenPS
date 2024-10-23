@@ -24,6 +24,9 @@ class GalleryViewModel : ViewModel() {
     private val _selectedAlbum = MutableStateFlow<GalleryAlbum?>(null)
     val selectedAlbum: StateFlow<GalleryAlbum?> = _selectedAlbum
 
+    private val _previewImage = MutableStateFlow<GalleryImage?>(null)
+    val previewImage: StateFlow<GalleryImage?> = _previewImage
+
     private var selectImageCallback: ((Uri) -> Unit)? = null
 
     fun init(context: Context, selectImageCallback: ((Uri) -> Unit)? = null) {
@@ -35,13 +38,14 @@ class GalleryViewModel : ViewModel() {
 
     fun updateSelectedAlbum(context: Context, album: GalleryAlbum) {
         _selectedAlbum.value = album
-        viewModelScope.launch {
-            loadThumbnails(context, album)
-        }
     }
 
     fun selectImage(uri: Uri) {
         selectImageCallback?.invoke(uri)
+    }
+
+    fun updatePreviewImage(image: GalleryImage?) {
+        _previewImage.value = image
     }
 
     private suspend fun updateAlbumList(context: Context) = withContext(Dispatchers.IO) {
@@ -61,21 +65,5 @@ class GalleryViewModel : ViewModel() {
             newAlbumList.add(GalleryAlbum(it.albumName, images))
         }
         _albumList.value = newAlbumList
-    }
-
-    private suspend fun loadThumbnails(context: Context, album: GalleryAlbum) = withContext(Dispatchers.IO) {
-        val newImages = mutableListOf<GalleryImage>()
-        album.images.forEach { image ->
-            GalleryUtils.getThumbnail(context, image.uri, THUMBNAIL_SIZE, THUMBNAIL_SIZE, onSuccess = { bitmap ->
-                newImages.add(image.copy(thumbnail = bitmap))
-                if (newImages.size == album.images.size) {
-                    val newAlbum = GalleryAlbum(album.albumName, newImages)
-                    _albumList.value = _albumList.value.map {
-                        if (it.albumName == album.albumName) newAlbum else it
-                    }
-                    _selectedAlbum.value = newAlbum
-                }
-            }, onError = {})
-        }
     }
 }

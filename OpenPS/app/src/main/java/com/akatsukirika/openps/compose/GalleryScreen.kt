@@ -1,5 +1,11 @@
 package com.akatsukirika.openps.compose
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -46,17 +52,89 @@ import com.akatsukirika.openps.model.GalleryImage
 import com.akatsukirika.openps.utils.clickableNoIndication
 import com.akatsukirika.openps.viewmodel.GalleryViewModel
 
+private const val LABEL_ANIMATED_CONTENT = "animated_content"
+private const val SHARED_ELEMENT_KEY_IMAGE = "image"
+
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun GalleryScreen(viewModel: GalleryViewModel) {
+    val previewImage = viewModel.previewImage.collectAsState(null).value
+
     MaterialTheme {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Spacer(modifier = Modifier.height(16.dp))
+        SharedTransitionLayout {
+            AnimatedContent(targetState = previewImage, label = LABEL_ANIMATED_CONTENT) { targetState ->
+                if (targetState == null) {
+                    GalleryLayout(
+                        viewModel = viewModel,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedVisibilityScope = this@AnimatedContent
+                    )
+                } else {
+                    PreviewLayout(
+                        viewModel = viewModel,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedVisibilityScope = this@AnimatedContent
+                    )
+                }
+            }
+        }
 
-            AlbumLazyRow(viewModel = viewModel)
+        BackHandler(enabled = previewImage != null) {
+            viewModel.updatePreviewImage(null)
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            ImagesGrid(viewModel = viewModel)
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun GalleryLayout(
+    viewModel: GalleryViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        AlbumLazyRow(viewModel = viewModel)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        ImagesGrid(
+            viewModel = viewModel,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope
+        )
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun PreviewLayout(
+    viewModel: GalleryViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
+    val previewImage = viewModel.previewImage.collectAsState(null).value
+
+    if (previewImage != null) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            with(sharedTransitionScope) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(previewImage.uri)
+                        .crossfade(false)
+                        .size(Size.ORIGINAL)
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .sharedElement(
+                            rememberSharedContentState(key = SHARED_ELEMENT_KEY_IMAGE + "_" + previewImage.uri),
+                            animatedVisibilityScope
+                        ),
+                    contentScale = ContentScale.Fit
+                )
+            }
         }
     }
 }
@@ -102,8 +180,14 @@ private fun AlbumLazyRow(modifier: Modifier = Modifier, viewModel: GalleryViewMo
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun ImagesGrid(modifier: Modifier = Modifier, viewModel: GalleryViewModel) {
+private fun ImagesGrid(
+    modifier: Modifier = Modifier,
+    viewModel: GalleryViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     val selectedAlbum = viewModel.selectedAlbum.collectAsState(initial = null).value
 
     LazyVerticalGrid(
@@ -120,14 +204,20 @@ private fun ImagesGrid(modifier: Modifier = Modifier, viewModel: GalleryViewMode
                     it.uri.toString()
                 }
             ) {
-                ImageGridItem(image = it, viewModel)
+                ImageGridItem(it, viewModel, sharedTransitionScope, animatedVisibilityScope)
             }
         }
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun ImageGridItem(image: GalleryImage, viewModel: GalleryViewModel) {
+private fun ImageGridItem(
+    image: GalleryImage,
+    viewModel: GalleryViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     val context = LocalContext.current
     
     Box(modifier = Modifier
@@ -138,30 +228,40 @@ private fun ImageGridItem(image: GalleryImage, viewModel: GalleryViewModel) {
             viewModel.selectImage(image.uri)
         }
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(context)
-                .data(image.uri)
-                .crossfade(true)
-                .size(Size.ORIGINAL)
-                .build(),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        with(sharedTransitionScope) {
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(image.uri)
+                    .crossfade(true)
+                    .size(GalleryViewModel.THUMBNAIL_SIZE)
+                    .build(),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .sharedElement(
+                        rememberSharedContentState(key = SHARED_ELEMENT_KEY_IMAGE + "_" + image.uri),
+                        animatedVisibilityScope
+                    ),
+                contentScale = ContentScale.Crop
+            )
+        }
 
         MagnifyButton(modifier = Modifier
             .align(Alignment.BottomEnd)
-            .padding(bottom = 2.dp, end = 2.dp)
+            .padding(bottom = 2.dp, end = 2.dp),
+            image, viewModel
         )
     }
 }
 
 @Composable
-private fun MagnifyButton(modifier: Modifier = Modifier) {
+private fun MagnifyButton(modifier: Modifier = Modifier, image: GalleryImage, viewModel: GalleryViewModel) {
     Box(modifier = modifier
         .size(24.dp)
         .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
-        .clickableNoIndication {}
+        .clickableNoIndication {
+            viewModel.updatePreviewImage(image)
+        }
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_preview_magnify),
