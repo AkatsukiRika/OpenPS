@@ -87,18 +87,23 @@ private:
   std::shared_ptr<BrightnessFilter> brightnessFilter;
   std::shared_ptr<TargetView> targetView;
   std::shared_ptr<TargetRawDataOutput> targetRawDataOutput;
+  std::vector<std::shared_ptr<Filter>> filterList;
 
-  float smoothLevel = 0;
-  float whiteLevel = 0;
-  float lipstickLevel = 0;
-  float blusherLevel = 0;
-  float eyeZoomLevel = 0;
-  float faceSlimLevel = 0;
-  float contrastLevel = 1.0;
-  float exposureLevel = 0;
-  float saturationLevel = 1.0;
-  float sharpnessLevel = 0;
-  float brightnessLevel = 0;
+  static constexpr float DEFAULT_LEVEL = 0;
+  static constexpr float DEFAULT_CONTRAST_LEVEL = 1;
+  static constexpr float DEFAULT_SATURATION_LEVEL = 1;
+
+  float smoothLevel = DEFAULT_LEVEL;
+  float whiteLevel = DEFAULT_LEVEL;
+  float lipstickLevel = DEFAULT_LEVEL;
+  float blusherLevel = DEFAULT_LEVEL;
+  float eyeZoomLevel = DEFAULT_LEVEL;
+  float faceSlimLevel = DEFAULT_LEVEL;
+  float contrastLevel = DEFAULT_CONTRAST_LEVEL;
+  float exposureLevel = DEFAULT_LEVEL;
+  float saturationLevel = DEFAULT_SATURATION_LEVEL;
+  float sharpnessLevel = DEFAULT_LEVEL;
+  float brightnessLevel = DEFAULT_LEVEL;
 
   int imageWidth = 0;
   int imageHeight = 0;
@@ -107,6 +112,11 @@ private:
   UndoRedoHelper undoRedoHelper;
   void addUndoRedoRecord();
   void setLevels(OpenPSRecord record);
+  void refreshRenderPipeline();
+  /**
+   * @return needRebuild
+   */
+  bool addOrRemoveFilter(bool needFilter, std::shared_ptr<Filter> filter);
 };
 
 NS_GPUPIXEL_END

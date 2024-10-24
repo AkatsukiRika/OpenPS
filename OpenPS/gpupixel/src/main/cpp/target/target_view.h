@@ -33,7 +33,7 @@ class GPUPIXEL_API TargetView : public Target {
   void onSizeChanged(int width, int height);
   void getViewInfo(float* info);
   void setMVPMatrix(const Matrix4& mvpMatrix);
-  void updateMatrixState();
+  bool updateMatrixState();
   virtual void update(int64_t frameTime) override;
 
  private:

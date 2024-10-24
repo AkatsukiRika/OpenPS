@@ -45,61 +45,66 @@ void gpupixel::OpenPSHelper::buildBasicRenderPipeline() {
 void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   gpuSourceImage->removeAllTargets();
   beautyFaceFilter = BeautyFaceFilter::create();
+  beautyFaceFilter->setFilterClassName("BeautyFaceFilter");
   lipstickFilter = LipstickFilter::create();
+  lipstickFilter->setFilterClassName("LipstickFilter");
   blusherFilter = BlusherFilter::create();
+  blusherFilter->setFilterClassName("BlusherFilter");
   faceReshapeFilter = FaceReshapeFilter::create();
+  faceReshapeFilter->setFilterClassName("FaceReshapeFilter");
   contrastFilter = ContrastFilter::create();
+  contrastFilter->setFilterClassName("ContrastFilter");
   exposureFilter = ExposureFilter::create();
+  exposureFilter->setFilterClassName("ExposureFilter");
   saturationFilter = SaturationFilter::create();
+  saturationFilter->setFilterClassName("SaturationFilter");
   sharpenFilter = SharpenFilter::create();
+  sharpenFilter->setFilterClassName("SharpenFilter");
   sharpenFilter->setTexelSize(imageWidth, imageHeight);
   brightnessFilter = BrightnessFilter::create();
+  brightnessFilter->setFilterClassName("BrightnessFilter");
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
     blusherFilter->SetFaceLandmarks(landmarks);
     faceReshapeFilter->SetFaceLandmarks(landmarks);
   });
-  gpuSourceImage
-      ->addTarget(contrastFilter)
-      ->addTarget(exposureFilter)
-      ->addTarget(saturationFilter)
-      ->addTarget(sharpenFilter)
-      ->addTarget(brightnessFilter)
-      ->addTarget(lipstickFilter)
-      ->addTarget(blusherFilter)
-      ->addTarget(faceReshapeFilter)
-      ->addTarget(beautyFaceFilter)
-      ->addTarget(targetView);
-  beautyFaceFilter->addTarget(targetRawDataOutput);
+  gpuSourceImage->addTarget(targetView);
+  gpuSourceImage->addTarget(targetRawDataOutput);
 }
 
 void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
   if (gpuSourceImage) {
     gpuSourceImage->removeAllTargets();
     contrastFilter = ContrastFilter::create();
+    contrastFilter->setFilterClassName("ContrastFilter");
     exposureFilter = ExposureFilter::create();
+    exposureFilter->setFilterClassName("ExposureFilter");
     saturationFilter = SaturationFilter::create();
+    saturationFilter->setFilterClassName("SaturationFilter");
     sharpenFilter = SharpenFilter::create();
+    sharpenFilter->setFilterClassName("SharpenFilter");
     sharpenFilter->setTexelSize(imageWidth, imageHeight);
     brightnessFilter = BrightnessFilter::create();
+    brightnessFilter->setFilterClassName("BrightnessFilter");
     targetRawDataOutput = TargetRawDataOutput::create();
-    gpuSourceImage
-        ->addTarget(contrastFilter)
-        ->addTarget(exposureFilter)
-        ->addTarget(saturationFilter)
-        ->addTarget(sharpenFilter)
-        ->addTarget(brightnessFilter)
-        ->addTarget(targetView);
-    brightnessFilter->addTarget(targetRawDataOutput);
+    gpuSourceImage->addTarget(targetView);
+    gpuSourceImage->addTarget(targetRawDataOutput);
   }
 }
 
 void gpupixel::OpenPSHelper::requestRender() {
   if (gpuSourceImage) {
-    if (matrixUpdated && beautyFaceFilter && beautyFaceFilter->getFramebuffer()) {
-      beautyFaceFilter->updateTargets(0, false);
-      targetView->updateMatrixState();
+    std::shared_ptr<Filter> terminalFilter;
+    if (!filterList.empty()) {
+      terminalFilter = filterList.back();
+      Util::Log("MitakeRan", "terminalFilter: %s", terminalFilter->getFilterClassName().c_str());
+    }
+    if (matrixUpdated && terminalFilter && terminalFilter->getFramebuffer()) {
+      terminalFilter->updateTargets(0, false);
+      if (!targetView->updateMatrixState()) {
+        gpuSourceImage->Render();
+      }
       matrixUpdated = false;
     } else {
       gpuSourceImage->Render();
@@ -124,6 +129,7 @@ void gpupixel::OpenPSHelper::setSmoothLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -134,6 +140,7 @@ void gpupixel::OpenPSHelper::setWhiteLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -144,6 +151,7 @@ void gpupixel::OpenPSHelper::setLipstickLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -154,6 +162,7 @@ void gpupixel::OpenPSHelper::setBlusherLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -164,6 +173,7 @@ void gpupixel::OpenPSHelper::setEyeZoomLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -174,6 +184,7 @@ void gpupixel::OpenPSHelper::setFaceSlimLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -189,6 +200,7 @@ void gpupixel::OpenPSHelper::setContrastLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -200,6 +212,7 @@ void gpupixel::OpenPSHelper::setExposureLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -210,6 +223,7 @@ void gpupixel::OpenPSHelper::setSaturationLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -220,6 +234,7 @@ void gpupixel::OpenPSHelper::setSharpenLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -231,6 +246,7 @@ void gpupixel::OpenPSHelper::setBrightnessLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
   }
 }
 
@@ -368,4 +384,57 @@ void gpupixel::OpenPSHelper::setLevels(gpupixel::OpenPSRecord record) {
   setSaturationLevel(record.saturationLevel, false);
   setSharpenLevel(record.sharpnessLevel, false);
   setBrightnessLevel(record.brightnessLevel, false);
+}
+
+void gpupixel::OpenPSHelper::refreshRenderPipeline() {
+  bool needRebuild = false;
+
+  bool changed = addOrRemoveFilter(smoothLevel != DEFAULT_LEVEL || whiteLevel != DEFAULT_LEVEL, beautyFaceFilter);
+  needRebuild = needRebuild || changed;
+
+  changed = addOrRemoveFilter(lipstickLevel != DEFAULT_LEVEL, lipstickFilter);
+  needRebuild = needRebuild || changed;
+
+  changed = addOrRemoveFilter(blusherLevel != DEFAULT_LEVEL, blusherFilter);
+  needRebuild = needRebuild || changed;
+
+  changed = addOrRemoveFilter(eyeZoomLevel != DEFAULT_LEVEL || faceSlimLevel != DEFAULT_LEVEL, faceReshapeFilter);
+  needRebuild = needRebuild || changed;
+
+  changed = addOrRemoveFilter(contrastLevel != DEFAULT_CONTRAST_LEVEL, contrastFilter);
+  needRebuild = needRebuild || changed;
+
+  changed = addOrRemoveFilter(exposureLevel != DEFAULT_LEVEL, exposureFilter);
+  needRebuild = needRebuild || changed;
+
+  changed = addOrRemoveFilter(saturationLevel != DEFAULT_SATURATION_LEVEL, saturationFilter);
+  needRebuild = needRebuild || changed;
+
+  changed = addOrRemoveFilter(sharpnessLevel != DEFAULT_LEVEL, sharpenFilter);
+  needRebuild = needRebuild || changed;
+
+  changed = addOrRemoveFilter(brightnessLevel != DEFAULT_LEVEL, brightnessFilter);
+  needRebuild = needRebuild || changed;
+
+  if (gpuSourceImage && needRebuild) {
+    gpuSourceImage->removeAllTargets();
+    std::shared_ptr<Source> lastSource = gpuSourceImage;
+    for (auto filter : filterList) {
+      lastSource = lastSource->addTarget(filter);
+    }
+    lastSource->addTarget(targetView);
+    lastSource->addTarget(targetRawDataOutput);
+  }
+}
+
+bool gpupixel::OpenPSHelper::addOrRemoveFilter(bool needFilter, std::shared_ptr<Filter> filter) {
+  bool hasFilter = std::find(filterList.begin(), filterList.end(), filter) != filterList.end();
+  if (needFilter && !hasFilter) {
+    filterList.push_back(filter);
+    return true;
+  } else if (!needFilter && hasFilter) {
+    filterList.erase(std::remove(filterList.begin(), filterList.end(), filter));
+    return true;
+  }
+  return false;
 }

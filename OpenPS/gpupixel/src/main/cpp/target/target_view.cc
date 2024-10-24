@@ -105,7 +105,11 @@ void TargetView::setMVPMatrix(const Matrix4 &mvpMatrix) {
   _mvpMatrix = mvpMatrix;
 }
 
-void TargetView::updateMatrixState() {
+bool TargetView::updateMatrixState() {
+  if (_inputFramebuffers.empty() || _inputFramebuffers[0].frameBuffer == nullptr) {
+    return false;
+  }
+
   GPUPixelContext::getInstance()->setActiveShaderProgram(_displayProgram);
   CHECK_GL(glUniformMatrix4fv(_mvpMatrixUniformLocation, 1, false, _mvpMatrix.m));
 
@@ -126,6 +130,7 @@ void TargetView::updateMatrixState() {
       _getTexureCoordinate(_inputFramebuffers[0].rotationMode)));
 
   CHECK_GL(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+  return true;
 }
 
 void TargetView::update(int64_t frameTime) {
