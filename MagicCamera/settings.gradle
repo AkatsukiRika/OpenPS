@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "MagicCamera"
 include ':app'
+include ':MagicFilter'
