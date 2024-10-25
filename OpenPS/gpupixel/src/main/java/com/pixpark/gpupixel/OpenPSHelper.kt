@@ -126,6 +126,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun applyCustomFilter(type: Int, level: Float = 1f) {
+        renderView.postOnGLThread {
+            OpenPS.nativeApplyCustomFilter(type, level)
+            requestRender()
+        }
+    }
+
     fun onCompareBegin() {
         renderView.postOnGLThread {
             OpenPS.nativeCompareBegin()

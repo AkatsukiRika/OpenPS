@@ -93,6 +93,8 @@
 #define NS_GPUPIXEL_END }
 #define USING_NS_GPUPIXEL using namespace gpupixel;
 
+#define STRINGIZE(x) #x
+#define SHADER_STRING(text) STRINGIZE(text)
 
 // Pi
 #define PI 3.14159265358979323846264338327950288

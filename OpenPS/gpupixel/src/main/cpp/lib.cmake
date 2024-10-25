@@ -38,6 +38,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_SOURCE_DIR}/core
 	${CMAKE_CURRENT_SOURCE_DIR}/filter
+	${CMAKE_CURRENT_SOURCE_DIR}/filter/custom
 	${CMAKE_CURRENT_SOURCE_DIR}/source
 	${CMAKE_CURRENT_SOURCE_DIR}/target
 	${CMAKE_CURRENT_SOURCE_DIR}/utils
@@ -56,7 +57,8 @@ INCLUDE_DIRECTORIES(
 # Add common source file
 FILE(GLOB SOURCE_FILES     
 	"${CMAKE_CURRENT_SOURCE_DIR}/core/*"        
-	"${CMAKE_CURRENT_SOURCE_DIR}/filter/*"         
+	"${CMAKE_CURRENT_SOURCE_DIR}/filter/*"
+	"${CMAKE_CURRENT_SOURCE_DIR}/filter/custom/*"
 	"${CMAKE_CURRENT_SOURCE_DIR}/source/*"       
 	"${CMAKE_CURRENT_SOURCE_DIR}/target/*"                               
 	"${CMAKE_CURRENT_SOURCE_DIR}/face_detect/*"                 
@@ -69,7 +71,8 @@ FILE(GLOB SOURCE_FILES
 # Add export header file
 FILE(GLOB EXPORT_HEADER 
 	"${CMAKE_CURRENT_SOURCE_DIR}/core/*.h"         
-	"${CMAKE_CURRENT_SOURCE_DIR}/filter/*.h"         
+	"${CMAKE_CURRENT_SOURCE_DIR}/filter/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/filter/custom/*.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/source/*.h"       
 	"${CMAKE_CURRENT_SOURCE_DIR}/target/*.h"                      
 	"${CMAKE_CURRENT_SOURCE_DIR}/utils/*.h"                 

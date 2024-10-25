@@ -88,3 +88,6 @@
 #include "weak_pixel_inclusion_filter.h"
 #include "white_balance_filter.h"
 #include "sharpen_filter.h"
+
+// custom filters
+#include "fairy_tale_filter.h"

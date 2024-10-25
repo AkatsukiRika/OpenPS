@@ -22,6 +22,7 @@ import com.akatsukirika.openps.repo.INDEX_CONTRAST
 import com.akatsukirika.openps.repo.INDEX_EXPOSURE
 import com.akatsukirika.openps.repo.INDEX_EYE_ZOOM
 import com.akatsukirika.openps.repo.INDEX_FACE_SLIM
+import com.akatsukirika.openps.repo.INDEX_FAIRY_TALE
 import com.akatsukirika.openps.repo.INDEX_LIPSTICK
 import com.akatsukirika.openps.repo.INDEX_SATURATION
 import com.akatsukirika.openps.repo.INDEX_SHARPEN
@@ -188,6 +189,7 @@ class EditViewModel : ViewModel() {
             TAB_FILTER -> {
                 if (selectedFilterIndex.value != -1) {
                     _currentLevel.value = filterLevelMap.value[selectedFilterIndex.value] ?: 1f
+                    helper?.applyCustomFilter(selectedFilterIndex.value, currentLevel.value)
                 }
             }
         }

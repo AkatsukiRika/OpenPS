@@ -17,6 +17,7 @@ gpupixel::OpenPSHelper::~OpenPSHelper() {
   saturationFilter.reset();
   sharpenFilter.reset();
   brightnessFilter.reset();
+  customFilter.reset();
   targetView.reset();
   targetRawDataOutput.reset();
   GPUPixelContext::destroy();
@@ -63,6 +64,8 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   sharpenFilter->setTexelSize(imageWidth, imageHeight);
   brightnessFilter = BrightnessFilter::create();
   brightnessFilter->setFilterClassName("BrightnessFilter");
+  customFilter = FairyTaleFilter::create();
+  customFilter->setFilterClassName("FairyTaleFilter");
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
@@ -87,6 +90,8 @@ void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
     sharpenFilter->setTexelSize(imageWidth, imageHeight);
     brightnessFilter = BrightnessFilter::create();
     brightnessFilter->setFilterClassName("BrightnessFilter");
+    customFilter = FairyTaleFilter::create();
+    customFilter->setFilterClassName("FairyTaleFilter");
     targetRawDataOutput = TargetRawDataOutput::create();
     gpuSourceImage->addTarget(targetView);
     gpuSourceImage->addTarget(targetRawDataOutput);
@@ -246,6 +251,13 @@ void gpupixel::OpenPSHelper::setBrightnessLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
+    refreshRenderPipeline();
+  }
+}
+
+void gpupixel::OpenPSHelper::applyCustomFilter(int type, float level) {
+  if (customFilter) {
+    customFilterLevel = level;
     refreshRenderPipeline();
   }
 }
@@ -414,6 +426,9 @@ void gpupixel::OpenPSHelper::refreshRenderPipeline() {
   needRebuild = needRebuild || changed;
 
   changed = addOrRemoveFilter(brightnessLevel != DEFAULT_LEVEL, brightnessFilter);
+  needRebuild = needRebuild || changed;
+
+  changed = addOrRemoveFilter(customFilterLevel != DEFAULT_LEVEL, customFilter);
   needRebuild = needRebuild || changed;
 
   if (gpuSourceImage && needRebuild) {

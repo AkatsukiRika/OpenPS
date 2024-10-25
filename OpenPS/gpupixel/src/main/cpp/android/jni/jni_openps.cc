@@ -199,6 +199,13 @@ Java_com_pixpark_gpupixel_OpenPS_nativeSetBrightnessLevel(JNIEnv *env, jobject t
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeApplyCustomFilter(JNIEnv *env, jobject thiz, jint type, jfloat level) {
+  if (openPSHelper) {
+    openPSHelper->applyCustomFilter(type, level);
+  }
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeCompareBegin(JNIEnv *env, jobject thiz) {
   if (openPSHelper) {
     openPSHelper->onCompareBegin();

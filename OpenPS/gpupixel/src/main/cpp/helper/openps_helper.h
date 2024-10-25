@@ -60,6 +60,8 @@ public:
 
   void setBrightnessLevel(float level, bool addRecord = false);
 
+  void applyCustomFilter(int type, float level = 1);
+
   void onCompareBegin();
 
   void onCompareEnd();
@@ -85,6 +87,7 @@ private:
   std::shared_ptr<SaturationFilter> saturationFilter;
   std::shared_ptr<SharpenFilter> sharpenFilter;
   std::shared_ptr<BrightnessFilter> brightnessFilter;
+  std::shared_ptr<Filter> customFilter;
   std::shared_ptr<TargetView> targetView;
   std::shared_ptr<TargetRawDataOutput> targetRawDataOutput;
   std::vector<std::shared_ptr<Filter>> filterList;
@@ -92,6 +95,13 @@ private:
   static constexpr float DEFAULT_LEVEL = 0;
   static constexpr float DEFAULT_CONTRAST_LEVEL = 1;
   static constexpr float DEFAULT_SATURATION_LEVEL = 1;
+
+  static constexpr int TYPE_ORIGINAL = 0;
+  static constexpr int TYPE_FAIRY_TALE = 1;
+  static constexpr int INDEX_SUNRISE = 2;
+  static constexpr int INDEX_SUNSET = 3;
+  static constexpr int INDEX_WHITE_CAT = 4;
+  static constexpr int INDEX_BLACK_CAT = 5;
 
   float smoothLevel = DEFAULT_LEVEL;
   float whiteLevel = DEFAULT_LEVEL;
@@ -104,6 +114,7 @@ private:
   float saturationLevel = DEFAULT_SATURATION_LEVEL;
   float sharpnessLevel = DEFAULT_LEVEL;
   float brightnessLevel = DEFAULT_LEVEL;
+  float customFilterLevel = DEFAULT_LEVEL;
 
   int imageWidth = 0;
   int imageHeight = 0;
