@@ -433,6 +433,7 @@ bool gpupixel::OpenPSHelper::addOrRemoveFilter(bool needFilter, std::shared_ptr<
     filterList.push_back(filter);
     return true;
   } else if (!needFilter && hasFilter) {
+    filter->removeAllTargets();
     filterList.erase(std::remove(filterList.begin(), filterList.end(), filter));
     return true;
   }
