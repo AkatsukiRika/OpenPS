@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="white_50p">#80FFFFFF</color>
     <color name="dark_bg">#FF212121</color>
+    <color name="filter_color_blue">#ff5cbadc</color>
+    <color name="filter_color_grey_light">#c4c4c4</color>
+    <color name="filter_color_brown_light">#ff9933</color>
 </resources>

@@ -1,5 +1,6 @@
 package com.akatsukirika.openps.compose
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -31,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,22 +42,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
+import com.akatsukirika.openps.repo.INDEX_ORIGINAL
+import com.akatsukirika.openps.utils.clickableNoIndication
 import com.akatsukirika.openps.viewmodel.EditViewModel
 import kotlin.math.roundToInt
 
-// 人像美颜
-const val INDEX_SMOOTH = 0
-const val INDEX_WHITE = 1
-const val INDEX_LIPSTICK = 2
-const val INDEX_BLUSHER = 3
-const val INDEX_EYE_ZOOM = 4
-const val INDEX_FACE_SLIM = 5
-// 编辑小项
-const val INDEX_CONTRAST = 0
-const val INDEX_EXPOSURE = 1
-const val INDEX_SATURATION = 2
-const val INDEX_SHARPEN = 3
-const val INDEX_BRIGHTNESS = 4
 // 处理状态
 const val STATUS_IDLE = 10
 const val STATUS_LOADING = 11
@@ -62,16 +55,19 @@ const val STATUS_ERROR = 13
 // 一级TAB
 const val TAB_BEAUTIFY = 0
 const val TAB_ADJUST = 1
+const val TAB_FILTER = 2
 
 @Composable
 fun EditScreen(viewModel: EditViewModel) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        OperationRow(
-            viewModel = viewModel,
-            modifier = Modifier.align(Alignment.End)
-        )
+    MaterialTheme {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            OperationRow(
+                viewModel = viewModel,
+                modifier = Modifier.align(Alignment.End)
+            )
 
-        MainColumn(viewModel)
+            MainColumn(viewModel)
+        }
     }
 }
 
@@ -150,14 +146,25 @@ private fun MainColumn(viewModel: EditViewModel) {
 
         Box {
             Column {
-                FunctionList(
-                    modifier = Modifier.height(84.dp),
-                    itemList = itemList,
-                    selectedIndex = selectedFunctionIndex,
-                    onSelect = {
-                        viewModel.onSelect(it)
-                    }
-                )
+                if (selectedTabIndex == TAB_FILTER) {
+                    FilterList(
+                        modifier = Modifier.height(108.dp),
+                        itemList = itemList,
+                        selectedIndex = selectedFunctionIndex,
+                        onSelect = {
+                            viewModel.onSelect(it)
+                        }
+                    )
+                } else {
+                    FunctionList(
+                        modifier = Modifier.height(84.dp),
+                        itemList = itemList,
+                        selectedIndex = selectedFunctionIndex,
+                        onSelect = {
+                            viewModel.onSelect(it)
+                        }
+                    )
+                }
 
                 BottomTabRow(
                     modifier = Modifier.height(28.dp),
@@ -273,6 +280,17 @@ private fun BottomTabRow(
                 fontWeight = FontWeight.Bold
             )
         }
+        
+        Tab(selected = selectedIndex == TAB_FILTER, onClick = {
+            onSelect(TAB_FILTER)
+        }) {
+            Text(
+                text = stringResource(id = R.string.filter),
+                color = if (selectedIndex == TAB_FILTER) Color.White else Color.Gray,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
@@ -301,12 +319,46 @@ private fun FunctionList(
 }
 
 @Composable
+private fun FilterList(
+    modifier: Modifier = Modifier,
+    itemList: List<FunctionItem>,
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit
+) {
+    LazyRow(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        item {
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+
+        item {
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+
+        items(itemList) { item ->
+            if (item.index == INDEX_ORIGINAL) {
+                OriginalFilterItem(item, isSelected = selectedIndex == INDEX_ORIGINAL, onClick = {
+                    onSelect(item.index)
+                })
+            } else {
+                FilterListItem(item, isSelected = item.index == selectedIndex, onClick = {
+                    onSelect(item.index)
+                })
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.width(16.dp))
+        }
+    }
+}
+
+@Composable
 private fun FunctionListItem(item: FunctionItem, isSelected: Boolean, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .width(70.dp)
-            .clickable {
+            .clickableNoIndication {
                 onClick()
             }
     ) {
@@ -317,13 +369,54 @@ private fun FunctionListItem(item: FunctionItem, isSelected: Boolean, onClick: (
             modifier = Modifier.size(32.dp)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         Text(
             text = item.name,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = if (isSelected) AppColors.Green200 else Color.White
+        )
+    }
+}
+
+@Composable
+private fun OriginalFilterItem(item: FunctionItem, isSelected: Boolean, onClick: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        FilterListItem(item, isSelected, onClick)
+
+        Box(modifier = Modifier
+            .width(1.dp)
+            .height(64.dp)
+            .background(Color.DarkGray)
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+    }
+}
+
+@Composable
+private fun FilterListItem(item: FunctionItem, isSelected: Boolean, onClick: () -> Unit) {
+    Box(modifier = Modifier
+        .padding(end = 8.dp)
+        .width(64.dp)
+        .height(80.dp)
+        .clickable { onClick() }
+    ) {
+        Image(
+            painter = painterResource(id = item.icon),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Text(
+            text = item.name,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            fontSize = 11.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .background(Color(item.labelBgColor))
         )
     }
 }
@@ -342,5 +435,6 @@ data class FunctionItem(
     val index: Int,
     val icon: Int,
     val name: String,
-    val hasTwoWaySlider: Boolean = false
+    val hasTwoWaySlider: Boolean = false,
+    val labelBgColor: Int = 0
 )

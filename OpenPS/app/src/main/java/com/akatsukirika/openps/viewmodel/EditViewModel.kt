@@ -8,24 +8,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.FunctionItem
-import com.akatsukirika.openps.compose.INDEX_BLUSHER
-import com.akatsukirika.openps.compose.INDEX_BRIGHTNESS
-import com.akatsukirika.openps.compose.INDEX_CONTRAST
-import com.akatsukirika.openps.compose.INDEX_EXPOSURE
-import com.akatsukirika.openps.compose.INDEX_EYE_ZOOM
-import com.akatsukirika.openps.compose.INDEX_FACE_SLIM
-import com.akatsukirika.openps.compose.INDEX_LIPSTICK
-import com.akatsukirika.openps.compose.INDEX_SATURATION
-import com.akatsukirika.openps.compose.INDEX_SHARPEN
-import com.akatsukirika.openps.compose.INDEX_SMOOTH
-import com.akatsukirika.openps.compose.INDEX_WHITE
 import com.akatsukirika.openps.compose.STATUS_ERROR
 import com.akatsukirika.openps.compose.STATUS_IDLE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.compose.TAB_ADJUST
 import com.akatsukirika.openps.compose.TAB_BEAUTIFY
+import com.akatsukirika.openps.compose.TAB_FILTER
 import com.akatsukirika.openps.interop.NativeLib
+import com.akatsukirika.openps.repo.INDEX_BLUSHER
+import com.akatsukirika.openps.repo.INDEX_BRIGHTNESS
+import com.akatsukirika.openps.repo.INDEX_CONTRAST
+import com.akatsukirika.openps.repo.INDEX_EXPOSURE
+import com.akatsukirika.openps.repo.INDEX_EYE_ZOOM
+import com.akatsukirika.openps.repo.INDEX_FACE_SLIM
+import com.akatsukirika.openps.repo.INDEX_LIPSTICK
+import com.akatsukirika.openps.repo.INDEX_SATURATION
+import com.akatsukirika.openps.repo.INDEX_SHARPEN
+import com.akatsukirika.openps.repo.INDEX_SMOOTH
+import com.akatsukirika.openps.repo.INDEX_WHITE
+import com.akatsukirika.openps.repo.getAdjustFunctionList
+import com.akatsukirika.openps.repo.getBeautifyFunctionList
+import com.akatsukirika.openps.repo.getFilterList
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.BitmapUtils
 import com.akatsukirika.openps.utils.EvenDimensionsTransformation
@@ -109,24 +113,15 @@ class EditViewModel : ViewModel() {
             selectedTabIndex.collect {
                 when (selectedTabIndex.value) {
                     TAB_BEAUTIFY -> {
-                        _itemList.value = listOf(
-                            FunctionItem(index = INDEX_SMOOTH, icon = R.drawable.ic_smooth, name = context.getString(R.string.smooth)),
-                            FunctionItem(index = INDEX_WHITE, icon = R.drawable.ic_white, name = context.getString(R.string.white)),
-                            FunctionItem(index = INDEX_LIPSTICK, icon = R.drawable.ic_lipstick, name = context.getString(R.string.lipstick)),
-                            FunctionItem(index = INDEX_BLUSHER, icon = R.drawable.ic_blusher, name = context.getString(R.string.blusher)),
-                            FunctionItem(index = INDEX_EYE_ZOOM, icon = R.drawable.ic_eye_zoom, name = context.getString(R.string.eye_zoom)),
-                            FunctionItem(index = INDEX_FACE_SLIM, icon = R.drawable.ic_face_slim, name = context.getString(R.string.face_slim))
-                        )
+                        _itemList.value = getBeautifyFunctionList(context)
                     }
 
                     TAB_ADJUST -> {
-                        _itemList.value = listOf(
-                            FunctionItem(index = INDEX_CONTRAST, icon = R.drawable.ic_contrast, name = context.getString(R.string.contrast), hasTwoWaySlider = true),
-                            FunctionItem(index = INDEX_EXPOSURE, icon = R.drawable.ic_exposure, name = context.getString(R.string.exposure), hasTwoWaySlider = true),
-                            FunctionItem(index = INDEX_SATURATION, icon = R.drawable.ic_saturation, name = context.getString(R.string.saturation), hasTwoWaySlider = true),
-                            FunctionItem(index = INDEX_SHARPEN, icon = R.drawable.ic_sharpen, name = context.getString(R.string.sharpen)),
-                            FunctionItem(index = INDEX_BRIGHTNESS, icon = R.drawable.ic_brightness, name = context.getString(R.string.brightness), hasTwoWaySlider = true)
-                        )
+                        _itemList.value = getAdjustFunctionList(context)
+                    }
+
+                    TAB_FILTER -> {
+                        _itemList.value = getFilterList(context)
                     }
                 }
                 if (selectedTabIndex.value != lastSelectedTabIndex.value) {
