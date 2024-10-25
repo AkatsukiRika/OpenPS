@@ -70,11 +70,16 @@ class EditViewModel : ViewModel() {
 
     private val adjustLevelMap = MutableStateFlow(mapOf<Int, Float>())
 
+    private val filterLevelMap = MutableStateFlow(mapOf<Int, Float>())
+
     private val _currentLevel = MutableStateFlow(0f)
     val currentLevel: StateFlow<Float> = _currentLevel
 
     private val _selectedFunctionIndex = MutableStateFlow(-1)
     val selectedFunctionIndex: StateFlow<Int> = _selectedFunctionIndex
+
+    private val _selectedFilterIndex = MutableStateFlow(-1)
+    val selectedFilterIndex: StateFlow<Int> = _selectedFilterIndex
 
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: StateFlow<Int> = _selectedTabIndex
@@ -162,15 +167,27 @@ class EditViewModel : ViewModel() {
     }
 
     fun onSelect(index: Int) {
-        _selectedFunctionIndex.value = if (selectedFunctionIndex.value == -1 || index != selectedFunctionIndex.value) index else -1
-        if (selectedFunctionIndex.value != -1) {
-            when (selectedTabIndex.value) {
-                TAB_BEAUTIFY -> {
+        if (selectedTabIndex.value == TAB_FILTER) {
+            _selectedFilterIndex.value = index
+        } else {
+            _selectedFunctionIndex.value = if (selectedFunctionIndex.value == -1 || index != selectedFunctionIndex.value) index else -1
+        }
+        when (selectedTabIndex.value) {
+            TAB_BEAUTIFY -> {
+                if (selectedFunctionIndex.value != -1) {
                     _currentLevel.value = beautifyLevelMap.value[selectedFunctionIndex.value] ?: 0f
                 }
+            }
 
-                TAB_ADJUST -> {
+            TAB_ADJUST -> {
+                if (selectedFunctionIndex.value != -1) {
                     _currentLevel.value = adjustLevelMap.value[selectedFunctionIndex.value] ?: 0f
+                }
+            }
+
+            TAB_FILTER -> {
+                if (selectedFilterIndex.value != -1) {
+                    _currentLevel.value = filterLevelMap.value[selectedFilterIndex.value] ?: 1f
                 }
             }
         }
@@ -216,11 +233,20 @@ class EditViewModel : ViewModel() {
                     INDEX_BRIGHTNESS -> helper?.setBrightnessLevel(currentLevel.value, addRecord)
                 }
             }
+
+            TAB_FILTER -> {
+                filterLevelMap.update {
+                    it + (selectedFunctionIndex.value to currentLevel.value)
+                }
+            }
         }
     }
 
     fun updateSelectedTab(tabIndex: Int) {
         _selectedTabIndex.value = tabIndex
+        if (tabIndex == TAB_FILTER && selectedFilterIndex.value != -1) {
+            _currentLevel.value = filterLevelMap.value[selectedFilterIndex.value] ?: 1f
+        }
     }
 
     fun updateLoadStatus(status: Int) {

@@ -126,6 +126,7 @@ private fun OperationRow(modifier: Modifier = Modifier, viewModel: EditViewModel
 private fun MainColumn(viewModel: EditViewModel) {
     val currentLevel = viewModel.currentLevel.collectAsState(initial = 0f).value
     val selectedFunctionIndex = viewModel.selectedFunctionIndex.collectAsState(initial = -1).value
+    val selectedFilterIndex = viewModel.selectedFilterIndex.collectAsState(initial = -1).value
     val selectedTabIndex = viewModel.selectedTabIndex.collectAsState(initial = 0).value
     val itemList = viewModel.itemList.collectAsState(initial = emptyList()).value
     val loadStatus = viewModel.loadStatus.collectAsState(initial = STATUS_IDLE).value
@@ -135,7 +136,11 @@ private fun MainColumn(viewModel: EditViewModel) {
         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
         .background(AppColors.DarkBG)
     ) {
-        val selectedItem = itemList.getOrNull(selectedFunctionIndex)
+        val selectedItem = if (selectedTabIndex == TAB_FILTER) {
+            itemList.getOrNull(selectedFilterIndex)
+        } else {
+            itemList.getOrNull(selectedFunctionIndex)
+        }
         if (selectedItem != null) {
             if (selectedItem.hasTwoWaySlider) {
                 BidirectionalSliderLayout(viewModel, currentLevel)
@@ -150,7 +155,7 @@ private fun MainColumn(viewModel: EditViewModel) {
                     FilterList(
                         modifier = Modifier.height(108.dp),
                         itemList = itemList,
-                        selectedIndex = selectedFunctionIndex,
+                        selectedIndex = selectedFilterIndex,
                         onSelect = {
                             viewModel.onSelect(it)
                         }
@@ -337,7 +342,7 @@ private fun FilterList(
         items(itemList) { item ->
             if (item.index == INDEX_ORIGINAL) {
                 OriginalFilterItem(item, isSelected = selectedIndex == INDEX_ORIGINAL, onClick = {
-                    onSelect(item.index)
+                    onSelect(INDEX_ORIGINAL)
                 })
             } else {
                 FilterListItem(item, isSelected = item.index == selectedIndex, onClick = {
@@ -407,6 +412,23 @@ private fun FilterListItem(item: FunctionItem, isSelected: Boolean, onClick: () 
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
+        if (isSelected) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .background(Color(item.labelBgColor).copy(0.75f))
+            )
+
+            Icon(
+                painter = painterResource(id = R.drawable.ic_tick),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 16.dp)
+                    .size(32.dp)
+            )
+        }
 
         Text(
             text = item.name,
