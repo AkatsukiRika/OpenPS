@@ -22,7 +22,7 @@ class GPUPIXEL_API FilterGroup : public Filter {
   static std::shared_ptr<FilterGroup> create(
       std::vector<std::shared_ptr<Filter>> filters);
 
-  bool init();
+  virtual bool init();
   bool init(std::vector<std::shared_ptr<Filter>> filters);
   bool hasFilter(const std::shared_ptr<Filter> filter) const;
   void addFilter(std::shared_ptr<Filter> filter);

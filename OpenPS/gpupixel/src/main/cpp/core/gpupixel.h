@@ -90,4 +90,4 @@
 #include "sharpen_filter.h"
 
 // custom filters
-#include "fairy_tale_filter.h"
+#include "custom_filter.h"

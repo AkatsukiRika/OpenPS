@@ -64,8 +64,8 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   sharpenFilter->setTexelSize(imageWidth, imageHeight);
   brightnessFilter = BrightnessFilter::create();
   brightnessFilter->setFilterClassName("BrightnessFilter");
-  customFilter = FairyTaleFilter::create();
-  customFilter->setFilterClassName("FairyTaleFilter");
+  customFilter = CustomFilter::create();
+  customFilter->setFilterClassName("CustomFilter");
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);
@@ -90,8 +90,8 @@ void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
     sharpenFilter->setTexelSize(imageWidth, imageHeight);
     brightnessFilter = BrightnessFilter::create();
     brightnessFilter->setFilterClassName("BrightnessFilter");
-    customFilter = FairyTaleFilter::create();
-    customFilter->setFilterClassName("FairyTaleFilter");
+    customFilter = CustomFilter::create();
+    customFilter->setFilterClassName("CustomFilter");
     targetRawDataOutput = TargetRawDataOutput::create();
     gpuSourceImage->addTarget(targetView);
     gpuSourceImage->addTarget(targetRawDataOutput);
@@ -257,15 +257,9 @@ void gpupixel::OpenPSHelper::setBrightnessLevel(float level, bool addRecord) {
 
 void gpupixel::OpenPSHelper::applyCustomFilter(int type, float level) {
   if (customFilter) {
-    if (type == TYPE_ORIGINAL) {
-      customFilterLevel = DEFAULT_LEVEL;
-    } else {
-      customFilterLevel = level;
-      auto fairyTaleFilter = std::dynamic_pointer_cast<FairyTaleFilter>(customFilter);
-      if (fairyTaleFilter) {
-        fairyTaleFilter->setIntensity(level);
-      }
-    }
+    customFilterLevel = level;
+    customFilter->setType(type);
+    customFilter->setIntensity(level);
     refreshRenderPipeline();
   }
 }
@@ -300,6 +294,9 @@ void gpupixel::OpenPSHelper::onCompareBegin() {
   if (brightnessFilter) {
     brightnessFilter->setBrightness(0);
   }
+  if (customFilter) {
+    customFilter->setIntensity(0);
+  }
 }
 
 void gpupixel::OpenPSHelper::onCompareEnd() {
@@ -331,6 +328,9 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   }
   if (brightnessFilter) {
     brightnessFilter->setBrightness(brightnessLevel);
+  }
+  if (customFilter) {
+    customFilter->setIntensity(customFilterLevel);
   }
 }
 

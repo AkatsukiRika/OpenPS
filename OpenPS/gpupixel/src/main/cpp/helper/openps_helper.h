@@ -87,7 +87,7 @@ private:
   std::shared_ptr<SaturationFilter> saturationFilter;
   std::shared_ptr<SharpenFilter> sharpenFilter;
   std::shared_ptr<BrightnessFilter> brightnessFilter;
-  std::shared_ptr<Filter> customFilter;
+  std::shared_ptr<CustomFilter> customFilter;
   std::shared_ptr<TargetView> targetView;
   std::shared_ptr<TargetRawDataOutput> targetRawDataOutput;
   std::vector<std::shared_ptr<Filter>> filterList;
