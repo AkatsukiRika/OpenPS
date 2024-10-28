@@ -19,6 +19,7 @@ const std::string kLookupFragmentShaderString = SHADER_STRING(
     varying highp vec2 textureCoordinate;
     uniform sampler2D inputImageTexture;
     uniform sampler2D lookupImageTexture;
+    uniform lowp float intensity;
 
     void main() {
         lowp vec4 textureColor = texture2D(inputImageTexture, textureCoordinate);
@@ -45,7 +46,7 @@ const std::string kLookupFragmentShaderString = SHADER_STRING(
         lowp vec4 newColor2 = texture2D(lookupImageTexture, texPos2);
 
         lowp vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
-        gl_FragColor = vec4(newColor.rgb, textureColor.w);
+        gl_FragColor = vec4(mix(textureColor.rgb, newColor.rgb, intensity), textureColor.w);
     }
 );
 
@@ -63,6 +64,10 @@ bool FairyTaleFilter::init() {
   }
   fairyTaleImage = SourceImage::create(Util::getResourcePath("lookup_fairy_tale.png"));
   return true;
+}
+
+void FairyTaleFilter::setIntensity(float newIntensity) {
+  intensity = newIntensity;
 }
 
 bool FairyTaleFilter::proceed(bool bUpdateTargets, int64_t frameTime) {
@@ -92,6 +97,8 @@ bool FairyTaleFilter::proceed(bool bUpdateTargets, int64_t frameTime) {
   CHECK_GL(glActiveTexture(GL_TEXTURE3));
   CHECK_GL(glBindTexture(GL_TEXTURE_2D,fairyTaleImage->getFramebuffer()->getTexture()));
   _filterProgram->setUniformValue("lookupImageTexture", 3);
+
+  _filterProgram->setUniformValue("intensity", intensity);
 
   // vertex position
   CHECK_GL(glVertexAttribPointer(_filterPositionAttribute, 2, GL_FLOAT, 0, 0,

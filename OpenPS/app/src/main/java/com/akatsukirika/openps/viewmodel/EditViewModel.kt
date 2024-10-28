@@ -239,6 +239,7 @@ class EditViewModel : ViewModel() {
                 filterLevelMap.update {
                     it + (selectedFunctionIndex.value to currentLevel.value)
                 }
+                helper?.applyCustomFilter(selectedFilterIndex.value, currentLevel.value)
             }
         }
     }

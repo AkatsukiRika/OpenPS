@@ -261,6 +261,10 @@ void gpupixel::OpenPSHelper::applyCustomFilter(int type, float level) {
       customFilterLevel = DEFAULT_LEVEL;
     } else {
       customFilterLevel = level;
+      auto fairyTaleFilter = std::dynamic_pointer_cast<FairyTaleFilter>(customFilter);
+      if (fairyTaleFilter) {
+        fairyTaleFilter->setIntensity(level);
+      }
     }
     refreshRenderPipeline();
   }
