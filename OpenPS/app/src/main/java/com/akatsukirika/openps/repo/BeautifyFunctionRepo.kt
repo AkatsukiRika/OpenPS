@@ -2,7 +2,7 @@ package com.akatsukirika.openps.repo
 
 import android.content.Context
 import com.akatsukirika.openps.R
-import com.akatsukirika.openps.compose.FunctionItem
+import com.akatsukirika.openps.model.FunctionItem
 
 const val INDEX_SMOOTH = 0
 const val INDEX_WHITE = 1

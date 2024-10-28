@@ -7,7 +7,6 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.R
-import com.akatsukirika.openps.compose.FunctionItem
 import com.akatsukirika.openps.compose.STATUS_ERROR
 import com.akatsukirika.openps.compose.STATUS_IDLE
 import com.akatsukirika.openps.compose.STATUS_LOADING
@@ -16,13 +15,13 @@ import com.akatsukirika.openps.compose.TAB_ADJUST
 import com.akatsukirika.openps.compose.TAB_BEAUTIFY
 import com.akatsukirika.openps.compose.TAB_FILTER
 import com.akatsukirika.openps.interop.NativeLib
+import com.akatsukirika.openps.model.FunctionItem
 import com.akatsukirika.openps.repo.INDEX_BLUSHER
 import com.akatsukirika.openps.repo.INDEX_BRIGHTNESS
 import com.akatsukirika.openps.repo.INDEX_CONTRAST
 import com.akatsukirika.openps.repo.INDEX_EXPOSURE
 import com.akatsukirika.openps.repo.INDEX_EYE_ZOOM
 import com.akatsukirika.openps.repo.INDEX_FACE_SLIM
-import com.akatsukirika.openps.repo.INDEX_FAIRY_TALE
 import com.akatsukirika.openps.repo.INDEX_LIPSTICK
 import com.akatsukirika.openps.repo.INDEX_SATURATION
 import com.akatsukirika.openps.repo.INDEX_SHARPEN

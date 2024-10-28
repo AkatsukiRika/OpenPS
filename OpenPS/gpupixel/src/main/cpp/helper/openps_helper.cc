@@ -257,7 +257,11 @@ void gpupixel::OpenPSHelper::setBrightnessLevel(float level, bool addRecord) {
 
 void gpupixel::OpenPSHelper::applyCustomFilter(int type, float level) {
   if (customFilter) {
-    customFilterLevel = level;
+    if (type == TYPE_ORIGINAL) {
+      customFilterLevel = DEFAULT_LEVEL;
+    } else {
+      customFilterLevel = level;
+    }
     refreshRenderPipeline();
   }
 }

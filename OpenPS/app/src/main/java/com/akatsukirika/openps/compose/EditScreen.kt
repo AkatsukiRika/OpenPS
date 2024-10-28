@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
+import com.akatsukirika.openps.model.FunctionItem
 import com.akatsukirika.openps.repo.INDEX_ORIGINAL
 import com.akatsukirika.openps.utils.clickableNoIndication
 import com.akatsukirika.openps.viewmodel.EditViewModel
@@ -141,7 +142,7 @@ private fun MainColumn(viewModel: EditViewModel) {
         } else {
             itemList.getOrNull(selectedFunctionIndex)
         }
-        if (selectedItem != null) {
+        if (selectedItem != null && !selectedItem.isOriginal) {
             if (selectedItem.hasTwoWaySlider) {
                 BidirectionalSliderLayout(viewModel, currentLevel)
             } else {
@@ -452,11 +453,3 @@ private fun LoadingMask(modifier: Modifier = Modifier) {
         )
     }
 }
-
-data class FunctionItem(
-    val index: Int,
-    val icon: Int,
-    val name: String,
-    val hasTwoWaySlider: Boolean = false,
-    val labelBgColor: Int = 0
-)
