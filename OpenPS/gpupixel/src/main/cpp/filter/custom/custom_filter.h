@@ -5,6 +5,7 @@
 #include "fairy_tale_filter.h"
 #include "sunrise_filter.h"
 #include "sunset_filter.h"
+#include "white_cat_filter.h"
 
 NS_GPUPIXEL_BEGIN
 
@@ -27,10 +28,12 @@ protected:
   static constexpr int TYPE_FAIRY_TALE = 1;
   static constexpr int TYPE_SUNRISE = 2;
   static constexpr int TYPE_SUNSET = 3;
+  static constexpr int TYPE_WHITE_CAT = 4;
 
   std::shared_ptr<FairyTaleFilter> fairyTaleFilter;
   std::shared_ptr<SunriseFilter> sunriseFilter;
   std::shared_ptr<SunsetFilter> sunsetFilter;
+  std::shared_ptr<WhiteCatFilter> whiteCatFilter;
 
   int type = TYPE_ORIGINAL;
   float intensity = 0;

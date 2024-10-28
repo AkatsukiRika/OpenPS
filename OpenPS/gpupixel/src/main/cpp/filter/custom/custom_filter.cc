@@ -28,9 +28,13 @@ bool CustomFilter::init() {
   sunsetFilter = SunsetFilter::create();
   addFilter(sunsetFilter);
 
+  whiteCatFilter = WhiteCatFilter::create();
+  addFilter(whiteCatFilter);
+
   fairyTaleFilter
       ->addTarget(sunriseFilter)
-      ->addTarget(sunsetFilter);
+      ->addTarget(sunsetFilter)
+      ->addTarget(whiteCatFilter);
 
   return true;
 }
@@ -46,21 +50,31 @@ void CustomFilter::setIntensity(float newIntensity) {
       fairyTaleFilter->setIntensity(intensity);
       sunriseFilter->setIntensity(0);
       sunsetFilter->setIntensity(0);
+      whiteCatFilter->setIntensity(0);
       break;
     case TYPE_SUNRISE:
       fairyTaleFilter->setIntensity(0);
       sunriseFilter->setIntensity(intensity);
       sunsetFilter->setIntensity(0);
+      whiteCatFilter->setIntensity(0);
       break;
     case TYPE_SUNSET:
       fairyTaleFilter->setIntensity(0);
       sunriseFilter->setIntensity(0);
       sunsetFilter->setIntensity(intensity);
+      whiteCatFilter->setIntensity(0);
+      break;
+    case TYPE_WHITE_CAT:
+      fairyTaleFilter->setIntensity(0);
+      sunriseFilter->setIntensity(0);
+      sunsetFilter->setIntensity(0);
+      whiteCatFilter->setIntensity(intensity);
       break;
     default:
       fairyTaleFilter->setIntensity(0);
       sunriseFilter->setIntensity(0);
       sunsetFilter->setIntensity(0);
+      whiteCatFilter->setIntensity(0);
   }
 }
 
