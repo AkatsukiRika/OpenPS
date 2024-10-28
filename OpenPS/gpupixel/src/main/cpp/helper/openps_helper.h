@@ -96,13 +96,6 @@ private:
   static constexpr float DEFAULT_CONTRAST_LEVEL = 1;
   static constexpr float DEFAULT_SATURATION_LEVEL = 1;
 
-  static constexpr int TYPE_ORIGINAL = 0;
-  static constexpr int TYPE_FAIRY_TALE = 1;
-  static constexpr int INDEX_SUNRISE = 2;
-  static constexpr int INDEX_SUNSET = 3;
-  static constexpr int INDEX_WHITE_CAT = 4;
-  static constexpr int INDEX_BLACK_CAT = 5;
-
   float smoothLevel = DEFAULT_LEVEL;
   float whiteLevel = DEFAULT_LEVEL;
   float lipstickLevel = DEFAULT_LEVEL;
