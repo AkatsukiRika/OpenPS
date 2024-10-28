@@ -25,27 +25,14 @@ bool CustomFilter::init() {
   sunriseFilter = SunriseFilter::create();
   addFilter(sunriseFilter);
 
+  fairyTaleFilter->addTarget(sunriseFilter);
+  setTerminalFilter(sunriseFilter);
+
   return true;
 }
 
 void CustomFilter::setType(int newType) {
-  if (newType == type) {
-    return;
-  }
   type = newType;
-  removeAllFilters();
-  fairyTaleFilter->removeAllTargets();
-  sunriseFilter->removeAllTargets();
-  switch (type) {
-    case TYPE_FAIRY_TALE:
-      addFilter(fairyTaleFilter);
-      break;
-    case TYPE_SUNRISE:
-      addFilter(sunriseFilter);
-      break;
-    default:
-      break;
-  }
 }
 
 void CustomFilter::setIntensity(float newIntensity) {
@@ -59,6 +46,9 @@ void CustomFilter::setIntensity(float newIntensity) {
       fairyTaleFilter->setIntensity(0);
       sunriseFilter->setIntensity(intensity);
       break;
+    default:
+      fairyTaleFilter->setIntensity(0);
+      sunriseFilter->setIntensity(0);
   }
 }
 
