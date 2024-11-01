@@ -60,7 +60,7 @@ public:
 
   void setBrightnessLevel(float level, bool addRecord = false);
 
-  void applyCustomFilter(int type, float level = 1);
+  void applyCustomFilter(int type, float level = 1, bool addRecord = false);
 
   void onCompareBegin();
 

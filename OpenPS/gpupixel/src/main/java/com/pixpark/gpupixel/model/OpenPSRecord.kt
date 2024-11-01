@@ -11,5 +11,7 @@ data class OpenPSRecord(
     val exposureLevel: Float,
     val saturationLevel: Float,
     val sharpenLevel: Float,
-    val brightnessLevel: Float
+    val brightnessLevel: Float,
+    val customFilterType: Int,
+    val customFilterIntensity: Float
 )

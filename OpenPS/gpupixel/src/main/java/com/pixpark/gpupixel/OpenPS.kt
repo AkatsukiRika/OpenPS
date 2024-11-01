@@ -55,7 +55,7 @@ internal object OpenPS {
 
     external fun nativeSetBrightnessLevel(level: Float, addRecord: Boolean = false)
 
-    external fun nativeApplyCustomFilter(type: Int, level: Float = 1f)
+    external fun nativeApplyCustomFilter(type: Int, level: Float = 1f, addRecord: Boolean = false)
 
     external fun nativeCompareBegin()
 

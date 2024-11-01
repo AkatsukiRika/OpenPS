@@ -255,11 +255,14 @@ void gpupixel::OpenPSHelper::setBrightnessLevel(float level, bool addRecord) {
   }
 }
 
-void gpupixel::OpenPSHelper::applyCustomFilter(int type, float level) {
+void gpupixel::OpenPSHelper::applyCustomFilter(int type, float level, bool addRecord) {
   if (customFilter) {
     customFilterLevel = level;
     customFilter->setType(type);
     customFilter->setIntensity(level);
+    if (addRecord) {
+      addUndoRedoRecord();
+    }
     refreshRenderPipeline();
   }
 }
@@ -388,7 +391,7 @@ void gpupixel::OpenPSHelper::addUndoRedoRecord() {
       smoothRecordLevel, whiteRecordLevel, lipstickRecordLevel,
       blusherRecordLevel, eyeZoomRecordLevel, faceSlimRecordLevel,
       contrastRecordLevel, exposureRecordLevel, saturationRecordLevel,
-      sharpnessRecordLevel, brightnessRecordLevel);
+      sharpnessRecordLevel, brightnessRecordLevel, customFilter->getType(), customFilterLevel);
   undoRedoHelper.addRecord(record);
 }
 
@@ -404,6 +407,7 @@ void gpupixel::OpenPSHelper::setLevels(gpupixel::OpenPSRecord record) {
   setSaturationLevel(record.saturationLevel, false);
   setSharpenLevel(record.sharpnessLevel, false);
   setBrightnessLevel(record.brightnessLevel, false);
+  applyCustomFilter(record.customFilterType, record.customFilterIntensity, false);
 }
 
 void gpupixel::OpenPSHelper::refreshRenderPipeline() {

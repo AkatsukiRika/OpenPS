@@ -16,6 +16,7 @@ public:
   ~CustomFilter();
   bool init();
   void setType(int newType);
+  int getType();
   void setIntensity(float newIntensity);
 
   virtual void setInputFramebuffer(std::shared_ptr<Framebuffer> framebuffer,

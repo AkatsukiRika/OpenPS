@@ -47,6 +47,10 @@ void CustomFilter::setType(int newType) {
   type = newType;
 }
 
+int CustomFilter::getType() {
+  return type;
+}
+
 void CustomFilter::setIntensity(float newIntensity) {
   intensity = newIntensity;
   switch (type) {

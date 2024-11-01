@@ -188,7 +188,10 @@ class EditViewModel : ViewModel() {
             TAB_FILTER -> {
                 if (selectedFilterIndex.value != -1) {
                     _currentLevel.value = filterLevelMap.value[selectedFilterIndex.value] ?: 1f
-                    helper?.applyCustomFilter(selectedFilterIndex.value, currentLevel.value)
+                    helper?.applyCustomFilter(selectedFilterIndex.value, currentLevel.value, true)
+                    viewModelScope.launch {
+                        refreshUndoRedo()
+                    }
                 }
             }
         }
@@ -239,7 +242,7 @@ class EditViewModel : ViewModel() {
                 filterLevelMap.update {
                     it + (selectedFunctionIndex.value to currentLevel.value)
                 }
-                helper?.applyCustomFilter(selectedFilterIndex.value, currentLevel.value)
+                helper?.applyCustomFilter(selectedFilterIndex.value, currentLevel.value, addRecord)
             }
         }
     }
@@ -295,7 +298,14 @@ class EditViewModel : ViewModel() {
                 INDEX_BRIGHTNESS to record.brightnessLevel
             )
         }
+        filterLevelMap.update {
+            mapOf(record.customFilterType to record.customFilterIntensity)
+        }
         _selectedFunctionIndex.value = -1
+        if (selectedTabIndex.value == TAB_FILTER) {
+            _currentLevel.value = record.customFilterIntensity
+            _selectedFilterIndex.value = record.customFilterType
+        }
     }
 
     private fun startImageFilter(context: Context, bitmap: Bitmap) {

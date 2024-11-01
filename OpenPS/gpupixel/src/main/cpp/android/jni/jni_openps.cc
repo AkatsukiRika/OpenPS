@@ -199,9 +199,9 @@ Java_com_pixpark_gpupixel_OpenPS_nativeSetBrightnessLevel(JNIEnv *env, jobject t
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeApplyCustomFilter(JNIEnv *env, jobject thiz, jint type, jfloat level) {
+Java_com_pixpark_gpupixel_OpenPS_nativeApplyCustomFilter(JNIEnv *env, jobject thiz, jint type, jfloat level, jboolean addRecord) {
   if (openPSHelper) {
-    openPSHelper->applyCustomFilter(type, level);
+    openPSHelper->applyCustomFilter(type, level, addRecord);
   }
 }
 
@@ -249,11 +249,12 @@ Java_com_pixpark_gpupixel_OpenPS_nativeUndo(JNIEnv *env, jobject thiz) {
   if (openPSHelper) {
     OpenPSRecord record = openPSHelper->undo();
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
-    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFF)V");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIF)V");
     jobject kotlinObject = env->NewObject(kotlinClass, constructor, record.smoothLevel, record.whiteLevel,
                                           record.lipstickLevel, record.blusherLevel, record.eyeZoomLevel,
                                           record.faceSlimLevel, record.contrastLevel, record.exposureLevel,
-                                          record.saturationLevel, record.sharpnessLevel, record.brightnessLevel);
+                                          record.saturationLevel, record.sharpnessLevel, record.brightnessLevel,
+                                          record.customFilterType, record.customFilterIntensity);
     return kotlinObject;
   }
   return nullptr;
@@ -264,11 +265,12 @@ Java_com_pixpark_gpupixel_OpenPS_nativeRedo(JNIEnv *env, jobject thiz) {
   if (openPSHelper) {
     OpenPSRecord record = openPSHelper->redo();
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
-    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFF)V");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIF)V");
     jobject kotlinObject = env->NewObject(kotlinClass, constructor, record.smoothLevel, record.whiteLevel,
                                           record.lipstickLevel, record.blusherLevel, record.eyeZoomLevel,
                                           record.faceSlimLevel, record.contrastLevel, record.exposureLevel,
-                                          record.saturationLevel, record.sharpnessLevel, record.brightnessLevel);
+                                          record.saturationLevel, record.sharpnessLevel, record.brightnessLevel,
+                                          record.customFilterType, record.customFilterIntensity);
     return kotlinObject;
   }
   return nullptr;

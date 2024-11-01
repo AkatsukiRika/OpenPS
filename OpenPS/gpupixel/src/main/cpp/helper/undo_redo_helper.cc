@@ -63,5 +63,5 @@ gpupixel::UndoRedoHelper::UndoRedoHelper() {
 }
 
 gpupixel::OpenPSRecord gpupixel::UndoRedoHelper::getEmptyRecord() {
-  return gpupixel::OpenPSRecord(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  return gpupixel::OpenPSRecord(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }

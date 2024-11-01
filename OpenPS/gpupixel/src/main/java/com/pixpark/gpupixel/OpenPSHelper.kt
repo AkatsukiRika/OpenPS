@@ -126,9 +126,9 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
-    fun applyCustomFilter(type: Int, level: Float = 1f) {
+    fun applyCustomFilter(type: Int, level: Float = 1f, addRecord: Boolean = false) {
         renderView.postOnGLThread {
-            OpenPS.nativeApplyCustomFilter(type, level)
+            OpenPS.nativeApplyCustomFilter(type, level, addRecord)
             requestRender()
         }
     }
