@@ -24,7 +24,7 @@ object GalleryUtils {
             val bucketNameColumn = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
             while (cursor.moveToNext()) {
                 val albumName = cursor.getString(bucketNameColumn)
-                if (!albumNames.contains(albumName)) {
+                if (!albumNames.contains(albumName) && albumName != null) {
                     albumNames.add(albumName)
                 }
             }
