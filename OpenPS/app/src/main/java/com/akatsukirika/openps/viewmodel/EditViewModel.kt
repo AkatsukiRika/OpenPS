@@ -260,6 +260,9 @@ class EditViewModel : ViewModel() {
 
     fun undo() {
         viewModelScope.launch(Dispatchers.IO) {
+            if (helper?.canUndo() != true) {
+                return@launch
+            }
             val record = helper?.undo()
             record?.let {
                 updateMap(it)
@@ -270,6 +273,9 @@ class EditViewModel : ViewModel() {
 
     fun redo() {
         viewModelScope.launch(Dispatchers.IO) {
+            if (helper?.canRedo() != true) {
+                return@launch
+            }
             val record = helper?.redo()
             record?.let {
                 updateMap(it)
