@@ -7,8 +7,23 @@
 | Key | Value |
 | --- | ----- |
 | Supported Platforms | Android 6.0 or above |
-| Latest Version | 1.0.0 |
+| Latest Version | 1.1.0 |
 | GUI Language | English |
+
+## Update Notes
+
+### Version 1.1.0
+
+- Built-in Photo Gallery
+    - Preview support
+    - Information display: file type, size and resolution
+- Improved Preview Clarity
+    - MVP matrix introduced for gesture operations
+    - Preview in original size supported
+- Custom Image Filters
+    - 5 different full-image filter effects
+- Bug Fix & Optimization
+    - Undo / redo optimization
 
 ## Introduction
 
