@@ -2,7 +2,7 @@
 #include "CvUtils.h"
 #include "../model/SkinModelProcessor.h"
 #include <android/log.h>
-#include <tensorflow/lite/c/c_api.h>
+#include <onnxruntime_cxx_api.h>
 
 #define LOG_TAG "xuanTest"
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
@@ -49,126 +49,102 @@ int CvLoader::runSkinModelInference(const char *modelBuffer, off_t modelSize) {
         LOGE("Bitmap未加载!");
         return 1;
     }
-    auto preprocessResult = SkinModelProcessor::preprocess(originalMat);
-    LOGI("皮肤模型预处理完成, 预处理结果大小: %zu", preprocessResult.size());
 
-    // 加载TFLite模型
-    TfLiteModel* model = TfLiteModelCreate(modelBuffer, modelSize);
-    if (model == nullptr) {
-        LOGE("加载TFLite模型失败!");
+    try {
+        auto preprocessResult = SkinModelProcessor::preprocess(originalMat);
+        LOGI("皮肤模型预处理完成, 预处理结果大小: %zu", preprocessResult.size());
+
+        auto modelData = std::vector<uint8_t>(modelBuffer, modelBuffer + modelSize);
+
+        Ort::SessionOptions sessionOptions;
+        sessionOptions.SetIntraOpNumThreads(2);
+        sessionOptions.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
+
+        Ort::MemoryInfo memoryInfo = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
+        Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "skin-model-inference");
+        Ort::Session session(env, modelData.data(), modelData.size(), sessionOptions);
+
+        Ort::AllocatorWithDefaultOptions allocator;
+        auto inputName = session.GetInputNameAllocated(0, allocator);
+        auto outputName = session.GetOutputNameAllocated(0, allocator);
+
+        std::vector<int64_t> inputShape = {1, 3, 512, 512};
+        std::vector<int64_t> outputShape = {1, 19, 512, 512};
+
+        // 修改：使用通用的 CreateTensor 函数，明确指定 FP16 类型
+        Ort::Value inputTensor = Ort::Value::CreateTensor(
+            memoryInfo,
+            preprocessResult.data(),
+            preprocessResult.size() * sizeof(uint16_t),  // FP16 的大小
+            inputShape.data(),
+            inputShape.size(),
+            ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT16  // 明确指定 FP16 类型
+        );
+
+        auto inputTensorInfo = inputTensor.GetTensorTypeAndShapeInfo();
+        auto inputDims = inputTensorInfo.GetShape();
+        LOGI("输入Tensor类型: %d", inputTensorInfo.GetElementType());
+        for (size_t i = 0; i < inputDims.size(); i++) {
+            LOGI("输入Tensor维度: %zu, 大小: %lld", i, inputDims[i]);
+        }
+
+        std::array<const char*, 1> inputNames = {inputName.get()};
+        std::array<const char*, 1> outputNames = {outputName.get()};
+
+        auto outputTensors = session.Run(
+            Ort::RunOptions{nullptr},
+            inputNames.data(),
+            &inputTensor,
+            1,
+            outputNames.data(),
+            1
+        );
+
+        if (outputTensors.empty() || !outputTensors[0].IsTensor()) {
+            LOGE("推理输出无效!");
+            return 1;
+        }
+
+        const auto& outputTensor = outputTensors[0];
+        auto outputTensorInfo = outputTensor.GetTensorTypeAndShapeInfo();
+        auto actualOutputShape = outputTensorInfo.GetShape();
+
+        LOGI("实际输出Tensor类型: %d", outputTensorInfo.GetElementType());
+        for (size_t i = 0; i < actualOutputShape.size(); i++) {
+            LOGI("实际输出Tensor维度: %zu, 大小: %lld", i, actualOutputShape[i]);
+        }
+
+        size_t outputSize = 19 * 512 * 512;
+        if (actualOutputShape[1] != 19 || actualOutputShape[2] != 512 || actualOutputShape[3] != 512) {
+            LOGE("输出维度不符合预期!");
+            return 1;
+        }
+
+        // 获取 FP16 输出数据并转换为 FP32
+        const uint16_t* outputFp16Data = outputTensor.GetTensorData<uint16_t>();  // 使用 uint16_t 替代 hfloat
+        std::vector<float> outputFp32Data(outputSize);
+        cv::hal::cvt16f32f(reinterpret_cast<const cv::hfloat*>(outputFp16Data), outputFp32Data.data(), outputSize);
+
+        cv::Mat outputMat(1, outputSize, CV_32F, outputFp32Data.data());
+        outputMat = outputMat.reshape(1, {1, 19, 512, 512});
+        auto postprocessResult = SkinModelProcessor::postprocess(outputMat, originalMat.rows, originalMat.cols);
+
+        if (postprocessResult.size() != 4) {
+            LOGE("皮肤模型后处理失败!");
+            return 1;
+        }
+
+        parseResult = postprocessResult[0];
+        skinMask = postprocessResult[1];
+
+        return 0;
+    } catch (const Ort::Exception& e) {
+        LOGE("ONNX Runtime错误: %s", e.what());
+        return 1;
+    } catch (const std::exception& e) {
+        LOGE("发生错误: %s", e.what());
         return 1;
     }
-
-    // 创建解释器选项
-    TfLiteInterpreterOptions* options = TfLiteInterpreterOptionsCreate();
-    TfLiteInterpreterOptionsSetNumThreads(options, 2);
-
-    // 创建解释器
-    TfLiteInterpreter* interpreter = TfLiteInterpreterCreate(model, options);
-    if (interpreter == nullptr) {
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("创建解释器失败!");
-        return 1;
-    }
-
-    // 分配Tensor Buffers
-    if (TfLiteInterpreterAllocateTensors(interpreter) != kTfLiteOk) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("分配Tensor Buffers失败!");
-        return 1;
-    }
-
-    // 获取输入Tensor
-    TfLiteTensor* inputTensor = TfLiteInterpreterGetInputTensor(interpreter, 0);
-    if (inputTensor == nullptr) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("获取输入Tensor失败!");
-        return 1;
-    }
-
-    // 获取输入类型和维度
-    TfLiteType tensorType = TfLiteTensorType(inputTensor);
-    int32_t tensorDims = TfLiteTensorNumDims(inputTensor);
-    LOGI("输入Tensor类型: %d", tensorType);
-    for (int32_t i = 0; i < tensorDims; i++) {
-        int32_t tensorDim = TfLiteTensorDim(inputTensor, i);
-        LOGI("输入Tensor维度: %d, 大小: %d", i, tensorDim);
-    }
-
-    // 准备输入数据
-    if (TfLiteTensorCopyFromBuffer(inputTensor, preprocessResult.data(), preprocessResult.size() * sizeof(float_t)) != kTfLiteOk) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("准备输入数据失败!");
-        return 1;
-    }
-
-    // 运行推理
-    if (TfLiteInterpreterInvoke(interpreter) != kTfLiteOk) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("运行推理失败!");
-        return 1;
-    }
-
-    // 获取输出Tensor
-    const TfLiteTensor* outputTensor = TfLiteInterpreterGetOutputTensor(interpreter, 0);
-    if (!outputTensor) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("获取输出Tensor失败!");
-        return 1;
-    }
-
-    // 获取输出类型和维度
-    tensorType = TfLiteTensorType(outputTensor);
-    tensorDims = TfLiteTensorNumDims(outputTensor);
-    LOGI("输出Tensor类型: %d", tensorType);
-    for (int32_t i = 0; i < tensorDims; i++) {
-        int32_t tensorDim = TfLiteTensorDim(outputTensor, i);
-        LOGI("输出Tensor维度: %d, 大小: %d", i, tensorDim);
-    }
-
-    // 获取输出数据
-    std::vector<float_t> outputData(TfLiteTensorByteSize(outputTensor) / sizeof(float_t));
-    if (TfLiteTensorCopyToBuffer(outputTensor, outputData.data(), outputData.size() * sizeof(float_t)) != kTfLiteOk) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("获取输出数据失败!");
-        return 1;
-    }
-
-    // 后处理
-    cv::Mat outputMat(1, 19 * 512 * 512, CV_32F, outputData.data());
-    outputMat = outputMat.reshape(1, {1, 19, 512, 512});
-    auto postprocessResult = SkinModelProcessor::postprocess(outputMat, originalMat.rows, originalMat.cols);
-    if (postprocessResult.size() != 4) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("皮肤模型后处理失败!");
-        return 1;
-    }
-
-    // 设置后处理结果
-    parseResult = postprocessResult[0];
-    skinMask = postprocessResult[1];
-
-    // 清理
-    TfLiteInterpreterDelete(interpreter);
-    TfLiteModelDelete(model);
-    TfLiteInterpreterOptionsDelete(options);
-
-    return 0;
 }
 
 jobject CvLoader::getSkinMaskBitmap(JNIEnv *env) {
