@@ -11,8 +11,8 @@ android {
         applicationId "com.akatsukirika.openps"
         minSdk 23
         targetSdk 34
-        versionCode 2
-        versionName "1.1.0"
+        versionCode 3
+        versionName "1.2.0"
 
         buildFeatures {
             compose true
@@ -27,6 +27,9 @@ android {
             cmake {
                 cppFlags '-std=c++17'
             }
+        }
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
         }
     }
 
