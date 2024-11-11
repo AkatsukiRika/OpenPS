@@ -75,7 +75,7 @@ int CvLoader::runSkinModelInference(const char *modelBuffer, off_t modelSize) {
         Ort::Value inputTensor = Ort::Value::CreateTensor(
             memoryInfo,
             preprocessResult.data(),
-            preprocessResult.size() * sizeof(uint16_t),  // FP16 的大小
+            preprocessResult.size() * sizeof(float16_t),  // FP16 的大小
             inputShape.data(),
             inputShape.size(),
             ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT16  // 明确指定 FP16 类型
@@ -121,13 +121,14 @@ int CvLoader::runSkinModelInference(const char *modelBuffer, off_t modelSize) {
         }
 
         // 获取 FP16 输出数据并转换为 FP32
-        const uint16_t* outputFp16Data = outputTensor.GetTensorData<uint16_t>();  // 使用 uint16_t 替代 hfloat
-        std::vector<float> outputFp32Data(outputSize);
-        cv::hal::cvt16f32f(reinterpret_cast<const cv::hfloat*>(outputFp16Data), outputFp32Data.data(), outputSize);
+        const float16_t* outputFp16Data = outputTensor.GetTensorData<float16_t>();
+        std::vector<float16_t> outputValues(outputFp16Data, outputFp16Data + outputSize);
+        std::vector<float> outputFp32Data = CvUtils::convertToFloat(outputValues);
 
-        cv::Mat outputMat(1, outputSize, CV_32F, outputFp32Data.data());
-        outputMat = outputMat.reshape(1, {1, 19, 512, 512});
-        auto postprocessResult = SkinModelProcessor::postprocess(outputMat, originalMat.rows, originalMat.cols);
+        const int dims[] = {1, 19, 512, 512};
+        cv::Mat modelOut(4, dims, CV_32F, outputFp32Data.data());
+
+        auto postprocessResult = SkinModelProcessor::postprocess(modelOut, originalMat.rows, originalMat.cols);
 
         if (postprocessResult.size() != 4) {
             LOGE("皮肤模型后处理失败!");

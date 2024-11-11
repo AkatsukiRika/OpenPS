@@ -55,3 +55,13 @@ jobject CvUtils::matToBitmap(JNIEnv* env, const cv::Mat mat) {
     AndroidBitmap_unlockPixels(env, bitmap);
     return bitmap;
 }
+
+std::vector<float> CvUtils::convertToFloat(const std::vector<float16_t> &input) {
+    std::vector<float> output(input.size());
+
+    for (size_t i = 0; i < input.size(); ++i) {
+        output[i] = static_cast<float>(input[i]);
+    }
+
+    return output;
+}

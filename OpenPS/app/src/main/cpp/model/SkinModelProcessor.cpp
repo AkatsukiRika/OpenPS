@@ -4,7 +4,7 @@
 const cv::Vec3f mean(0.485f, 0.456f, 0.406f);
 const cv::Vec3f standard(0.229f, 0.224f, 0.225f);
 
-std::vector<cv::hfloat> SkinModelProcessor::preprocess(const cv::Mat &src_img) {
+std::vector<float16_t> SkinModelProcessor::preprocess(const cv::Mat &src_img) {
     // 将 RGBA 转换为 RGB
     cv::Mat img;
     cvtColor(src_img, img, cv::COLOR_RGBA2RGB);
@@ -26,7 +26,7 @@ std::vector<cv::hfloat> SkinModelProcessor::preprocess(const cv::Mat &src_img) {
     }
 
     // 变换维度为 (1, 3, 512, 512)
-    std::vector<float_t> result(1 * 3 * 512 * 512);
+    std::vector<float16_t> result(1 * 3 * 512 * 512);
     int idx = 0;
     for (int c = 0; c < 3; ++c) {
         for (int i = 0; i < 512; ++i) {
@@ -36,44 +36,18 @@ std::vector<cv::hfloat> SkinModelProcessor::preprocess(const cv::Mat &src_img) {
         }
     }
 
-    // 将结果转换为 FP16
-    std::vector<cv::hfloat> hfloat_result(1 * 3 * 512 * 512);
-    cv::hal::cvt32f16f(result.data(), hfloat_result.data(), result.size());
-
-    return hfloat_result;
+    return result;
 }
 
 std::vector<cv::Mat> SkinModelProcessor::postprocess(const cv::Mat &model_out, int src_img_height, int src_img_width) {
-    // 首先确保输入数据被正确reshape为我们需要的维度
-    cv::Mat input_reshaped;
-    if (model_out.total() == 19 * 512 * 512) {
-        input_reshaped = model_out.reshape(1, 19);  // 将数据重塑为 19 x (512*512)
-    } else {
-        throw std::runtime_error("Invalid input size for postprocess");
-    }
-
-    // 使用 C++ 的 std::memcpy 来安全地进行类型转换
-    const size_t num_elements = model_out.total();
-    std::vector<cv::hfloat> fp16_buffer(num_elements);
-    std::memcpy(fp16_buffer.data(), input_reshaped.data, num_elements * sizeof(cv::hfloat));
-
-    // 将 FP16 输出转换为 FP32
-    cv::Mat model_out_fp32(19, 512 * 512, CV_32F);
-    cv::hal::cvt16f32f(
-        fp16_buffer.data(),
-        model_out_fp32.ptr<float>(),
-        num_elements
-    );
-
-    // 将数据分割为19个通道
+    // 将 model_out 处理为 (19, 512, 512) 的三维数组
     std::vector<cv::Mat> channels;
     for (int i = 0; i < 19; ++i) {
-        // 创建一个指向当前行的Mat，然后reshape为512x512
-        cv::Mat channel = model_out_fp32.row(i).reshape(1, 512);
-        channels.push_back(channel.clone());  // 使用clone确保数据连续性
+        cv::Mat channel(512, 512, CV_32F, (void*)(model_out.ptr<float>() + i * 512 * 512));
+        channels.push_back(channel);
     }
 
-    // 对每个像素找到最大值对应的通道
+    // 将每个通道合并为一个二维矩阵
     cv::Mat parsing = cv::Mat::zeros(512, 512, CV_32S);
     for (int i = 0; i < 512; ++i) {
         for (int j = 0; j < 512; ++j) {
@@ -82,8 +56,8 @@ std::vector<cv::Mat> SkinModelProcessor::postprocess(const cv::Mat &model_out, i
             for (int c = 0; c < 19; ++c) {
                 float val = channels[c].at<float>(i, j);
                 if (val > max_val) {
-                    max_val = val;
-                    max_idx = c;
+                  max_val = val;
+                  max_idx = c;
                 }
             }
             parsing.at<int>(i, j) = max_idx;
@@ -94,7 +68,6 @@ std::vector<cv::Mat> SkinModelProcessor::postprocess(const cv::Mat &model_out, i
     cv::Mat resized_parsing;
     resize(parsing, resized_parsing, cv::Size(src_img_width, src_img_height), 0, 0, cv::INTER_NEAREST);
 
-    // 创建各种掩码
     auto skin_mask = create_mask(resized_parsing, [](int val) { return val >= 1 && val <= 13; });
     auto teeth_mask = create_mask(resized_parsing, [](int val) { return val == 11; });
     auto eyes_mask = create_mask(resized_parsing, [](int val) { return val == 4 || val == 5 || val == 6; });

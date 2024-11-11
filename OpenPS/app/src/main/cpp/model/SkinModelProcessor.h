@@ -3,10 +3,11 @@
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/hal/hal.hpp>
+#include <arm_fp16.h>
 
 class SkinModelProcessor {
 public:
-    static std::vector<cv::hfloat> preprocess(const cv::Mat& src_img);
+    static std::vector<float16_t> preprocess(const cv::Mat& src_img);
     static std::vector<cv::Mat> postprocess(const cv::Mat& model_out, int src_img_height, int src_img_width);
 
 private:
