@@ -55,6 +55,12 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
+            outputFileName = "OpenPS-v${defaultConfig.versionName}.apk"
+        }
+    }
 }
 
 dependencies {
