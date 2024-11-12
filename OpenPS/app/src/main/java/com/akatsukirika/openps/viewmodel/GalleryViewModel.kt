@@ -27,6 +27,8 @@ class GalleryViewModel : ViewModel() {
     private val _previewImage = MutableStateFlow<GalleryImage?>(null)
     val previewImage: StateFlow<GalleryImage?> = _previewImage
 
+    val uiFrameRate = MutableStateFlow(0.0)
+
     private var selectImageCallback: ((Uri) -> Unit)? = null
 
     fun init(context: Context, selectImageCallback: ((Uri) -> Unit)? = null) {

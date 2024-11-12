@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -264,7 +265,8 @@ private fun ImageGridItem(
                         rememberSharedContentState(key = SHARED_ELEMENT_KEY_IMAGE + "_" + image.uri),
                         animatedVisibilityScope
                     ),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                placeholder = ColorPainter(Color.DarkGray)
             )
         }
 
