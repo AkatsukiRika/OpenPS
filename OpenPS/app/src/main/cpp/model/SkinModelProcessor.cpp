@@ -4,7 +4,7 @@
 const cv::Vec3f mean(0.485f, 0.456f, 0.406f);
 const cv::Vec3f standard(0.229f, 0.224f, 0.225f);
 
-std::vector<float16_t> SkinModelProcessor::preprocess(const cv::Mat &src_img) {
+std::vector<float_t> SkinModelProcessor::preprocess(const cv::Mat &src_img) {
     // 将 RGBA 转换为 RGB
     cv::Mat img;
     cvtColor(src_img, img, cv::COLOR_RGBA2RGB);
@@ -26,7 +26,7 @@ std::vector<float16_t> SkinModelProcessor::preprocess(const cv::Mat &src_img) {
     }
 
     // 变换维度为 (1, 3, 512, 512)
-    std::vector<float16_t> result(1 * 3 * 512 * 512);
+    std::vector<float_t> result(1 * 3 * 512 * 512);
     int idx = 0;
     for (int c = 0; c < 3; ++c) {
         for (int i = 0; i < 512; ++i) {

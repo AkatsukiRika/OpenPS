@@ -357,7 +357,7 @@ class EditViewModel : ViewModel() {
                         return@withContext
                     }
 
-                    result = NativeLib.runSkinModelInference(context.assets, "79999_iter_fp16.onnx")
+                    result = NativeLib.runSkinModelInference(context.assets, "79999_iter_fp16.tflite")
                     if (result != 0) {
                         // 加载失败
                         _loadStatus.emit(STATUS_ERROR)
@@ -369,7 +369,9 @@ class EditViewModel : ViewModel() {
                     if (skinMaskBitmap == null) {
                         // 加载失败
                         _loadStatus.emit(STATUS_ERROR)
-                        ToastUtils.showToast(context, context.getString(R.string.msg_image_process_fail))
+                        withContext(Dispatchers.Main) {
+                            ToastUtils.showToast(context, context.getString(R.string.msg_image_process_fail))
+                        }
                         return@withContext
                     }
 

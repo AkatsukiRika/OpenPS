@@ -7,7 +7,7 @@
 
 class SkinModelProcessor {
 public:
-    static std::vector<float16_t> preprocess(const cv::Mat& src_img);
+    static std::vector<float_t> preprocess(const cv::Mat& src_img);
     static std::vector<cv::Mat> postprocess(const cv::Mat& model_out, int src_img_height, int src_img_width);
 
 private:
