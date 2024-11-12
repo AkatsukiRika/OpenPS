@@ -138,8 +138,8 @@ int CvLoader::runSkinModelInference(const char *modelBuffer, off_t modelSize) {
     }
 
     // 获取输出数据
-    std::vector<float_t> outputData(TfLiteTensorByteSize(outputTensor) / sizeof(float_t));
-    if (TfLiteTensorCopyToBuffer(outputTensor, outputData.data(), outputData.size() * sizeof(float_t)) != kTfLiteOk) {
+    std::vector<float16_t> outputData(TfLiteTensorByteSize(outputTensor) / sizeof(float16_t));
+    if (TfLiteTensorCopyToBuffer(outputTensor, outputData.data(), outputData.size() * sizeof(float16_t)) != kTfLiteOk) {
         TfLiteInterpreterDelete(interpreter);
         TfLiteModelDelete(model);
         TfLiteInterpreterOptionsDelete(options);
