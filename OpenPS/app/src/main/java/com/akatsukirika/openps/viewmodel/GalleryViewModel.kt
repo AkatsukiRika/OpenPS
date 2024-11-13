@@ -2,6 +2,7 @@ package com.akatsukirika.openps.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.model.GalleryAlbum
@@ -27,6 +28,9 @@ class GalleryViewModel : ViewModel() {
     private val _previewImage = MutableStateFlow<GalleryImage?>(null)
     val previewImage: StateFlow<GalleryImage?> = _previewImage
 
+    private val _loadedImages = mutableStateMapOf<String, Boolean>()
+    val loadedImages: Map<String, Boolean> = _loadedImages
+
     val uiFrameRate = MutableStateFlow(0.0)
 
     private var selectImageCallback: ((Uri) -> Unit)? = null
@@ -48,6 +52,10 @@ class GalleryViewModel : ViewModel() {
 
     fun updatePreviewImage(image: GalleryImage?) {
         _previewImage.value = image
+    }
+
+    fun setImageLoaded(uri: String) {
+        _loadedImages[uri] = true
     }
 
     private suspend fun updateAlbumList(context: Context) = withContext(Dispatchers.IO) {

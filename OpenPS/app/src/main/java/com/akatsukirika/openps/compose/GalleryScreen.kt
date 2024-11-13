@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -212,9 +213,12 @@ private fun ImagesGrid(
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val selectedAlbum = viewModel.selectedAlbum.collectAsState(initial = null).value
+    val gridState = rememberLazyGridState()
+    val isScrolling = gridState.isScrollInProgress
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
+        state = gridState,
         contentPadding = PaddingValues(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -227,7 +231,7 @@ private fun ImagesGrid(
                     it.uri.toString()
                 }
             ) {
-                ImageGridItem(it, viewModel, sharedTransitionScope, animatedVisibilityScope)
+                ImageGridItem(it, viewModel, sharedTransitionScope, animatedVisibilityScope, !isScrolling)
             }
         }
     }
@@ -239,9 +243,12 @@ private fun ImageGridItem(
     image: GalleryImage,
     viewModel: GalleryViewModel,
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    loadImage: Boolean
 ) {
     val context = LocalContext.current
+    val imageUri = image.uri.toString()
+    val isLoaded = viewModel.loadedImages[imageUri] == true
     
     Box(modifier = Modifier
         .aspectRatio(1f)
@@ -252,22 +259,31 @@ private fun ImageGridItem(
         }
     ) {
         with(sharedTransitionScope) {
-            AsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(image.uri)
-                    .crossfade(true)
-                    .size(GalleryViewModel.THUMBNAIL_SIZE)
-                    .build(),
-                contentDescription = null,
-                modifier = Modifier
+            if (!loadImage && !isLoaded) {
+                Box(modifier = Modifier
                     .fillMaxSize()
-                    .sharedElement(
-                        rememberSharedContentState(key = SHARED_ELEMENT_KEY_IMAGE + "_" + image.uri),
-                        animatedVisibilityScope
-                    ),
-                contentScale = ContentScale.Crop,
-                placeholder = ColorPainter(Color.DarkGray)
-            )
+                    .background(Color.DarkGray))
+            } else {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(image.uri)
+                        .crossfade(true)
+                        .size(GalleryViewModel.THUMBNAIL_SIZE)
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .sharedElement(
+                            rememberSharedContentState(key = SHARED_ELEMENT_KEY_IMAGE + "_" + image.uri),
+                            animatedVisibilityScope
+                        ),
+                    contentScale = ContentScale.Crop,
+                    onSuccess = {
+                        viewModel.setImageLoaded(imageUri)
+                    },
+                    placeholder = ColorPainter(Color.DarkGray)
+                )
+            }
         }
 
         MagnifyButton(modifier = Modifier
