@@ -66,9 +66,11 @@ class EditViewModel : ViewModel() {
     private val _loadStatus = MutableStateFlow(STATUS_IDLE)
     val loadStatus: StateFlow<Int> = _loadStatus
 
-    private val beautifyLevelMap = MutableStateFlow(mapOf<Int, Float>())
+    private val _beautifyLevelMap = MutableStateFlow(mapOf<Int, Float>())
+    val beautifyLevelMap: StateFlow<Map<Int, Float>> = _beautifyLevelMap
 
-    private val adjustLevelMap = MutableStateFlow(mapOf<Int, Float>())
+    private val _adjustLevelMap = MutableStateFlow(mapOf<Int, Float>())
+    val adjustLevelMap: StateFlow<Map<Int, Float>> = _adjustLevelMap
 
     private val filterLevelMap = MutableStateFlow(mapOf<Int, Float>())
 
@@ -175,13 +177,13 @@ class EditViewModel : ViewModel() {
         when (selectedTabIndex.value) {
             TAB_BEAUTIFY -> {
                 if (selectedFunctionIndex.value != -1) {
-                    _currentLevel.value = beautifyLevelMap.value[selectedFunctionIndex.value] ?: 0f
+                    _currentLevel.value = _beautifyLevelMap.value[selectedFunctionIndex.value] ?: 0f
                 }
             }
 
             TAB_ADJUST -> {
                 if (selectedFunctionIndex.value != -1) {
-                    _currentLevel.value = adjustLevelMap.value[selectedFunctionIndex.value] ?: 0f
+                    _currentLevel.value = _adjustLevelMap.value[selectedFunctionIndex.value] ?: 0f
                 }
             }
 
@@ -212,7 +214,7 @@ class EditViewModel : ViewModel() {
     private fun updateHelperValue(addRecord: Boolean = false) {
         when (selectedTabIndex.value) {
             TAB_BEAUTIFY -> {
-                beautifyLevelMap.update {
+                _beautifyLevelMap.update {
                     it + (selectedFunctionIndex.value to currentLevel.value)
                 }
                 when (selectedFunctionIndex.value) {
@@ -226,7 +228,7 @@ class EditViewModel : ViewModel() {
             }
 
             TAB_ADJUST -> {
-                adjustLevelMap.update {
+                _adjustLevelMap.update {
                     it + (selectedFunctionIndex.value to currentLevel.value)
                 }
                 when (selectedFunctionIndex.value) {
@@ -285,7 +287,7 @@ class EditViewModel : ViewModel() {
     }
 
     private fun updateMap(record: OpenPSRecord) {
-        beautifyLevelMap.update {
+        _beautifyLevelMap.update {
             mapOf(
                 INDEX_SMOOTH to record.smoothLevel,
                 INDEX_WHITE to record.whiteLevel,
@@ -295,7 +297,7 @@ class EditViewModel : ViewModel() {
                 INDEX_FACE_SLIM to record.faceSlimLevel
             )
         }
-        adjustLevelMap.update {
+        _adjustLevelMap.update {
             mapOf(
                 INDEX_CONTRAST to record.contrastLevel,
                 INDEX_EXPOSURE to record.exposureLevel,

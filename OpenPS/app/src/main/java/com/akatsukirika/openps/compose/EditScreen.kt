@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -31,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -129,6 +131,8 @@ private fun MainColumn(viewModel: EditViewModel) {
     val selectedFunctionIndex = viewModel.selectedFunctionIndex.collectAsState(initial = -1).value
     val selectedFilterIndex = viewModel.selectedFilterIndex.collectAsState(initial = -1).value
     val selectedTabIndex = viewModel.selectedTabIndex.collectAsState(initial = 0).value
+    val beautifyLevelMap = viewModel.beautifyLevelMap.collectAsState(initial = emptyMap()).value
+    val adjustLevelMap = viewModel.adjustLevelMap.collectAsState(initial = emptyMap()).value
     val itemList = viewModel.itemList.collectAsState(initial = emptyList()).value
     val loadStatus = viewModel.loadStatus.collectAsState(initial = STATUS_IDLE).value
 
@@ -165,6 +169,7 @@ private fun MainColumn(viewModel: EditViewModel) {
                     FunctionList(
                         modifier = Modifier.height(84.dp),
                         itemList = itemList,
+                        levelMap = if (selectedTabIndex == TAB_BEAUTIFY) beautifyLevelMap else adjustLevelMap,
                         selectedIndex = selectedFunctionIndex,
                         onSelect = {
                             viewModel.onSelect(it)
@@ -202,12 +207,21 @@ private fun BidirectionalSliderLayout(viewModel: EditViewModel, currentLevel: Fl
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 24.dp)
     ) {
-        Text(
-            text = if (currentLevel >= 0.01f) "+${(currentLevel * 100).toInt()}" else "${(currentLevel * 100).toInt()}",
-            color = Color.White,
-            modifier = Modifier.width(32.dp),
-            textAlign = TextAlign.End
-        )
+        Box {
+            Text(
+                text = if (currentLevel >= 0.01f) "+${(currentLevel * 100).toInt()}" else "${(currentLevel * 100).toInt()}",
+                color = Color.White,
+                textAlign = TextAlign.End,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+
+            Text(
+                text = "+100",
+                color = Color.Transparent,
+                textAlign = TextAlign.End,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -304,6 +318,7 @@ private fun BottomTabRow(
 private fun FunctionList(
     modifier: Modifier = Modifier,
     itemList: List<FunctionItem>,
+    levelMap: Map<Int, Float>,
     selectedIndex: Int,
     onSelect: (Int) -> Unit
 ) {
@@ -313,7 +328,9 @@ private fun FunctionList(
         }
 
         items(itemList) { item ->
-            FunctionListItem(item, isSelected = item.index == selectedIndex, onClick = {
+            val isUsed = levelMap.containsKey(item.index) && levelMap[item.index] != 0f
+
+            FunctionListItem(item, isSelected = item.index == selectedIndex, isUsed = isUsed, onClick = {
                 onSelect(item.index)
             })
         }
@@ -359,7 +376,7 @@ private fun FilterList(
 }
 
 @Composable
-private fun FunctionListItem(item: FunctionItem, isSelected: Boolean, onClick: () -> Unit) {
+private fun FunctionListItem(item: FunctionItem, isSelected: Boolean, isUsed: Boolean, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -380,6 +397,13 @@ private fun FunctionListItem(item: FunctionItem, isSelected: Boolean, onClick: (
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = if (isSelected) AppColors.Green200 else Color.White
+        )
+
+        Box(modifier = Modifier
+            .alpha(if (isUsed) 1f else 0f)
+            .clip(CircleShape)
+            .background(if (isSelected) AppColors.Green200 else Color.White)
+            .size(4.dp)
         )
     }
 }
