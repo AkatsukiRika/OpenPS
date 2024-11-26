@@ -66,6 +66,7 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   brightnessFilter->setFilterClassName("BrightnessFilter");
   customFilter = CustomFilter::create();
   customFilter->setFilterClassName("CustomFilter");
+  customFilter->setTexelSize(imageWidth, imageHeight);
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
     lipstickFilter->SetFaceLandmarks(landmarks);

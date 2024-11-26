@@ -152,6 +152,11 @@ void GLProgram::setUniformValue(const std::string& uniformName, Vector2 value) {
   setUniformValue(getUniformLocation(uniformName), value);
 }
 
+void GLProgram::setUniformValue(const std::string &uniformValue, Vector4 value) {
+  GPUPixelContext::getInstance()->setActiveShaderProgram(this);
+  setUniformValue(getUniformLocation(uniformValue), value);
+}
+
 void GLProgram::setUniformValue(const std::string& uniformName, Matrix3 value) {
   GPUPixelContext::getInstance()->setActiveShaderProgram(this);
   setUniformValue(getUniformLocation(uniformName), value);
@@ -182,6 +187,11 @@ void GLProgram::setUniformValue(int uniformLocation, Matrix4 value) {
 void GLProgram::setUniformValue(int uniformLocation, Vector2 value) {
   GPUPixelContext::getInstance()->setActiveShaderProgram(this);
   CHECK_GL(glUniform2f(uniformLocation, value.x, value.y));
+}
+
+void GLProgram::setUniformValue(int uniformLocation, Vector4 value) {
+  GPUPixelContext::getInstance()->setActiveShaderProgram(this);
+  CHECK_GL(glUniform4f(uniformLocation, value.x, value.y, value.z, value.w));
 }
 
 void GLProgram::setUniformValue(int uniformLocation, Matrix3 value) {

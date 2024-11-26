@@ -70,6 +70,19 @@ class GPUPIXEL_API Vector2 {
 class GPUPIXEL_API Vector3 {
 };
 
+class GPUPIXEL_API Vector4 {
+public:
+  float x;
+  float y;
+  float z;
+  float w;
+
+  Vector4();
+  Vector4(float xx, float yy, float zz, float ww);
+  Vector4(const Vector4& copy);
+  ~Vector4();
+};
+
 class GPUPIXEL_API Matrix4 {
  public:
   float m[16];

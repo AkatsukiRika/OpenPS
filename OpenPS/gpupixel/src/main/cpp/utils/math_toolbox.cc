@@ -29,6 +29,14 @@ Vector2::Vector2(const Vector2& copy) {
 
 Vector2::~Vector2() {}
 
+Vector4::Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
+
+Vector4::Vector4(float xx, float yy, float zz, float ww) : x(xx), y(yy), z(zz), w(ww) {}
+
+Vector4::Vector4(const Vector4 &copy) : x(copy.x), y(copy.y), z(copy.z), w(copy.w) {}
+
+Vector4::~Vector4() {}
+
 bool Vector2::isZero() const {
   return x == 0.0f && y == 0.0f;
 }

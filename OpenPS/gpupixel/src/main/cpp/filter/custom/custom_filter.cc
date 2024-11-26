@@ -34,11 +34,15 @@ bool CustomFilter::init() {
   blackCatFilter = BlackCatFilter::create();
   addFilter(blackCatFilter);
 
+  beautyFilter = BeautyFilter::create();
+  addFilter(beautyFilter);
+
   fairyTaleFilter
       ->addTarget(sunriseFilter)
       ->addTarget(sunsetFilter)
       ->addTarget(whiteCatFilter)
-      ->addTarget(blackCatFilter);
+      ->addTarget(blackCatFilter)
+      ->addTarget(beautyFilter);
 
   return true;
 }
@@ -51,6 +55,12 @@ int CustomFilter::getType() {
   return type;
 }
 
+void CustomFilter::setTexelSize(int textureWidth, int textureHeight) {
+  if (beautyFilter) {
+    beautyFilter->setTexelSize(textureWidth, textureHeight);
+  }
+}
+
 void CustomFilter::setIntensity(float newIntensity) {
   intensity = newIntensity;
   switch (type) {
@@ -60,6 +70,7 @@ void CustomFilter::setIntensity(float newIntensity) {
       sunsetFilter->setIntensity(0);
       whiteCatFilter->setIntensity(0);
       blackCatFilter->setIntensity(0);
+      beautyFilter->setIntensity(0);
       break;
     case TYPE_SUNRISE:
       fairyTaleFilter->setIntensity(0);
@@ -67,6 +78,7 @@ void CustomFilter::setIntensity(float newIntensity) {
       sunsetFilter->setIntensity(0);
       whiteCatFilter->setIntensity(0);
       blackCatFilter->setIntensity(0);
+      beautyFilter->setIntensity(0);
       break;
     case TYPE_SUNSET:
       fairyTaleFilter->setIntensity(0);
@@ -74,6 +86,7 @@ void CustomFilter::setIntensity(float newIntensity) {
       sunsetFilter->setIntensity(intensity);
       whiteCatFilter->setIntensity(0);
       blackCatFilter->setIntensity(0);
+      beautyFilter->setIntensity(0);
       break;
     case TYPE_WHITE_CAT:
       fairyTaleFilter->setIntensity(0);
@@ -81,6 +94,7 @@ void CustomFilter::setIntensity(float newIntensity) {
       sunsetFilter->setIntensity(0);
       whiteCatFilter->setIntensity(intensity);
       blackCatFilter->setIntensity(0);
+      beautyFilter->setIntensity(0);
       break;
     case TYPE_BLACK_CAT:
       fairyTaleFilter->setIntensity(0);
@@ -88,6 +102,15 @@ void CustomFilter::setIntensity(float newIntensity) {
       sunsetFilter->setIntensity(0);
       whiteCatFilter->setIntensity(0);
       blackCatFilter->setIntensity(intensity);
+      beautyFilter->setIntensity(0);
+      break;
+    case TYPE_BEAUTY:
+      fairyTaleFilter->setIntensity(0);
+      sunriseFilter->setIntensity(0);
+      sunsetFilter->setIntensity(0);
+      whiteCatFilter->setIntensity(0);
+      blackCatFilter->setIntensity(0);
+      beautyFilter->setIntensity(intensity);
       break;
     default:
       fairyTaleFilter->setIntensity(0);
@@ -95,6 +118,7 @@ void CustomFilter::setIntensity(float newIntensity) {
       sunsetFilter->setIntensity(0);
       whiteCatFilter->setIntensity(0);
       blackCatFilter->setIntensity(0);
+      beautyFilter->setIntensity(0);
   }
 }
 

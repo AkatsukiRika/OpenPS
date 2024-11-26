@@ -12,4 +12,5 @@
     <color name="filter_color_blue">#ff5cbadc</color>
     <color name="filter_color_grey_light">#c4c4c4</color>
     <color name="filter_color_brown_light">#ff9933</color>
+    <color name="filter_color_red">#ff6666</color>
 </resources>
