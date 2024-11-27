@@ -11,6 +11,7 @@ const val INDEX_SUNSET = 3
 const val INDEX_WHITE_CAT = 4
 const val INDEX_BLACK_CAT = 5
 const val INDEX_BEAUTY = 6
+const val INDEX_SKIN_WHITEN = 7
 
 fun getFilterList(context: Context) = listOf(
     FunctionItem(index = INDEX_ORIGINAL, icon = R.drawable.img_filter_original, name = context.getString(R.string.filter_original), labelBgColor = context.getColor(R.color.filter_color_grey_light), isOriginal = true),
@@ -19,5 +20,6 @@ fun getFilterList(context: Context) = listOf(
     FunctionItem(index = INDEX_SUNSET, icon = R.drawable.img_filter_sunset, name = context.getString(R.string.filter_sunset), labelBgColor = context.getColor(R.color.filter_color_brown_light)),
     FunctionItem(index = INDEX_WHITE_CAT, icon = R.drawable.img_filter_white_cat, name = context.getString(R.string.filter_white_cat), labelBgColor = context.getColor(R.color.filter_color_brown_light)),
     FunctionItem(index = INDEX_BLACK_CAT, icon = R.drawable.img_filter_black_cat, name = context.getString(R.string.filter_black_cat), labelBgColor = context.getColor(R.color.filter_color_brown_light)),
-    FunctionItem(index = INDEX_BEAUTY, icon = R.drawable.img_filter_beauty, name = context.getString(R.string.filter_beauty), labelBgColor = context.getColor(R.color.filter_color_red))
+    FunctionItem(index = INDEX_BEAUTY, icon = R.drawable.img_filter_beauty, name = context.getString(R.string.filter_beauty), labelBgColor = context.getColor(R.color.filter_color_red)),
+    FunctionItem(index = INDEX_SKIN_WHITEN, icon = R.drawable.img_filter_beauty, name = context.getString(R.string.filter_whitening), labelBgColor = context.getColor(R.color.filter_color_red))
 )

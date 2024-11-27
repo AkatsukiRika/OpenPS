@@ -40,6 +40,7 @@
     <string name="filter_white_cat">White Cat</string>
     <string name="filter_black_cat">Black Cat</string>
     <string name="filter_beauty">Beauty</string>
+    <string name="filter_whitening">Whitening</string>
     <string name="version_x">Version %s</string>
     <string name="size_4k" translatable="false">4K</string>
     <string name="size_2k" translatable="false">2K</string>

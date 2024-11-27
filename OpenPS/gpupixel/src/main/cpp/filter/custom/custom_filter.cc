@@ -1,4 +1,5 @@
 #include "custom_filter.h"
+#include <unordered_map>
 
 USING_NS_GPUPIXEL
 
@@ -37,12 +38,16 @@ bool CustomFilter::init() {
   beautyFilter = BeautyFilter::create();
   addFilter(beautyFilter);
 
+  skinWhitenFilter = SkinWhitenFilter::create();
+  addFilter(skinWhitenFilter);
+
   fairyTaleFilter
       ->addTarget(sunriseFilter)
       ->addTarget(sunsetFilter)
       ->addTarget(whiteCatFilter)
       ->addTarget(blackCatFilter)
-      ->addTarget(beautyFilter);
+      ->addTarget(beautyFilter)
+      ->addTarget(skinWhitenFilter);
 
   return true;
 }
@@ -59,66 +64,52 @@ void CustomFilter::setTexelSize(int textureWidth, int textureHeight) {
   if (beautyFilter) {
     beautyFilter->setTexelSize(textureWidth, textureHeight);
   }
+  if (skinWhitenFilter) {
+    skinWhitenFilter->setTexelSize(textureWidth, textureHeight);
+  }
 }
 
 void CustomFilter::setIntensity(float newIntensity) {
   intensity = newIntensity;
-  switch (type) {
-    case TYPE_FAIRY_TALE:
-      fairyTaleFilter->setIntensity(intensity);
-      sunriseFilter->setIntensity(0);
-      sunsetFilter->setIntensity(0);
-      whiteCatFilter->setIntensity(0);
-      blackCatFilter->setIntensity(0);
-      beautyFilter->setIntensity(0);
-      break;
-    case TYPE_SUNRISE:
-      fairyTaleFilter->setIntensity(0);
-      sunriseFilter->setIntensity(intensity);
-      sunsetFilter->setIntensity(0);
-      whiteCatFilter->setIntensity(0);
-      blackCatFilter->setIntensity(0);
-      beautyFilter->setIntensity(0);
-      break;
-    case TYPE_SUNSET:
-      fairyTaleFilter->setIntensity(0);
-      sunriseFilter->setIntensity(0);
-      sunsetFilter->setIntensity(intensity);
-      whiteCatFilter->setIntensity(0);
-      blackCatFilter->setIntensity(0);
-      beautyFilter->setIntensity(0);
-      break;
-    case TYPE_WHITE_CAT:
-      fairyTaleFilter->setIntensity(0);
-      sunriseFilter->setIntensity(0);
-      sunsetFilter->setIntensity(0);
-      whiteCatFilter->setIntensity(intensity);
-      blackCatFilter->setIntensity(0);
-      beautyFilter->setIntensity(0);
-      break;
-    case TYPE_BLACK_CAT:
-      fairyTaleFilter->setIntensity(0);
-      sunriseFilter->setIntensity(0);
-      sunsetFilter->setIntensity(0);
-      whiteCatFilter->setIntensity(0);
-      blackCatFilter->setIntensity(intensity);
-      beautyFilter->setIntensity(0);
-      break;
-    case TYPE_BEAUTY:
-      fairyTaleFilter->setIntensity(0);
-      sunriseFilter->setIntensity(0);
-      sunsetFilter->setIntensity(0);
-      whiteCatFilter->setIntensity(0);
-      blackCatFilter->setIntensity(0);
-      beautyFilter->setIntensity(intensity);
-      break;
-    default:
-      fairyTaleFilter->setIntensity(0);
-      sunriseFilter->setIntensity(0);
-      sunsetFilter->setIntensity(0);
-      whiteCatFilter->setIntensity(0);
-      blackCatFilter->setIntensity(0);
-      beautyFilter->setIntensity(0);
+
+  std::unordered_map<int, std::function<void(float)>> intensitySetters = {
+    {
+      TYPE_FAIRY_TALE,
+      [this](float i) { fairyTaleFilter->setIntensity(i); }
+    },
+    {
+      TYPE_SUNRISE,
+      [this](float i) { sunriseFilter->setIntensity(i); }
+    },
+    {
+      TYPE_SUNSET,
+      [this](float i) { sunsetFilter->setIntensity(i); }
+    },
+    {
+      TYPE_WHITE_CAT,
+      [this](float i) { whiteCatFilter->setIntensity(i); }
+    },
+    {
+      TYPE_BLACK_CAT,
+      [this](float i) { blackCatFilter->setIntensity(i); }
+    },
+    {
+      TYPE_BEAUTY,
+      [this](float i) { beautyFilter->setIntensity(i); }
+    },
+    {
+      TYPE_SKIN_WHITEN,
+      [this](float i) { skinWhitenFilter->setIntensity(i); }
+    }
+  };
+
+  for (const auto& setter : intensitySetters) {
+    setter.second(0);
+  }
+
+  auto it = intensitySetters.find(type);
+  if (it != intensitySetters.end()) {
+    it->second(intensity);
   }
 }
 
