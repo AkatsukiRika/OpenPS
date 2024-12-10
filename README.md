@@ -1,6 +1,6 @@
 # OpenPS (Open Photo Studio)
 
-> An upcoming open-source Android image processing application using GPU rendering. GUI is built with Jetpack Compose according to Google's latest development specifications.
+> An open-source Android image processing application using GPU rendering. GUI is built with Jetpack Compose according to Google's latest development specifications.
 
 ## Information
 
