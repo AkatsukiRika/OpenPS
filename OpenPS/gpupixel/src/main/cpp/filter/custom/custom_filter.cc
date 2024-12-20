@@ -41,13 +41,17 @@ bool CustomFilter::init() {
   skinWhitenFilter = SkinWhitenFilter::create();
   addFilter(skinWhitenFilter);
 
+  healthyFilter = HealthyFilter::create();
+  addFilter(healthyFilter);
+
   fairyTaleFilter
       ->addTarget(sunriseFilter)
       ->addTarget(sunsetFilter)
       ->addTarget(whiteCatFilter)
       ->addTarget(blackCatFilter)
       ->addTarget(beautyFilter)
-      ->addTarget(skinWhitenFilter);
+      ->addTarget(skinWhitenFilter)
+      ->addTarget(healthyFilter);
 
   return true;
 }
@@ -66,6 +70,9 @@ void CustomFilter::setTexelSize(int textureWidth, int textureHeight) {
   }
   if (skinWhitenFilter) {
     skinWhitenFilter->setTexelSize(textureWidth, textureHeight);
+  }
+  if (healthyFilter) {
+    healthyFilter->setTexelSize(textureWidth, textureHeight);
   }
 }
 
@@ -100,6 +107,10 @@ void CustomFilter::setIntensity(float newIntensity) {
     {
       TYPE_SKIN_WHITEN,
       [this](float i) { skinWhitenFilter->setIntensity(i); }
+    },
+    {
+      TYPE_HEALTHY,
+      [this](float i) { healthyFilter->setIntensity(i); }
     }
   };
 

@@ -9,6 +9,7 @@
 #include "black_cat_filter.h"
 #include "beauty_filter.h"
 #include "skin_whiten_filter.h"
+#include "healthy_filter.h"
 
 NS_GPUPIXEL_BEGIN
 
@@ -37,6 +38,7 @@ protected:
   static constexpr int TYPE_BLACK_CAT = 5;
   static constexpr int TYPE_BEAUTY = 6;
   static constexpr int TYPE_SKIN_WHITEN = 7;
+  static constexpr int TYPE_HEALTHY = 8;
 
   std::shared_ptr<FairyTaleFilter> fairyTaleFilter;
   std::shared_ptr<SunriseFilter> sunriseFilter;
@@ -45,6 +47,7 @@ protected:
   std::shared_ptr<BlackCatFilter> blackCatFilter;
   std::shared_ptr<BeautyFilter> beautyFilter;
   std::shared_ptr<SkinWhitenFilter> skinWhitenFilter;
+  std::shared_ptr<HealthyFilter> healthyFilter;
 
   int type = TYPE_ORIGINAL;
   float intensity = 0;
