@@ -10,12 +10,14 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.EditScreen
+import com.akatsukirika.openps.compose.MODULE_NONE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.databinding.ActivityEditBinding
@@ -123,6 +125,14 @@ class EditActivity : AppCompatActivity() {
                 }.collect {
                     binding.tvFrameRate.text = it
                 }
+            }
+        }
+
+        onBackPressedDispatcher.addCallback {
+            if (viewModel.selectedModule.value == MODULE_NONE) {
+                finish()
+            } else {
+                viewModel.selectedModule.value = MODULE_NONE
             }
         }
 

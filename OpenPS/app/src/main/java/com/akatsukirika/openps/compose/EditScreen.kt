@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,17 +60,84 @@ const val STATUS_ERROR = 13
 const val TAB_BEAUTIFY = 0
 const val TAB_ADJUST = 1
 const val TAB_FILTER = 2
+// 模块
+const val MODULE_NONE = -1
+const val MODULE_ELIMINATE_PEN = 0
+const val MODULE_IMAGE_EFFECT = 1
 
 @Composable
 fun EditScreen(viewModel: EditViewModel) {
     MaterialTheme {
+        val selectedModule = viewModel.selectedModule.collectAsState(initial = MODULE_NONE).value
+
         Column(modifier = Modifier.fillMaxWidth()) {
             OperationRow(
                 viewModel = viewModel,
                 modifier = Modifier.align(Alignment.End)
             )
 
-            MainColumn(viewModel)
+            if (selectedModule == MODULE_NONE) {
+                ModuleSelectLayout(viewModel)
+            } else if (selectedModule == MODULE_IMAGE_EFFECT) {
+                MainColumn(viewModel)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ModuleSelectLayout(viewModel: EditViewModel) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+        .background(AppColors.DarkBG),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clickable {
+                    viewModel.selectedModule.value = MODULE_ELIMINATE_PEN
+                }
+                .padding(vertical = 16.dp, horizontal = 12.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_eliminate_pen),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+
+            Text(
+                text = stringResource(id = R.string.eliminate_pen),
+                color = Color.White,
+                fontSize = 11.sp
+            )
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clickable {
+                    viewModel.selectedModule.value = MODULE_IMAGE_EFFECT
+                }
+                .padding(vertical = 16.dp, horizontal = 12.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_image_effect),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(22.dp)
+            )
+
+            Spacer(modifier = Modifier.height(1.dp))
+
+            Text(
+                text = stringResource(id = R.string.image_effect),
+                color = Color.White,
+                fontSize = 11.sp
+            )
         }
     }
 }
