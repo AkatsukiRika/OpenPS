@@ -1,5 +1,6 @@
 package com.akatsukirika.openps.compose
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -76,9 +77,23 @@ fun EditScreen(viewModel: EditViewModel) {
                 modifier = Modifier.align(Alignment.End)
             )
 
-            if (selectedModule == MODULE_NONE) {
+            AnimatedVisibility(visible = selectedModule == MODULE_NONE) {
                 ModuleSelectLayout(viewModel)
-            } else if (selectedModule == MODULE_IMAGE_EFFECT) {
+            }
+
+            AnimatedVisibility(visible = selectedModule == MODULE_ELIMINATE_PEN) {
+                EliminatePenScreen(object : EliminatePenCallback {
+                    override fun onCancel() {
+                        viewModel.selectedModule.value = MODULE_NONE
+                    }
+
+                    override fun onConfirm() {
+                        viewModel.selectedModule.value = MODULE_NONE
+                    }
+                })
+            }
+
+            AnimatedVisibility(visible = selectedModule == MODULE_IMAGE_EFFECT) {
                 MainColumn(viewModel)
             }
         }

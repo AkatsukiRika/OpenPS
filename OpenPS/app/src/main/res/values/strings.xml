@@ -45,6 +45,7 @@
     <string name="version_x">Version %s</string>
     <string name="eliminate_pen">Eliminate Pen</string>
     <string name="image_effect">Image Effect</string>
+    <string name="brush">Brush</string>
     <string name="size_4k" translatable="false">4K</string>
     <string name="size_2k" translatable="false">2K</string>
     <string name="size_1k" translatable="false">1K</string>
