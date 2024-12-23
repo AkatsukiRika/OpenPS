@@ -12,6 +12,15 @@
 
 ## Update Notes
 
+### Version 1.2.0
+
+- Package Size Optimization
+    - Reduced package size to about half of previous version through model quantization
+- Performance Optimization
+    - Improved scrolling smoothness when first entering built-in gallery
+- Filter Updates
+    - Added 3 new full-image filters
+
 ### Version 1.1.0
 
 - Built-in Photo Gallery
