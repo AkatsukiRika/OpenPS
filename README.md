@@ -7,7 +7,7 @@
 | Key | Value |
 | --- | ----- |
 | Supported Platforms | Android 6.0 or above |
-| Latest Version | 1.1.0 |
+| Latest Version | 1.2.0 |
 | GUI Language | English |
 
 ## Update Notes
