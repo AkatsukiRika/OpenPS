@@ -22,6 +22,7 @@ import com.akatsukirika.openps.compose.MODULE_NONE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.databinding.ActivityEditBinding
+import com.akatsukirika.openps.fragment.EliminatePenFragment
 import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.FrameRateObserver
@@ -44,6 +45,8 @@ class EditActivity : AppCompatActivity() {
     private val viewModel: EditViewModel by viewModels()
 
     private val eliminateViewModel: EliminateViewModel by viewModels()
+
+    private var eliminatePenFragment: EliminatePenFragment? = null
 
     private val startExportForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
@@ -134,9 +137,9 @@ class EditActivity : AppCompatActivity() {
             launch {
                 viewModel.selectedModule.collect {
                     if (it == MODULE_ELIMINATE_PEN) {
-                        binding.flEliminatePen.visibility = View.VISIBLE
+                        createEliminatePenFragment()
                     } else {
-                        binding.flEliminatePen.visibility = View.GONE
+                        removeEliminatePenFragment()
                     }
                 }
             }
@@ -234,6 +237,21 @@ class EditActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 startExportForResult.launch(Intent(this@EditActivity, ExportActivity::class.java))
             }
+        }
+    }
+
+    private fun createEliminatePenFragment() {
+        eliminatePenFragment = EliminatePenFragment(eliminateViewModel, binding.surfaceView, viewModel.originalBitmap)
+        supportFragmentManager.beginTransaction()
+            .add(R.id.fl_eliminate_pen, eliminatePenFragment!!)
+            .commit()
+    }
+
+    private fun removeEliminatePenFragment() {
+        eliminatePenFragment?.let {
+            supportFragmentManager.beginTransaction()
+                .remove(it)
+                .commit()
         }
     }
 

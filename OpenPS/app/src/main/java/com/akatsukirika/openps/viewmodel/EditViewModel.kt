@@ -64,6 +64,9 @@ class EditViewModel : ViewModel() {
 
     private var skinMaskBitmap: Bitmap? = null
 
+    var originalBitmap: Bitmap? = null
+        private set
+
     private val _loadStatus = MutableStateFlow(STATUS_IDLE)
     val loadStatus: StateFlow<Int> = _loadStatus
 
@@ -167,6 +170,7 @@ class EditViewModel : ViewModel() {
                     .submit()
                     .get()
             }
+            originalBitmap = bitmap
             startImageFilter(context, bitmap)
         }
     }

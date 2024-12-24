@@ -32,6 +32,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <FrameLayout
+        android:id="@+id/fl_eliminate_pen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/compose_view"
         android:layout_width="match_parent"
@@ -53,27 +58,4 @@
         android:layout_marginStart="8dp"
         android:visibility="gone"
         tools:visibility="visible" />
-
-    <FrameLayout
-        android:id="@+id/fl_eliminate_pen"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.akatsukirika.openps.view.EliminatePaintView
-            android:id="@+id/view_eliminate_pen"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent" />
-
-        <com.akatsukirika.openps.view.EliminateZoomView
-            android:layout_width="@dimen/zoom_area_width"
-            android:layout_height="@dimen/zoom_area_height"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_eliminate_zoom_view"
-            android:visibility="gone"
-            android:layout_gravity="top|start"
-            tools:visibility="visible" />
-
-    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -101,7 +101,7 @@ class EliminatePaintView @JvmOverloads constructor(
     private val enablePerformanceLog = false
 
     private var magnifyView: EliminateZoomView? = null
-    private var imageView: View? = null
+    private var outerView: View? = null
     private var imageBitmap: Bitmap? = null
     private var drawingBitmap: Bitmap? = null
     private var bitmapCanvas: Canvas? = null
@@ -224,7 +224,7 @@ class EliminatePaintView @JvmOverloads constructor(
         }
 
         if (isMultiTouch) {
-            imageView?.let {
+            outerView?.let {
                 val newEvent = MotionEvent.obtain(event)
                 val location = IntArray(2)
                 it.getLocationOnScreen(location)
@@ -457,8 +457,8 @@ class EliminatePaintView @JvmOverloads constructor(
         magnifyView = magnifier
     }
 
-    fun setCustomImageView(customImageView: View, bitmap: Bitmap?) {
-        imageView = customImageView
+    fun setOuterView(view: View, bitmap: Bitmap?) {
+        outerView = view
         if (bitmap != imageBitmap) {
             imageBitmap = bitmap
             resetCanvas()
