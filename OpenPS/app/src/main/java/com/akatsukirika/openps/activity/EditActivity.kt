@@ -25,6 +25,7 @@ import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.FrameRateObserver
 import com.akatsukirika.openps.viewmodel.EditViewModel
+import com.akatsukirika.openps.viewmodel.EliminateViewModel
 import com.pixpark.gpupixel.model.RenderViewInfo
 import com.pixpark.gpupixel.view.OpenPSRenderView
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,8 @@ class EditActivity : AppCompatActivity() {
     private var showFaceRect: Boolean = true
 
     private val viewModel: EditViewModel by viewModels()
+
+    private val eliminateViewModel: EliminateViewModel by viewModels()
 
     private val startExportForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
@@ -137,7 +140,7 @@ class EditActivity : AppCompatActivity() {
         }
 
         binding.composeView.setContent {
-            EditScreen(viewModel)
+            EditScreen(viewModel, eliminateViewModel)
         }
     }
 
