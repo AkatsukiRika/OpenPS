@@ -14,4 +14,10 @@ object MatrixUtils {
             values[Matrix.MTRANS_Y]
         )
     }
+
+    fun Matrix.getScaleX(): Float {
+        val values = FloatArray(9)
+        getValues(values)
+        return values[Matrix.MSCALE_X]
+    }
 }

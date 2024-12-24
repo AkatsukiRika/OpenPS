@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.EditScreen
+import com.akatsukirika.openps.compose.MODULE_ELIMINATE_PEN
 import com.akatsukirika.openps.compose.MODULE_NONE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
@@ -127,6 +128,16 @@ class EditActivity : AppCompatActivity() {
                     "UI: ${uiFps.toInt()}\nGL: ${glFps.toInt()}"
                 }.collect {
                     binding.tvFrameRate.text = it
+                }
+            }
+
+            launch {
+                viewModel.selectedModule.collect {
+                    if (it == MODULE_ELIMINATE_PEN) {
+                        binding.flEliminatePen.visibility = View.VISIBLE
+                    } else {
+                        binding.flEliminatePen.visibility = View.GONE
+                    }
                 }
             }
         }

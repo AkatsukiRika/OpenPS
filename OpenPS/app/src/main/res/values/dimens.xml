@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="overlay_rect_stroke_width">2dp</dimen>
+    <dimen name="stroke_width_min">2dp</dimen>
+    <dimen name="stroke_width_max">80dp</dimen>
+    <dimen name="stroke_width_lasso">3dp</dimen>
+    <dimen name="indicator_border_width">2dp</dimen>
+    <dimen name="indicator_preview_margin_bottom">400dp</dimen>
+    <dimen name="lasso_dash_distance">10dp</dimen>
+    <dimen name="zoom_view_border_width">2dp</dimen>
+    <dimen name="zoom_view_border_radius">20dp</dimen>
+    <dimen name="zoom_area_width">110dp</dimen>
+    <dimen name="zoom_area_height">110dp</dimen>
 </resources>
