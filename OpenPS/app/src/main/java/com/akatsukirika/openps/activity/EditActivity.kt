@@ -70,6 +70,7 @@ class EditActivity : AppCompatActivity() {
         binding.surfaceView.setCallback(object : OpenPSRenderView.Callback {
             override fun onMatrixChanged(matrix: Matrix) {
                 binding.transformLayout.setTransform(matrix)
+                eliminatePenFragment?.onMatrixChange(matrix)
             }
 
             override fun onGLMatrixChanged(glMatrix: FloatArray) {
