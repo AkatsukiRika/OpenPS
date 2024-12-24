@@ -20,7 +20,8 @@
         <com.akatsukirika.openps.view.OverlayView
             android:id="@+id/overlay_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
     </com.akatsukirika.openps.view.TransformLayout>
 

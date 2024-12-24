@@ -11,6 +11,7 @@ import com.akatsukirika.openps.compose.MODE_LARIAT
 import com.akatsukirika.openps.compose.MODE_PAINT
 import com.akatsukirika.openps.compose.MODE_RECOVER
 import com.akatsukirika.openps.databinding.FragmentEliminatePenBinding
+import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.viewmodel.EliminateViewModel
 import kotlinx.coroutines.launch
 
@@ -44,7 +45,7 @@ class EliminatePenFragment(private val viewModel: EliminateViewModel?, private v
         binding.viewEliminatePaint.apply {
             setMagnifier(binding.viewEliminateZoom)
             setOuterView(outerView ?: return, viewModel?.originalBitmap)
-            setDebug(true)
+            setDebug(SettingsStore.isDebugMode)
             setDisableTouch(false)
             isInit = true
             setImageMatrix(viewModel?.matrix?.value ?: Matrix(), isInit)

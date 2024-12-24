@@ -41,7 +41,7 @@ class EditActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditBinding
     private var imageUri: Uri? = null
 
-    private var showFaceRect: Boolean = true
+    private var showFaceRect: Boolean = false
 
     private val viewModel: EditViewModel by viewModels()
 
@@ -99,7 +99,6 @@ class EditActivity : AppCompatActivity() {
                         info.scaledHeight,
                         faceRectF
                     )
-                    binding.overlayView.visibility = View.VISIBLE
                     binding.surfaceView.transformHelper.setViewportSize(info.viewWidth, info.viewHeight)
                     initBaseMatrix(info)
                 }

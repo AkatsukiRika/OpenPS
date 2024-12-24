@@ -8,8 +8,6 @@ class OpenGLTransformHelper {
     private val glMatrix = FloatArray(16)
     private val tempMatrix = FloatArray(16)
     private var currentScale = 1f
-    private val minScale = 0.1f
-    private val maxScale = 10f
 
     init {
         Matrix.setIdentityM(glMatrix, 0)
@@ -21,7 +19,7 @@ class OpenGLTransformHelper {
     }
 
     fun postScale(scale: Float, focusX: Float, focusY: Float) {
-        val newScale = (currentScale * scale).coerceIn(minScale, maxScale)
+        val newScale = currentScale * scale
         val effectiveScale = newScale / currentScale
         currentScale = newScale
 
