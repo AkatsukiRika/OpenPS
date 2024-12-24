@@ -1,6 +1,5 @@
 package com.akatsukirika.openps.fragment
 
-import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +18,9 @@ interface EliminateFragmentCallback {
     fun onMatrixChange(matrix: Matrix)
 }
 
-class EliminatePenFragment(private val viewModel: EliminateViewModel, private val outerView: View, private val bitmap: Bitmap?) : Fragment(), EliminateFragmentCallback {
+class EliminatePenFragment(private val viewModel: EliminateViewModel?, private val outerView: View?) : Fragment(), EliminateFragmentCallback {
+    constructor() : this(null, null)
+
     private lateinit var binding: FragmentEliminatePenBinding
 
     private var isInit = false
@@ -42,16 +43,17 @@ class EliminatePenFragment(private val viewModel: EliminateViewModel, private va
     private fun initPaintView() {
         binding.viewEliminatePaint.apply {
             setMagnifier(binding.viewEliminateZoom)
-            setOuterView(outerView, bitmap)
+            setOuterView(outerView ?: return, viewModel?.originalBitmap)
             setDebug(true)
             setDisableTouch(false)
             isInit = true
+            setImageMatrix(viewModel?.matrix?.value ?: Matrix(), isInit)
         }
     }
 
     private fun initObservers() {
         lifecycleScope.launch {
-            viewModel.size.collect {
+            viewModel?.size?.collect {
                 val mode = viewModel.mode.value
                 if (mode != MODE_LARIAT) {
                     binding.viewEliminatePaint.setBrushSize(it)
@@ -59,7 +61,7 @@ class EliminatePenFragment(private val viewModel: EliminateViewModel, private va
             }
         }
         lifecycleScope.launch {
-            viewModel.mode.collect {
+            viewModel?.mode?.collect {
                 when (it) {
                     MODE_PAINT -> {
                         binding.viewEliminatePaint.apply {

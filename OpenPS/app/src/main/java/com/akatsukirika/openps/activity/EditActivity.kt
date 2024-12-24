@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -48,6 +49,9 @@ class EditActivity : AppCompatActivity() {
 
     private var eliminatePenFragment: EliminatePenFragment? = null
 
+    // 原图->屏幕内居中适配的矩阵
+    private val baseImageMatrix = Matrix()
+
     private val startExportForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
             finish()
@@ -70,6 +74,9 @@ class EditActivity : AppCompatActivity() {
         binding.surfaceView.setCallback(object : OpenPSRenderView.Callback {
             override fun onMatrixChanged(matrix: Matrix) {
                 binding.transformLayout.setTransform(matrix)
+            }
+
+            override fun onImageMatrixChanged(matrix: Matrix) {
                 eliminatePenFragment?.onMatrixChange(matrix)
             }
 
@@ -94,6 +101,7 @@ class EditActivity : AppCompatActivity() {
                     )
                     binding.overlayView.visibility = View.VISIBLE
                     binding.surfaceView.transformHelper.setViewportSize(info.viewWidth, info.viewHeight)
+                    initBaseMatrix(info)
                 }
 
                 override fun setDebugImage(bitmap: Bitmap) {
@@ -102,6 +110,7 @@ class EditActivity : AppCompatActivity() {
 
                 override fun onRenderViewInfoReady(info: RenderViewInfo) {
                     binding.surfaceView.transformHelper.setViewportSize(info.viewWidth, info.viewHeight)
+                    initBaseMatrix(info)
                 }
             }
         )
@@ -242,7 +251,9 @@ class EditActivity : AppCompatActivity() {
     }
 
     private fun createEliminatePenFragment() {
-        eliminatePenFragment = EliminatePenFragment(eliminateViewModel, binding.surfaceView, viewModel.originalBitmap)
+        eliminateViewModel.originalBitmap = viewModel.originalBitmap
+        eliminateViewModel.matrix.value = binding.surfaceView.getImageMatrix()
+        eliminatePenFragment = EliminatePenFragment(eliminateViewModel, binding.surfaceView)
         supportFragmentManager.beginTransaction()
             .add(R.id.fl_eliminate_pen, eliminatePenFragment!!)
             .commit()
@@ -256,7 +267,23 @@ class EditActivity : AppCompatActivity() {
         }
     }
 
+    private fun initBaseMatrix(renderViewInfo: RenderViewInfo) {
+        val imageWidth = viewModel.originalBitmap?.width ?: return
+        val imageHeight = viewModel.originalBitmap?.height ?: return
+        val scaledWidth = renderViewInfo.scaledWidth * renderViewInfo.viewWidth
+        val scaledHeight = renderViewInfo.scaledHeight * renderViewInfo.viewHeight
+        val baseScaleX = scaledWidth / imageWidth
+        val baseScaleY = scaledHeight / imageHeight
+        val translateY = (renderViewInfo.viewHeight - scaledHeight) / 2
+        Log.d(TAG, "baseScaleX: $baseScaleX, baseScaleY: $baseScaleY, translateY: $translateY")
+        baseImageMatrix.reset()
+        baseImageMatrix.postScale(baseScaleX, baseScaleY)
+        baseImageMatrix.postTranslate(0f, translateY)
+        binding.surfaceView.initImageMatrix(baseImageMatrix)
+    }
+
     companion object {
+        const val TAG = "EditActivity"
         private const val EXTRA_KEY_IMAGE_URI = "image_uri"
 
         fun startMe(activity: Activity, imageUri: Uri) {
