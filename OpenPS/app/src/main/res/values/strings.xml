@@ -47,6 +47,7 @@
     <string name="image_effect">Image Effect</string>
     <string name="paint">Paint</string>
     <string name="lariat">Lariat</string>
+    <string name="eraser">Eraser</string>
     <string name="recover">Recover</string>
     <string name="size_4k" translatable="false">4K</string>
     <string name="size_2k" translatable="false">2K</string>

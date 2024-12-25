@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.akatsukirika.openps.compose.MODE_ERASER
 import com.akatsukirika.openps.compose.MODE_LARIAT
 import com.akatsukirika.openps.compose.MODE_PAINT
 import com.akatsukirika.openps.compose.MODE_RECOVER
@@ -80,6 +81,10 @@ class EliminatePenFragment(private val viewModel: EliminateViewModel?, private v
                             setDashedLine()
                             setErase(false)
                         }
+                    }
+
+                    MODE_ERASER -> {
+                        binding.viewEliminatePaint.setErase(true)
                     }
 
                     MODE_RECOVER -> {
