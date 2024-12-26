@@ -2,6 +2,7 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include "cv/CvLoader.h"
+#include "cv/InpaintLoader.h"
 
 CvLoader* cvLoader;
 
@@ -57,4 +58,34 @@ Java_com_akatsukirika_openps_interop_NativeLib_getSkinMaskBitmap(JNIEnv *env, jo
     }
 
     return cvLoader->getSkinMaskBitmap(env);
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_akatsukirika_openps_interop_NativeLib_runInpaint(
+    JNIEnv *env,
+    jobject thiz,
+    jobject image_bitmap,
+    jobject mask_bitmap,
+    jobject asset_manager,
+    jstring model_file
+) {
+    AAssetManager* mgr = AAssetManager_fromJava(env, asset_manager);
+    const char* model_file_path = env->GetStringUTFChars(model_file, 0);
+
+    AAsset* asset = AAssetManager_open(mgr, model_file_path, AASSET_MODE_BUFFER);
+    if (asset) {
+        off_t length = AAsset_getLength(asset);
+        char* buffer = new char[length];
+        AAsset_read(asset, buffer, length);
+        AAsset_close(asset);
+
+        auto inpaintLoader = new InpaintLoader();
+        inpaintLoader->storeBitmaps(env, image_bitmap, mask_bitmap);
+        inpaintLoader->releaseStoredBitmaps();
+
+        delete[] buffer;
+    }
+
+    return nullptr
 }
