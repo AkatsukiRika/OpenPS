@@ -6,12 +6,7 @@
 
 class InpaintLoader {
 public:
-    int storeBitmaps(JNIEnv* env, jobject imageBitmap, jobject maskBitmap);
-    void releaseStoredBitmaps();
-
-private:
-    cv::Mat image;
-    cv::Mat mask;
+    jobject runInference(JNIEnv* env, jobject imageBitmap, jobject maskBitmap, const char* modelBuffer, off_t modelSize);
 };
 
 #endif //OPENPS_INPAINTLOADER_H

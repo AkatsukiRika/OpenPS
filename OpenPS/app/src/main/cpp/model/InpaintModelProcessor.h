@@ -14,6 +14,7 @@ public:
      */
     static cv::Mat inpaint(const cv::Mat& image, const cv::Mat& mask, const char* modelBuffer, off_t modelSize);
 
+private:
     static void preprocessImage(const cv::Mat& input, std::vector<uint8_t>& output);
 
     static void preprocessMask(const cv::Mat& input, std::vector<uint8_t>& output);

@@ -558,9 +558,9 @@ class EliminatePaintView @JvmOverloads constructor(
                     val pixel = outputBitmap.getPixel(x, y)
                     val alpha = Color.alpha(pixel)
                     if (alpha == 0) {
-                        outputBitmap.setPixel(x, y, Color.BLACK)
-                    } else {
                         outputBitmap.setPixel(x, y, Color.WHITE)
+                    } else {
+                        outputBitmap.setPixel(x, y, Color.BLACK)
                     }
                 }
             }

@@ -76,16 +76,13 @@ Java_com_akatsukirika_openps_interop_NativeLib_runInpaint(
     AAsset* asset = AAssetManager_open(mgr, model_file_path, AASSET_MODE_BUFFER);
     if (asset) {
         off_t length = AAsset_getLength(asset);
-        char* buffer = new char[length];
-        AAsset_read(asset, buffer, length);
+        std::unique_ptr<char[]> buffer(new char[length]);
+        AAsset_read(asset, buffer.get(), length);
         AAsset_close(asset);
 
-        auto inpaintLoader = new InpaintLoader();
-        inpaintLoader->storeBitmaps(env, image_bitmap, mask_bitmap);
-        inpaintLoader->releaseStoredBitmaps();
-
-        delete[] buffer;
+        auto inpaintLoader = std::make_unique<InpaintLoader>();
+        return inpaintLoader->runInference(env, image_bitmap, mask_bitmap, buffer.get(), length);
     }
 
-    return nullptr
+    return nullptr;
 }

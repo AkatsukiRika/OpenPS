@@ -13,14 +13,19 @@ import com.akatsukirika.openps.compose.MODE_PAINT
 import com.akatsukirika.openps.compose.MODE_RECOVER
 import com.akatsukirika.openps.databinding.FragmentEliminatePenBinding
 import com.akatsukirika.openps.store.SettingsStore
+import com.akatsukirika.openps.view.EliminatePaintView
 import com.akatsukirika.openps.viewmodel.EliminateViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 interface EliminateFragmentCallback {
     fun onMatrixChange(matrix: Matrix)
 }
 
-class EliminatePenFragment(private val viewModel: EliminateViewModel?, private val outerView: View?) : Fragment(), EliminateFragmentCallback {
+class EliminatePenFragment(
+    private val viewModel: EliminateViewModel?,
+    private val outerView: View?
+) : Fragment(), EliminateFragmentCallback, EliminatePaintView.Callback {
     constructor() : this(null, null)
 
     private lateinit var binding: FragmentEliminatePenBinding
@@ -50,6 +55,7 @@ class EliminatePenFragment(private val viewModel: EliminateViewModel?, private v
             setDisableTouch(false)
             isInit = true
             setImageMatrix(viewModel?.matrix?.value ?: Matrix(), isInit)
+            setCallback(this@EliminatePenFragment)
         }
     }
 
@@ -99,4 +105,13 @@ class EliminatePenFragment(private val viewModel: EliminateViewModel?, private v
             }
         }
     }
+
+    override fun onActionUpOrCancel() {
+        viewModel ?: return
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.runInpaint(requireContext(), binding.viewEliminatePaint.getDrawingAreaMask())
+        }
+    }
+
+    override fun onTouchEvent(touchX: Float, touchY: Float) {}
 }
