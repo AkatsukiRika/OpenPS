@@ -22,6 +22,8 @@ public:
 
   void initWithImage(int width, int height, int channelCount, const unsigned char* pixels);
 
+  void changeImage(int width, int height, int channelCount, const unsigned char* pixels);
+
   void onTargetViewSizeChanged(int width, int height);
 
   void getTargetViewInfo(float *info);

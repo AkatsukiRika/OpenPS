@@ -31,6 +31,14 @@ void gpupixel::OpenPSHelper::initWithImage(int width, int height,
   imageHeight = height;
 }
 
+void gpupixel::OpenPSHelper::changeImage(int width, int height, int channelCount, const unsigned char *pixels) {
+  if (gpuSourceImage) {
+    gpuSourceImage->init(width, height, channelCount, pixels);
+    imageWidth = width;
+    imageHeight = height;
+  }
+}
+
 void gpupixel::OpenPSHelper::onTargetViewSizeChanged(int width, int height) {
   targetView->onSizeChanged(width, height);
 }

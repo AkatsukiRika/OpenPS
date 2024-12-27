@@ -15,6 +15,8 @@ internal object OpenPS {
 
     external fun nativeInitWithImage(width: Int, height: Int, channelCount: Int, bitmap: Bitmap)
 
+    external fun nativeChangeImage(width: Int, height: Int, channelCount: Int, bitmap: Bitmap)
+
     external fun nativeDestroy()
 
     external fun nativeTargetViewSizeChanged(width: Int, height: Int)

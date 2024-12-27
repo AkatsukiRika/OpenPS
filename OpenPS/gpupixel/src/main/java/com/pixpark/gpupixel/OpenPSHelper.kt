@@ -27,6 +27,17 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun changeImage(bitmap: Bitmap) {
+        val width = bitmap.width
+        val height = bitmap.height
+        val channelCount = BitmapUtils.getChannels(bitmap)
+
+        renderView.postOnGLThread {
+            OpenPS.nativeChangeImage(width, height, channelCount, bitmap)
+            requestRender()
+        }
+    }
+
     fun buildBasicRenderPipeline() {
         renderView.postOnGLThread {
             OpenPS.nativeBuildBasicRenderPipeline()

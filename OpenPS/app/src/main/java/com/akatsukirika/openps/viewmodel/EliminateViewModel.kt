@@ -25,17 +25,20 @@ class EliminateViewModel : ViewModel() {
 
     val inpaintStatus = MutableStateFlow(STATUS_IDLE)
 
+    val resultBitmap = MutableStateFlow<Bitmap?>(null)
+
     var originalBitmap: Bitmap? = null
 
     suspend fun runInpaint(context: Context, mask: Bitmap?) {
         inpaintStatus.emit(STATUS_LOADING)
         if (originalBitmap != null && mask != null) {
-            val resultBitmap = NativeLib.runInpaint(
+            val result = NativeLib.runInpaint(
                 imageBitmap = originalBitmap!!,
                 maskBitmap = mask,
                 assetManager = context.assets,
                 modelFile = "migan_pipeline_v2.onnx"
             )
+            resultBitmap.emit(result)
             inpaintStatus.emit(STATUS_SUCCESS)
         } else {
             inpaintStatus.emit(STATUS_ERROR)

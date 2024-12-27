@@ -31,6 +31,22 @@ Java_com_pixpark_gpupixel_OpenPS_nativeInitWithImage(JNIEnv *env, jobject thiz,
   AndroidBitmap_unlockPixels(env, bitmap);
 }
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeChangeImage(JNIEnv *env, jobject thiz, jint width, jint height, jint channel_count, jobject bitmap) {
+  AndroidBitmapInfo info;
+  void *pixels;
+  if ((AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
+    return;
+  }
+  if ((AndroidBitmap_lockPixels(env, bitmap, &pixels)) >= 0) {
+    if (openPSHelper) {
+      openPSHelper->changeImage(width, height, channel_count, (const unsigned char *) pixels);
+    }
+  }
+  AndroidBitmap_unlockPixels(env, bitmap);
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeDestroy(JNIEnv *env, jobject thiz) {
   openPSHelper.reset();
