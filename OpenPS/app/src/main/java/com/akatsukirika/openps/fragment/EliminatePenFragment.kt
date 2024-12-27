@@ -12,16 +12,14 @@ import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.MODE_ERASER
 import com.akatsukirika.openps.compose.MODE_LARIAT
 import com.akatsukirika.openps.compose.MODE_PAINT
-import com.akatsukirika.openps.compose.MODE_RECOVER
+import com.akatsukirika.openps.compose.MODE_GENERATE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.databinding.FragmentEliminatePenBinding
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.BitmapUtils.isFullyTransparent
-import com.akatsukirika.openps.view.EliminatePaintView
 import com.akatsukirika.openps.viewmodel.EliminateViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 interface EliminateFragmentCallback {
@@ -31,7 +29,7 @@ interface EliminateFragmentCallback {
 class EliminatePenFragment(
     private val viewModel: EliminateViewModel?,
     private val outerView: View?
-) : Fragment(), EliminateFragmentCallback, EliminatePaintView.Callback {
+) : Fragment(), EliminateFragmentCallback {
     constructor() : this(null, null)
 
     private lateinit var binding: FragmentEliminatePenBinding
@@ -63,7 +61,6 @@ class EliminatePenFragment(
             setDisableTouch(false)
             isInit = true
             setImageMatrix(viewModel?.matrix?.value ?: Matrix(), isInit)
-            setCallback(this@EliminatePenFragment)
         }
     }
 
@@ -101,12 +98,12 @@ class EliminatePenFragment(
                         binding.viewEliminatePaint.setErase(true)
                     }
 
-                    MODE_RECOVER -> {
-                        binding.viewEliminatePaint.apply {
-                            clearDrawing(strokeOnly = true)
-                            showIndicator(true)
-                            setBrushSize(viewModel.size.value, false)
-                            startRestore()
+                    MODE_GENERATE -> {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val isFullyTransparent = binding.viewEliminatePaint.getDrawingAreaBitmap()?.isFullyTransparent()
+                            if (isFullyTransparent == false) {
+                                viewModel.runInpaint(requireContext(), binding.viewEliminatePaint.getDrawingAreaMask())
+                            }
                         }
                     }
                 }
@@ -125,21 +122,10 @@ class EliminatePenFragment(
                     progressDialog?.dismiss()
                     if (it == STATUS_SUCCESS) {
                         binding.viewEliminatePaint.clearDrawing(strokeOnly = true)
+                        viewModel.mode.emit(MODE_PAINT)
                     }
                 }
             }
         }
     }
-
-    override fun onActionUpOrCancel() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(300)
-            val isFullyTransparent = binding.viewEliminatePaint.getDrawingAreaBitmap()?.isFullyTransparent()
-            if (isFullyTransparent == false) {
-                viewModel?.runInpaint(requireContext(), binding.viewEliminatePaint.getDrawingAreaMask())
-            }
-        }
-    }
-
-    override fun onTouchEvent(touchX: Float, touchY: Float) {}
 }

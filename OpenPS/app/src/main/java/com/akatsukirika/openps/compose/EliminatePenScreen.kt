@@ -36,7 +36,7 @@ interface EliminatePenCallback {
 const val MODE_PAINT = 0
 const val MODE_LARIAT = 1
 const val MODE_ERASER = 2
-const val MODE_RECOVER = 3
+const val MODE_GENERATE = 3
 
 @Composable
 fun EliminatePenScreen(callback: EliminatePenCallback, viewModel: EliminateViewModel) {
@@ -48,7 +48,7 @@ fun EliminatePenScreen(callback: EliminatePenCallback, viewModel: EliminateViewM
         .background(AppColors.DarkBG),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (mode != MODE_LARIAT) {
+        if (mode != MODE_LARIAT && mode != MODE_GENERATE) {
             SliderLayout(viewModel)
         }
 
@@ -103,57 +103,57 @@ fun EliminatePenScreen(callback: EliminatePenCallback, viewModel: EliminateViewM
                 )
             }
 
-//            Spacer(modifier = Modifier.width(24.dp))
-//
-//            Column(
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                verticalArrangement = Arrangement.Center,
-//                modifier = Modifier
-//                    .clip(RoundedCornerShape(16.dp))
-//                    .size(64.dp)
-//                    .clickableNoIndication {
-//                        viewModel.mode.value = MODE_ERASER
-//                    }
-//            ) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.ic_eraser),
-//                    contentDescription = null,
-//                    tint = if (mode == MODE_ERASER) AppColors.Green200 else Color.White,
-//                    modifier = Modifier.size(26.dp)
-//                )
-//
-//                Text(
-//                    text = stringResource(id = R.string.eraser),
-//                    color = if (mode == MODE_ERASER) AppColors.Green200 else Color.White,
-//                    fontSize = 11.sp
-//                )
-//            }
-//
-//            Spacer(modifier = Modifier.width(24.dp))
-//
-//            Column(
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                verticalArrangement = Arrangement.Center,
-//                modifier = Modifier
-//                    .clip(RoundedCornerShape(16.dp))
-//                    .size(64.dp)
-//                    .clickableNoIndication {
-//                        viewModel.mode.value = MODE_RECOVER
-//                    }
-//            ) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.ic_recover),
-//                    contentDescription = null,
-//                    tint = if (mode == MODE_RECOVER) AppColors.Green200 else Color.White,
-//                    modifier = Modifier.size(24.dp)
-//                )
-//
-//                Text(
-//                    text = stringResource(id = R.string.recover),
-//                    color = if (mode == MODE_RECOVER) AppColors.Green200 else Color.White,
-//                    fontSize = 11.sp
-//                )
-//            }
+            Spacer(modifier = Modifier.width(24.dp))
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .size(64.dp)
+                    .clickableNoIndication {
+                        viewModel.mode.value = MODE_ERASER
+                    }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_eraser),
+                    contentDescription = null,
+                    tint = if (mode == MODE_ERASER) AppColors.Green200 else Color.White,
+                    modifier = Modifier.size(26.dp)
+                )
+
+                Text(
+                    text = stringResource(id = R.string.eraser),
+                    color = if (mode == MODE_ERASER) AppColors.Green200 else Color.White,
+                    fontSize = 11.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.width(24.dp))
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .size(64.dp)
+                    .clickableNoIndication {
+                        viewModel.mode.value = MODE_GENERATE
+                    }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_generate),
+                    contentDescription = null,
+                    tint = if (mode == MODE_GENERATE) AppColors.Green200 else Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Text(
+                    text = stringResource(id = R.string.generate),
+                    color = if (mode == MODE_GENERATE) AppColors.Green200 else Color.White,
+                    fontSize = 11.sp
+                )
+            }
         }
 
         Row {
