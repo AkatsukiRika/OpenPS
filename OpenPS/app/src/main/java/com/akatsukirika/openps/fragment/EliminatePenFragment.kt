@@ -1,5 +1,6 @@
 package com.akatsukirika.openps.fragment
 
+import android.app.ProgressDialog
 import android.graphics.Matrix
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,15 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.MODE_ERASER
 import com.akatsukirika.openps.compose.MODE_LARIAT
 import com.akatsukirika.openps.compose.MODE_PAINT
 import com.akatsukirika.openps.compose.MODE_RECOVER
+import com.akatsukirika.openps.compose.STATUS_LOADING
+import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.databinding.FragmentEliminatePenBinding
 import com.akatsukirika.openps.store.SettingsStore
+import com.akatsukirika.openps.utils.BitmapUtils.isFullyTransparent
 import com.akatsukirika.openps.view.EliminatePaintView
 import com.akatsukirika.openps.viewmodel.EliminateViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 interface EliminateFragmentCallback {
@@ -31,6 +37,8 @@ class EliminatePenFragment(
     private lateinit var binding: FragmentEliminatePenBinding
 
     private var isInit = false
+
+    private var progressDialog: ProgressDialog? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentEliminatePenBinding.inflate(inflater, container, false)
@@ -104,12 +112,32 @@ class EliminatePenFragment(
                 }
             }
         }
+        lifecycleScope.launch {
+            viewModel?.inpaintStatus?.collect {
+                if (it == STATUS_LOADING) {
+                    progressDialog = ProgressDialog(requireContext()).apply {
+                        setCancelable(false)
+                        setCanceledOnTouchOutside(false)
+                        setMessage(requireContext().getString(R.string.inpaint_loading))
+                    }
+                    progressDialog?.show()
+                } else {
+                    progressDialog?.dismiss()
+                    if (it == STATUS_SUCCESS) {
+                        binding.viewEliminatePaint.clearDrawing(strokeOnly = true)
+                    }
+                }
+            }
+        }
     }
 
     override fun onActionUpOrCancel() {
-        viewModel ?: return
         lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.runInpaint(requireContext(), binding.viewEliminatePaint.getDrawingAreaMask())
+            delay(300)
+            val isFullyTransparent = binding.viewEliminatePaint.getDrawingAreaBitmap()?.isFullyTransparent()
+            if (isFullyTransparent == false) {
+                viewModel?.runInpaint(requireContext(), binding.viewEliminatePaint.getDrawingAreaMask())
+            }
         }
     }
 

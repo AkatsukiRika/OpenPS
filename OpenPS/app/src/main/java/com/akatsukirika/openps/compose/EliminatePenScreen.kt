@@ -103,57 +103,57 @@ fun EliminatePenScreen(callback: EliminatePenCallback, viewModel: EliminateViewM
                 )
             }
 
-            Spacer(modifier = Modifier.width(24.dp))
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(16.dp))
-                    .size(64.dp)
-                    .clickableNoIndication {
-                        viewModel.mode.value = MODE_ERASER
-                    }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_eraser),
-                    contentDescription = null,
-                    tint = if (mode == MODE_ERASER) AppColors.Green200 else Color.White,
-                    modifier = Modifier.size(26.dp)
-                )
-
-                Text(
-                    text = stringResource(id = R.string.eraser),
-                    color = if (mode == MODE_ERASER) AppColors.Green200 else Color.White,
-                    fontSize = 11.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.width(24.dp))
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(16.dp))
-                    .size(64.dp)
-                    .clickableNoIndication {
-                        viewModel.mode.value = MODE_RECOVER
-                    }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_recover),
-                    contentDescription = null,
-                    tint = if (mode == MODE_RECOVER) AppColors.Green200 else Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-
-                Text(
-                    text = stringResource(id = R.string.recover),
-                    color = if (mode == MODE_RECOVER) AppColors.Green200 else Color.White,
-                    fontSize = 11.sp
-                )
-            }
+//            Spacer(modifier = Modifier.width(24.dp))
+//
+//            Column(
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Arrangement.Center,
+//                modifier = Modifier
+//                    .clip(RoundedCornerShape(16.dp))
+//                    .size(64.dp)
+//                    .clickableNoIndication {
+//                        viewModel.mode.value = MODE_ERASER
+//                    }
+//            ) {
+//                Icon(
+//                    painter = painterResource(id = R.drawable.ic_eraser),
+//                    contentDescription = null,
+//                    tint = if (mode == MODE_ERASER) AppColors.Green200 else Color.White,
+//                    modifier = Modifier.size(26.dp)
+//                )
+//
+//                Text(
+//                    text = stringResource(id = R.string.eraser),
+//                    color = if (mode == MODE_ERASER) AppColors.Green200 else Color.White,
+//                    fontSize = 11.sp
+//                )
+//            }
+//
+//            Spacer(modifier = Modifier.width(24.dp))
+//
+//            Column(
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Arrangement.Center,
+//                modifier = Modifier
+//                    .clip(RoundedCornerShape(16.dp))
+//                    .size(64.dp)
+//                    .clickableNoIndication {
+//                        viewModel.mode.value = MODE_RECOVER
+//                    }
+//            ) {
+//                Icon(
+//                    painter = painterResource(id = R.drawable.ic_recover),
+//                    contentDescription = null,
+//                    tint = if (mode == MODE_RECOVER) AppColors.Green200 else Color.White,
+//                    modifier = Modifier.size(24.dp)
+//                )
+//
+//                Text(
+//                    text = stringResource(id = R.string.recover),
+//                    color = if (mode == MODE_RECOVER) AppColors.Green200 else Color.White,
+//                    fontSize = 11.sp
+//                )
+//            }
         }
 
         Row {

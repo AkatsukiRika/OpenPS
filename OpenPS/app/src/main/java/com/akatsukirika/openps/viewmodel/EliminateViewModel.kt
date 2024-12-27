@@ -3,9 +3,12 @@ package com.akatsukirika.openps.viewmodel
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.akatsukirika.openps.compose.MODE_PAINT
+import com.akatsukirika.openps.compose.STATUS_ERROR
+import com.akatsukirika.openps.compose.STATUS_IDLE
+import com.akatsukirika.openps.compose.STATUS_LOADING
+import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.interop.NativeLib
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -20,9 +23,12 @@ class EliminateViewModel : ViewModel() {
 
     val matrix = MutableStateFlow(Matrix())
 
+    val inpaintStatus = MutableStateFlow(STATUS_IDLE)
+
     var originalBitmap: Bitmap? = null
 
-    fun runInpaint(context: Context, mask: Bitmap?) {
+    suspend fun runInpaint(context: Context, mask: Bitmap?) {
+        inpaintStatus.emit(STATUS_LOADING)
         if (originalBitmap != null && mask != null) {
             val resultBitmap = NativeLib.runInpaint(
                 imageBitmap = originalBitmap!!,
@@ -30,7 +36,9 @@ class EliminateViewModel : ViewModel() {
                 assetManager = context.assets,
                 modelFile = "migan_pipeline_v2.onnx"
             )
-            Log.d(TAG, "resultBitmap width: ${resultBitmap?.width}, height: ${resultBitmap?.height}")
+            inpaintStatus.emit(STATUS_SUCCESS)
+        } else {
+            inpaintStatus.emit(STATUS_ERROR)
         }
     }
 }
