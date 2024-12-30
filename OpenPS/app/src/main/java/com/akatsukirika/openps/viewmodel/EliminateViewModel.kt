@@ -27,6 +27,8 @@ class EliminateViewModel : ViewModel() {
 
     val resultBitmap = MutableStateFlow<Bitmap?>(null)
 
+    val readyToGenerate = MutableStateFlow(false)
+
     var originalBitmap: Bitmap? = null
 
     suspend fun runInpaint(context: Context, mask: Bitmap?) {

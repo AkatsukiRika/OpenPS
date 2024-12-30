@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.EditScreen
 import com.akatsukirika.openps.compose.MODULE_ELIMINATE_PEN
+import com.akatsukirika.openps.compose.MODULE_IMAGE_EFFECT
 import com.akatsukirika.openps.compose.MODULE_NONE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
@@ -145,10 +146,19 @@ class EditActivity : AppCompatActivity() {
 
             launch {
                 viewModel.selectedModule.collect {
-                    if (it == MODULE_ELIMINATE_PEN) {
-                        createEliminatePenFragment()
-                    } else {
-                        removeEliminatePenFragment()
+                    when (it) {
+                        MODULE_ELIMINATE_PEN -> {
+                            supportActionBar?.setTitle(R.string.eliminate_pen)
+                            createEliminatePenFragment()
+                        }
+                        MODULE_IMAGE_EFFECT -> {
+                            supportActionBar?.setTitle(R.string.image_effect)
+                            removeEliminatePenFragment()
+                        }
+                        MODULE_NONE -> {
+                            supportActionBar?.setTitle(R.string.image_edit)
+                            removeEliminatePenFragment()
+                        }
                     }
                 }
             }

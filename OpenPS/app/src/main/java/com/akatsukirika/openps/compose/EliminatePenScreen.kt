@@ -41,6 +41,7 @@ const val MODE_GENERATE = 3
 @Composable
 fun EliminatePenScreen(callback: EliminatePenCallback, viewModel: EliminateViewModel) {
     val mode = viewModel.mode.collectAsState().value
+    val readyToGenerate = viewModel.readyToGenerate.collectAsState().value
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -137,59 +138,23 @@ fun EliminatePenScreen(callback: EliminatePenCallback, viewModel: EliminateViewM
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp))
                     .size(64.dp)
-                    .clickableNoIndication {
+                    .clickableNoIndication(enabled = readyToGenerate) {
                         viewModel.mode.value = MODE_GENERATE
                     }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_generate),
                     contentDescription = null,
-                    tint = if (mode == MODE_GENERATE) AppColors.Green200 else Color.White,
+                    tint = if (mode == MODE_GENERATE) AppColors.Green200 else if (readyToGenerate) Color.White else Color.DarkGray,
                     modifier = Modifier.size(24.dp)
                 )
 
                 Text(
                     text = stringResource(id = R.string.generate),
-                    color = if (mode == MODE_GENERATE) AppColors.Green200 else Color.White,
+                    color = if (mode == MODE_GENERATE) AppColors.Green200 else if (readyToGenerate) Color.White else Color.DarkGray,
                     fontSize = 11.sp
                 )
             }
-        }
-
-        Row {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_cancel),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(start = 16.dp, bottom = 16.dp)
-                    .size(18.dp)
-                    .clickableNoIndication {
-                        callback.onCancel()
-                    }
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = stringResource(id = R.string.eliminate_pen),
-                color = Color.Gray,
-                fontSize = 13.sp,
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Icon(
-                painter = painterResource(id = R.drawable.ic_tick),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(end = 16.dp, bottom = 16.dp)
-                    .size(20.dp)
-                    .clickableNoIndication {
-                        callback.onConfirm()
-                    }
-            )
         }
     }
 }

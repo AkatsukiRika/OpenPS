@@ -18,6 +18,7 @@ import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.databinding.FragmentEliminatePenBinding
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.BitmapUtils.isFullyTransparent
+import com.akatsukirika.openps.view.EliminatePaintView
 import com.akatsukirika.openps.viewmodel.EliminateViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,6 +62,16 @@ class EliminatePenFragment(
             setDisableTouch(false)
             isInit = true
             setImageMatrix(viewModel?.matrix?.value ?: Matrix(), isInit)
+            setCallback(object : EliminatePaintView.Callback {
+                override fun onActionUpOrCancel() {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val isFullyTransparent = binding.viewEliminatePaint.getDrawingAreaBitmap()?.isFullyTransparent()
+                        viewModel?.readyToGenerate?.emit(isFullyTransparent == false)
+                    }
+                }
+
+                override fun onTouchEvent(touchX: Float, touchY: Float) {}
+            })
         }
     }
 
@@ -123,6 +134,7 @@ class EliminatePenFragment(
                     if (it == STATUS_SUCCESS) {
                         binding.viewEliminatePaint.clearDrawing(strokeOnly = true)
                         viewModel.mode.emit(MODE_PAINT)
+                        viewModel.readyToGenerate.emit(false)
                     }
                 }
             }
