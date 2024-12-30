@@ -29,16 +29,19 @@ public:
   const float brightnessLevel;
   const int customFilterType;
   const float customFilterIntensity;
+  const std::string imageFileName;
 
   std::string toString() const override {
     return Util::str_format(
-        "smoothLevel: %f, whiteLevel: %f, lipstickLevel: %f, blusherLevel: "
-        "%f, eyeZoomLevel: %f, faceSlimLevel: %f, contrastLevel: %f, "
+        "smoothLevel: %f, whiteLevel: %f, lipstickLevel: %f, blusherLevel: %f, "
+        "eyeZoomLevel: %f, faceSlimLevel: %f, contrastLevel: %f, "
         "exposureLevel: %f, saturationLevel: %f, sharpnessLevel: %f, "
-        "brightnessLevel: %f, customFilterType: %d, customFilterIntensity: %f",
+        "brightnessLevel: %f, customFilterType: %d, customFilterIntensity: %f, "
+        "imageFileName: %s",
         smoothLevel, whiteLevel, lipstickLevel, blusherLevel, eyeZoomLevel,
         faceSlimLevel, contrastLevel, exposureLevel, saturationLevel,
-        sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity);
+        sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity,
+        imageFileName.c_str());
   }
 
   bool equals(const AbstractRecord& anotherRecord) const override {
@@ -65,25 +68,30 @@ public:
            exposureLevel == record->exposureLevel &&
            saturationLevel == record->saturationLevel &&
            sharpnessLevel == record->sharpnessLevel &&
-           brightnessLevel == record->brightnessLevel && customFilterEquals;
+           brightnessLevel == record->brightnessLevel &&
+           imageFileName == record->imageFileName &&
+           customFilterEquals;
   }
 
   AbstractRecord* clone() const override {
     return new OpenPSRecord(smoothLevel, whiteLevel, lipstickLevel, blusherLevel,
                             eyeZoomLevel, faceSlimLevel, contrastLevel, exposureLevel,
-                            saturationLevel, sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity);
+                            saturationLevel, sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity,
+                            imageFileName);
   }
 
   OpenPSRecord(float smoothLevel, float whiteLevel, float lipstickLevel,
                float blusherLevel, float eyeZoomLevel, float faceSlimLevel,
                float contrastLevel, float exposureLevel, float saturationLevel,
-               float sharpnessLevel, float brightnessLevel, int customFilterType, float customFilterIntensity)
+               float sharpnessLevel, float brightnessLevel, int customFilterType, float customFilterIntensity,
+               std::string imageFileName = "")
       : smoothLevel(smoothLevel), whiteLevel(whiteLevel),
         lipstickLevel(lipstickLevel), blusherLevel(blusherLevel),
         eyeZoomLevel(eyeZoomLevel), faceSlimLevel(faceSlimLevel),
         contrastLevel(contrastLevel), exposureLevel(exposureLevel),
         saturationLevel(saturationLevel), sharpnessLevel(sharpnessLevel),
-        brightnessLevel(brightnessLevel), customFilterType(customFilterType), customFilterIntensity(customFilterIntensity) {};
+        brightnessLevel(brightnessLevel), customFilterType(customFilterType), customFilterIntensity(customFilterIntensity),
+        imageFileName(imageFileName) {};
 };
 
 NS_GPUPIXEL_END

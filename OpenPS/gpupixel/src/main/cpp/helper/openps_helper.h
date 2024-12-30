@@ -112,6 +112,7 @@ private:
   float sharpnessLevel = DEFAULT_LEVEL;
   float brightnessLevel = DEFAULT_LEVEL;
   float customFilterLevel = DEFAULT_LEVEL;
+  std::string currentImageFileName = "";
 
   int imageWidth = 0;
   int imageHeight = 0;

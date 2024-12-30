@@ -32,9 +32,8 @@ void gpupixel::OpenPSHelper::initWithImage(int width, int height,
   imageWidth = width;
   imageHeight = height;
   if (filename) {
-    std::string filenameString(filename);
-    auto record = ImageRecord(filenameString);
-    undoRedoHelper.addRecord(record);
+    currentImageFileName = filename;
+    addUndoRedoRecord();
   }
 }
 
@@ -47,9 +46,8 @@ void gpupixel::OpenPSHelper::changeImage(int width, int height,
     imageWidth = width;
     imageHeight = height;
     if (filename) {
-      std::string filenameString(filename);
-      auto record = ImageRecord(filenameString);
-      undoRedoHelper.addRecord(record);
+      currentImageFileName = filename;
+      addUndoRedoRecord();
     }
   }
 }
@@ -383,22 +381,17 @@ std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::undo() {
   auto openPSRecord = std::dynamic_pointer_cast<OpenPSRecord>(result);
   if (check && openPSRecord) {
     setLevels(*openPSRecord);
-    return openPSRecord;
-  }
-
-  if (undoRedoHelper.getCurrentIndex() == 0) {
-    setLevels(*std::dynamic_pointer_cast<OpenPSRecord>(undoRedoHelper.getEmptyRecord()));
-  }
-
-  auto imageRecord = std::dynamic_pointer_cast<ImageRecord>(result);
-  if (check && imageRecord) {
-    int width, height, channelCount;
-    auto filename = Util::getExternalPathJni(imageRecord->filename);
-    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channelCount, 0);
-    if (data != nullptr) {
-      changeImage(width, height, channelCount, data);
-      stbi_image_free(data);
+    if (!openPSRecord->imageFileName.empty()) {
+      int width, height, channelCount;
+      auto imageFileNameStr = std::string(openPSRecord->imageFileName);
+      auto filename = Util::getExternalPathJni(imageFileNameStr);
+      unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channelCount, 0);
+      if (data != nullptr) {
+        changeImage(width, height, channelCount, data);
+        stbi_image_free(data);
+      }
     }
+    return openPSRecord;
   }
 
   return nullptr;
@@ -411,18 +404,17 @@ std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::redo() {
   auto openPSRecord = std::dynamic_pointer_cast<OpenPSRecord>(result);
   if (check && openPSRecord) {
     setLevels(*openPSRecord);
-    return openPSRecord;
-  }
-
-  auto imageRecord = std::dynamic_pointer_cast<ImageRecord>(result);
-  if (check && imageRecord) {
-    int width, height, channelCount;
-    auto filename = Util::getExternalPathJni(imageRecord->filename);
-    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channelCount, 0);
-    if (data != nullptr) {
-      changeImage(width, height, channelCount, data);
-      stbi_image_free(data);
+    if (!openPSRecord->imageFileName.empty()) {
+      int width, height, channelCount;
+      auto imageFileNameStr = std::string(openPSRecord->imageFileName);
+      auto filename = Util::getExternalPathJni(imageFileNameStr);
+      unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channelCount, 0);
+      if (data != nullptr) {
+        changeImage(width, height, channelCount, data);
+        stbi_image_free(data);
+      }
     }
+    return openPSRecord;
   }
 
   return nullptr;
@@ -445,11 +437,16 @@ void gpupixel::OpenPSHelper::addUndoRedoRecord() {
   float saturationRecordLevel = saturationLevel - 1;
   float sharpnessRecordLevel = sharpnessLevel / 2;
   float brightnessRecordLevel = brightnessLevel / 0.5;
+  int customFilterType = 0;
+  if (customFilter) {
+    customFilterType = customFilter->getType();
+  }
   auto record = OpenPSRecord(
       smoothRecordLevel, whiteRecordLevel, lipstickRecordLevel,
       blusherRecordLevel, eyeZoomRecordLevel, faceSlimRecordLevel,
       contrastRecordLevel, exposureRecordLevel, saturationRecordLevel,
-      sharpnessRecordLevel, brightnessRecordLevel, customFilter->getType(), customFilterLevel);
+      sharpnessRecordLevel, brightnessRecordLevel, customFilterType,
+      customFilterLevel, currentImageFileName);
   undoRedoHelper.addRecord(record);
 }
 
