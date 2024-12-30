@@ -317,4 +317,12 @@ Java_com_pixpark_gpupixel_OpenPS_nativeRedo(JNIEnv *env, jobject thiz) {
   return nullptr;
 }
 
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeGetCurrentImageFileName(JNIEnv* env, jobject thiz) {
+  if (openPSHelper) {
+    return env->NewStringUTF(openPSHelper->getCurrentImageFileName().c_str());
+  }
+  return nullptr;
+}
+
 #endif

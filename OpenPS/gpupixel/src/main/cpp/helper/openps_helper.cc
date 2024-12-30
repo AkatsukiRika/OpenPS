@@ -421,6 +421,10 @@ std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::redo() {
   return nullptr;
 }
 
+std::string gpupixel::OpenPSHelper::getCurrentImageFileName() {
+  return currentImageFileName;
+}
+
 void gpupixel::OpenPSHelper::addUndoRedoRecord() {
   float smoothRecordLevel = smoothLevel;
   float whiteRecordLevel = whiteLevel * 2;

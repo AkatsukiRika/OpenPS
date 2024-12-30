@@ -81,6 +81,8 @@ public:
 
   std::shared_ptr<OpenPSRecord> redo();
 
+  std::string getCurrentImageFileName();
+
 private:
   std::shared_ptr<SourceImage> gpuSourceImage;
   std::shared_ptr<LipstickFilter> lipstickFilter;

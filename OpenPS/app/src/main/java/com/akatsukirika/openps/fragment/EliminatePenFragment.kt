@@ -52,6 +52,10 @@ class EliminatePenFragment(
     private fun initView() {
         initPaintView()
         initObservers()
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewModel?.init(requireContext())
+            binding.viewEliminatePaint.setOuterView(outerView ?: return@launch, viewModel?.originalBitmap)
+        }
     }
 
     private fun initPaintView() {
@@ -136,6 +140,13 @@ class EliminatePenFragment(
                         viewModel.mode.emit(MODE_PAINT)
                         viewModel.readyToGenerate.emit(false)
                     }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            viewModel?.resultBitmap?.collect {
+                it?.let {
+                    binding.viewEliminatePaint.setOuterView(outerView ?: return@collect, it)
                 }
             }
         }

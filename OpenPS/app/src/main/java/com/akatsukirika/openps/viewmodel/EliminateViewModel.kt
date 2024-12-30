@@ -10,7 +10,11 @@ import com.akatsukirika.openps.compose.STATUS_IDLE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.interop.NativeLib
+import com.akatsukirika.openps.utils.BitmapUtils
+import com.pixpark.gpupixel.GPUPixel
+import com.pixpark.gpupixel.OpenPSHelper
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.io.File
 
 class EliminateViewModel : ViewModel() {
     companion object {
@@ -31,11 +35,18 @@ class EliminateViewModel : ViewModel() {
 
     var originalBitmap: Bitmap? = null
 
+    var helper: OpenPSHelper? = null
+
+    suspend fun init(context: Context) {
+        originalBitmap = getCurrentImageBitmap(context)
+    }
+
     suspend fun runInpaint(context: Context, mask: Bitmap?) {
         inpaintStatus.emit(STATUS_LOADING)
-        if (originalBitmap != null && mask != null) {
+        val bitmap = getCurrentImageBitmap(context)
+        if (bitmap != null && mask != null) {
             val result = NativeLib.runInpaint(
-                imageBitmap = originalBitmap!!,
+                imageBitmap = bitmap,
                 maskBitmap = mask,
                 assetManager = context.assets,
                 modelFile = "migan_pipeline_v2.onnx"
@@ -45,5 +56,11 @@ class EliminateViewModel : ViewModel() {
         } else {
             inpaintStatus.emit(STATUS_ERROR)
         }
+    }
+
+    private suspend fun getCurrentImageBitmap(context: Context): Bitmap? {
+        val currentImageFileName = helper?.getCurrentImageFileName()
+        val currentImageFilePath = GPUPixel.getExternalPath() + File.separator + currentImageFileName
+        return BitmapUtils.getBitmap(context, currentImageFilePath)
     }
 }

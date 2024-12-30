@@ -268,7 +268,7 @@ class EditActivity : AppCompatActivity() {
     }
 
     private fun createEliminatePenFragment() {
-        eliminateViewModel.originalBitmap = viewModel.originalBitmap
+        eliminateViewModel.helper = viewModel.helper
         eliminateViewModel.matrix.value = binding.surfaceView.getImageMatrix()
         eliminatePenFragment = EliminatePenFragment(eliminateViewModel, binding.surfaceView)
         supportFragmentManager.beginTransaction()

@@ -216,6 +216,8 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun getCurrentImageFileName() = OpenPS.nativeGetCurrentImageFileName()
+
     fun destroy() {
         scope.cancel()
         OpenPS.nativeDestroy()

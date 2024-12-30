@@ -72,4 +72,6 @@ internal object OpenPS {
     external fun nativeUndo(): OpenPSRecord?
 
     external fun nativeRedo(): OpenPSRecord?
+
+    external fun nativeGetCurrentImageFileName(): String?
 }
