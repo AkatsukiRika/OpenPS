@@ -24,6 +24,10 @@ public:
     }
     return filename == record->filename;
   }
+
+  AbstractRecord* clone() const override {
+    return new ImageRecord(filename);
+  }
 };
 
 NS_GPUPIXEL_END

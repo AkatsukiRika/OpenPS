@@ -12,6 +12,7 @@ public:
   virtual ~AbstractRecord() = default;
   virtual std::string toString() const = 0;
   virtual bool equals(const AbstractRecord& another) const = 0;
+  virtual AbstractRecord* clone() const = 0;
 };
 
 NS_GPUPIXEL_END

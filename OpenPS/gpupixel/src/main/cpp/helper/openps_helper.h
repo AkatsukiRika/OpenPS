@@ -22,7 +22,7 @@ public:
 
   ~OpenPSHelper();
 
-  void initWithImage(int width, int height, int channelCount, const unsigned char* pixels);
+  void initWithImage(int width, int height, int channelCount, const unsigned char* pixels, const char* filename = nullptr);
 
   void changeImage(int width, int height, int channelCount, const unsigned char* pixels);
 
@@ -76,9 +76,9 @@ public:
 
   bool canRedo();
 
-  OpenPSRecord undo();
+  std::shared_ptr<OpenPSRecord> undo();
 
-  OpenPSRecord redo();
+  std::shared_ptr<OpenPSRecord> redo();
 
 private:
   std::shared_ptr<SourceImage> gpuSourceImage;

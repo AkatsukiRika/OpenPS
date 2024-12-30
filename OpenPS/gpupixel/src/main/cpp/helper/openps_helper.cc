@@ -25,10 +25,16 @@ gpupixel::OpenPSHelper::~OpenPSHelper() {
 
 void gpupixel::OpenPSHelper::initWithImage(int width, int height,
                                            int channelCount,
-                                           const unsigned char *pixels) {
+                                           const unsigned char *pixels,
+                                           const char* filename) {
   gpuSourceImage = SourceImage::create_from_memory(width, height, channelCount, pixels);
   imageWidth = width;
   imageHeight = height;
+  if (filename) {
+    std::string filenameString(filename);
+    auto record = ImageRecord(filenameString);
+    undoRedoHelper.addRecord(record);
+  }
 }
 
 void gpupixel::OpenPSHelper::changeImage(int width, int height, int channelCount, const unsigned char *pixels) {
@@ -361,22 +367,28 @@ bool gpupixel::OpenPSHelper::canRedo() {
   return undoRedoHelper.canRedo();
 }
 
-gpupixel::OpenPSRecord gpupixel::OpenPSHelper::undo() {
+std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::undo() {
   bool check = canUndo();
   auto result = undoRedoHelper.undo();
-  if (check) {
-    setLevels(result);
+
+  auto openPSRecord = std::dynamic_pointer_cast<OpenPSRecord>(result);
+  if (check && openPSRecord) {
+    setLevels(*openPSRecord);
+    return openPSRecord;
   }
-  return result;
+  return nullptr;
 }
 
-gpupixel::OpenPSRecord gpupixel::OpenPSHelper::redo() {
+std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::redo() {
   bool check = canRedo();
   auto result = undoRedoHelper.redo();
-  if (check) {
-    setLevels(result);
+
+  auto openPSRecord = std::dynamic_pointer_cast<OpenPSRecord>(result);
+  if (check && openPSRecord) {
+    setLevels(*openPSRecord);
+    return openPSRecord;
   }
-  return result;
+  return nullptr;
 }
 
 void gpupixel::OpenPSHelper::addUndoRedoRecord() {

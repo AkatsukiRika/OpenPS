@@ -68,6 +68,12 @@ public:
            brightnessLevel == record->brightnessLevel && customFilterEquals;
   }
 
+  AbstractRecord* clone() const override {
+    return new OpenPSRecord(smoothLevel, whiteLevel, lipstickLevel, blusherLevel,
+                            eyeZoomLevel, faceSlimLevel, contrastLevel, exposureLevel,
+                            saturationLevel, sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity);
+  }
+
   OpenPSRecord(float smoothLevel, float whiteLevel, float lipstickLevel,
                float blusherLevel, float eyeZoomLevel, float faceSlimLevel,
                float contrastLevel, float exposureLevel, float saturationLevel,

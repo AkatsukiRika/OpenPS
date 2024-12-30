@@ -17,16 +17,24 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeInitWithImage(JNIEnv *env, jobject thiz,
                                                      jint width, jint height,
                                                      jint channelCount,
-                                                     jobject bitmap) {
+                                                     jobject bitmap,
+                                                     jstring filename) {
   AndroidBitmapInfo info;
   void *pixels;
   if ((AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
     return;
   }
+  const char* filenameStr = nullptr;
+  if (filename != nullptr) {
+    filenameStr = env->GetStringUTFChars(filename, nullptr);
+  }
   if ((AndroidBitmap_lockPixels(env, bitmap, &pixels)) >= 0) {
     if (openPSHelper) {
-      openPSHelper->initWithImage(width, height, channelCount, (const unsigned char *) pixels);
+      openPSHelper->initWithImage(width, height, channelCount, (const unsigned char *) pixels, filenameStr);
     }
+  }
+  if (filenameStr != nullptr) {
+    env->ReleaseStringUTFChars(filename, filenameStr);
   }
   AndroidBitmap_unlockPixels(env, bitmap);
 }
@@ -263,14 +271,17 @@ Java_com_pixpark_gpupixel_OpenPS_nativeCanRedo(JNIEnv *env, jobject thiz) {
 extern "C" JNIEXPORT jobject JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeUndo(JNIEnv *env, jobject thiz) {
   if (openPSHelper) {
-    OpenPSRecord record = openPSHelper->undo();
+    auto record = openPSHelper->undo();
+    if (!record) {
+      return nullptr;
+    }
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
     jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIF)V");
-    jobject kotlinObject = env->NewObject(kotlinClass, constructor, record.smoothLevel, record.whiteLevel,
-                                          record.lipstickLevel, record.blusherLevel, record.eyeZoomLevel,
-                                          record.faceSlimLevel, record.contrastLevel, record.exposureLevel,
-                                          record.saturationLevel, record.sharpnessLevel, record.brightnessLevel,
-                                          record.customFilterType, record.customFilterIntensity);
+    jobject kotlinObject = env->NewObject(kotlinClass, constructor, record->smoothLevel, record->whiteLevel,
+                                          record->lipstickLevel, record->blusherLevel, record->eyeZoomLevel,
+                                          record->faceSlimLevel, record->contrastLevel, record->exposureLevel,
+                                          record->saturationLevel, record->sharpnessLevel, record->brightnessLevel,
+                                          record->customFilterType, record->customFilterIntensity);
     return kotlinObject;
   }
   return nullptr;
@@ -279,14 +290,17 @@ Java_com_pixpark_gpupixel_OpenPS_nativeUndo(JNIEnv *env, jobject thiz) {
 extern "C" JNIEXPORT jobject JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeRedo(JNIEnv *env, jobject thiz) {
   if (openPSHelper) {
-    OpenPSRecord record = openPSHelper->redo();
+    auto record = openPSHelper->redo();
+    if (!record) {
+      return nullptr;
+    }
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
     jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIF)V");
-    jobject kotlinObject = env->NewObject(kotlinClass, constructor, record.smoothLevel, record.whiteLevel,
-                                          record.lipstickLevel, record.blusherLevel, record.eyeZoomLevel,
-                                          record.faceSlimLevel, record.contrastLevel, record.exposureLevel,
-                                          record.saturationLevel, record.sharpnessLevel, record.brightnessLevel,
-                                          record.customFilterType, record.customFilterIntensity);
+    jobject kotlinObject = env->NewObject(kotlinClass, constructor, record->smoothLevel, record->whiteLevel,
+                                          record->lipstickLevel, record->blusherLevel, record->eyeZoomLevel,
+                                          record->faceSlimLevel, record->contrastLevel, record->exposureLevel,
+                                          record->saturationLevel, record->sharpnessLevel, record->brightnessLevel,
+                                          record->customFilterType, record->customFilterIntensity);
     return kotlinObject;
   }
   return nullptr;

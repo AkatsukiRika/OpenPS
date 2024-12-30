@@ -8,7 +8,8 @@
 #pragma once
 
 #include <vector>
-#include "openps_record.h"
+#include <memory>
+#include "abstract_record.h"
 #include "gpupixel_macros.h"
 #include "util.h"
 
@@ -18,18 +19,18 @@ class GPUPIXEL_API UndoRedoHelper {
 public:
   UndoRedoHelper();
 
-  void addRecord(const OpenPSRecord& record);
+  void addRecord(const AbstractRecord& record);
   bool canUndo();
   bool canRedo();
-  OpenPSRecord undo();
-  OpenPSRecord redo();
+  std::shared_ptr<AbstractRecord> undo();
+  std::shared_ptr<AbstractRecord> redo();
 
 private:
-  std::vector<OpenPSRecord> recordList;
+  std::vector<std::shared_ptr<AbstractRecord>> recordList;
   int currentIndex = 0;
 
   void addEmptyRecord();
-  OpenPSRecord getEmptyRecord();
+  std::shared_ptr<AbstractRecord> getEmptyRecord();
 };
 
 NS_GPUPIXEL_END

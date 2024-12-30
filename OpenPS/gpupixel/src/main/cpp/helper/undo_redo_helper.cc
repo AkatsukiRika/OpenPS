@@ -1,19 +1,20 @@
 #include "undo_redo_helper.h"
+#include "openps_record.h"
 
-void gpupixel::UndoRedoHelper::addRecord(const gpupixel::OpenPSRecord &record) {
+USING_NS_GPUPIXEL
+
+void gpupixel::UndoRedoHelper::addRecord(const AbstractRecord& record) {
   int lastIndex = recordList.size() - 1;
   if (currentIndex < lastIndex) {
-    for (int i = currentIndex + 1; i <= lastIndex; i++) {
-      recordList.pop_back();
-    }
+    recordList.erase(recordList.begin() + currentIndex + 1, recordList.end());
   }
   if (recordList.empty()) {
-    recordList.emplace_back(record);
+    recordList.emplace_back(std::shared_ptr<gpupixel::AbstractRecord>(record.clone()));
     Util::Log("UndoRedoHelper", "addRecord {%s}", record.toString().c_str());
   } else {
     auto currentLatestRecord = recordList.back();
-    if (!record.equals(currentLatestRecord)) {
-      recordList.emplace_back(record);
+    if (!record.equals(*currentLatestRecord)) {
+      recordList.emplace_back(std::shared_ptr<gpupixel::AbstractRecord>(record.clone()));
       Util::Log("UndoRedoHelper", "addRecord {%s}", record.toString().c_str());
     }
   }
@@ -38,7 +39,7 @@ bool gpupixel::UndoRedoHelper::canRedo() {
   return currentIndex < lastIndex;
 }
 
-gpupixel::OpenPSRecord gpupixel::UndoRedoHelper::undo() {
+std::shared_ptr<AbstractRecord> gpupixel::UndoRedoHelper::undo() {
   if (canUndo()) {
     currentIndex--;
     return recordList[currentIndex];
@@ -46,7 +47,7 @@ gpupixel::OpenPSRecord gpupixel::UndoRedoHelper::undo() {
   return getEmptyRecord();
 }
 
-gpupixel::OpenPSRecord gpupixel::UndoRedoHelper::redo() {
+std::shared_ptr<AbstractRecord> gpupixel::UndoRedoHelper::redo() {
   if (canRedo()) {
     currentIndex++;
     return recordList[currentIndex];
@@ -55,13 +56,13 @@ gpupixel::OpenPSRecord gpupixel::UndoRedoHelper::redo() {
 }
 
 void gpupixel::UndoRedoHelper::addEmptyRecord() {
-  addRecord(getEmptyRecord());
+  addRecord(*getEmptyRecord());
 }
 
 gpupixel::UndoRedoHelper::UndoRedoHelper() {
   addEmptyRecord();
 }
 
-gpupixel::OpenPSRecord gpupixel::UndoRedoHelper::getEmptyRecord() {
-  return gpupixel::OpenPSRecord(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+std::shared_ptr<AbstractRecord> gpupixel::UndoRedoHelper::getEmptyRecord() {
+  return std::make_shared<OpenPSRecord>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
