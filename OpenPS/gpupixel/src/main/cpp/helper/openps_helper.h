@@ -12,7 +12,6 @@
 #include "undo_redo_helper.h"
 #include "abstract_record.h"
 #include "openps_record.h"
-#include "image_record.h"
 
 NS_GPUPIXEL_BEGIN
 
@@ -25,6 +24,8 @@ public:
   void initWithImage(int width, int height, int channelCount, const unsigned char* pixels, const char* filename = nullptr);
 
   void changeImage(int width, int height, int channelCount, const unsigned char* pixels, const char* filename = nullptr);
+
+  void changeImage(std::string filename);
 
   void onTargetViewSizeChanged(int width, int height);
 
@@ -117,6 +118,7 @@ private:
   int imageWidth = 0;
   int imageHeight = 0;
   bool matrixUpdated = false;
+  std::string initialImageFileName = "";
 
   UndoRedoHelper undoRedoHelper;
   void addUndoRedoRecord();

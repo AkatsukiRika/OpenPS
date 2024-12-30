@@ -33,6 +33,7 @@ void gpupixel::OpenPSHelper::initWithImage(int width, int height,
   imageHeight = height;
   if (filename) {
     currentImageFileName = filename;
+    initialImageFileName = filename;
     addUndoRedoRecord();
   }
 }
@@ -48,6 +49,18 @@ void gpupixel::OpenPSHelper::changeImage(int width, int height,
     if (filename) {
       currentImageFileName = filename;
       addUndoRedoRecord();
+    }
+  }
+}
+
+void gpupixel::OpenPSHelper::changeImage(std::string filename) {
+  if (!filename.empty()) {
+    int width, height, channelCount;
+    auto imageFileName = Util::getExternalPathJni(filename);
+    unsigned char* data = stbi_load(imageFileName.c_str(), &width, &height, &channelCount, 0);
+    if (data != nullptr) {
+      changeImage(width, height, channelCount, data);
+      stbi_image_free(data);
     }
   }
 }
@@ -322,6 +335,9 @@ void gpupixel::OpenPSHelper::onCompareBegin() {
   if (customFilter) {
     customFilter->setIntensity(0);
   }
+  if (currentImageFileName != initialImageFileName) {
+    changeImage(initialImageFileName);
+  }
 }
 
 void gpupixel::OpenPSHelper::onCompareEnd() {
@@ -357,6 +373,9 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   if (customFilter) {
     customFilter->setIntensity(customFilterLevel);
   }
+  if (currentImageFileName != initialImageFileName) {
+    changeImage(currentImageFileName);
+  }
 }
 
 void gpupixel::OpenPSHelper::updateMVPMatrix(float *matrix) {
@@ -381,16 +400,7 @@ std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::undo() {
   auto openPSRecord = std::dynamic_pointer_cast<OpenPSRecord>(result);
   if (check && openPSRecord) {
     setLevels(*openPSRecord);
-    if (!openPSRecord->imageFileName.empty()) {
-      int width, height, channelCount;
-      auto imageFileNameStr = std::string(openPSRecord->imageFileName);
-      auto filename = Util::getExternalPathJni(imageFileNameStr);
-      unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channelCount, 0);
-      if (data != nullptr) {
-        changeImage(width, height, channelCount, data);
-        stbi_image_free(data);
-      }
-    }
+    changeImage(openPSRecord->imageFileName);
     return openPSRecord;
   }
 
@@ -404,16 +414,7 @@ std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::redo() {
   auto openPSRecord = std::dynamic_pointer_cast<OpenPSRecord>(result);
   if (check && openPSRecord) {
     setLevels(*openPSRecord);
-    if (!openPSRecord->imageFileName.empty()) {
-      int width, height, channelCount;
-      auto imageFileNameStr = std::string(openPSRecord->imageFileName);
-      auto filename = Util::getExternalPathJni(imageFileNameStr);
-      unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channelCount, 0);
-      if (data != nullptr) {
-        changeImage(width, height, channelCount, data);
-        stbi_image_free(data);
-      }
-    }
+    changeImage(openPSRecord->imageFileName);
     return openPSRecord;
   }
 
