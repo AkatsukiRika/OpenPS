@@ -218,6 +218,13 @@ class EditViewModel : ViewModel() {
         }
     }
 
+    fun changeImage(bitmap: Bitmap) {
+        helper?.changeImage(bitmap)
+        viewModelScope.launch {
+            refreshUndoRedo()
+        }
+    }
+
     private fun updateHelperValue(addRecord: Boolean = false) {
         when (selectedTabIndex.value) {
             TAB_BEAUTIFY -> {

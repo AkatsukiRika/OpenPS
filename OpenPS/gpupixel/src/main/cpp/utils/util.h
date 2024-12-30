@@ -33,6 +33,7 @@ class GPUPIXEL_API Util {
 #endif
 #if defined(GPUPIXEL_ANDROID)
   static std::string getResourcePathJni(std::string name);
+  static std::string getExternalPathJni(std::string name);
 #endif
 
 private:

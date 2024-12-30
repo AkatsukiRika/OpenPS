@@ -148,6 +148,34 @@ std::string Util::getResourcePathJni(std::string name) {
   env->DeleteLocalRef(class_id);
   return str + "/" + name;
 }
+
+std::string Util::getExternalPathJni(std::string name) {
+  JavaVM *jvm = GetJVM();
+  JNIEnv *env = GetEnv(jvm);
+
+  const char *className = "com/pixpark/gpupixel/GPUPixel";
+  const char *methodName = "getExternalPath";
+  const char *methodSignature = "()Ljava/lang/String;";
+
+  // GPUPixel
+  jclass class_id = env->FindClass(className);
+  if (class_id == NULL) {
+    return NULL;
+  }
+
+  jmethodID mtd = env->GetStaticMethodID(class_id, methodName,
+                                         methodSignature);
+  if (mtd == NULL) {
+    return NULL;
+  }
+
+  jstring path = (jstring)env->CallStaticObjectMethod(class_id,
+                                                      mtd);
+
+  std::string str = env->GetStringUTFChars(path, nullptr);
+  env->DeleteLocalRef(class_id);
+  return str + "/" + name;
+}
 #endif
 
 std::string Util::str_format(const char* fmt, ...) {

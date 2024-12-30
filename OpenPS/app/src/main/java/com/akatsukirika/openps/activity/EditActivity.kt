@@ -156,7 +156,7 @@ class EditActivity : AppCompatActivity() {
             launch {
                 eliminateViewModel.resultBitmap.collect {
                     if (it != null) {
-                        viewModel.helper?.changeImage(it)
+                        viewModel.changeImage(it)
                     }
                 }
             }

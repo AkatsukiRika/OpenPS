@@ -41,16 +41,27 @@ Java_com_pixpark_gpupixel_OpenPS_nativeInitWithImage(JNIEnv *env, jobject thiz,
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeChangeImage(JNIEnv *env, jobject thiz, jint width, jint height, jint channel_count, jobject bitmap) {
+Java_com_pixpark_gpupixel_OpenPS_nativeChangeImage(JNIEnv *env, jobject thiz,
+                                                   jint width, jint height,
+                                                   jint channel_count,
+                                                   jobject bitmap,
+                                                   jstring filename) {
   AndroidBitmapInfo info;
   void *pixels;
   if ((AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
     return;
   }
+  const char* filenameStr = nullptr;
+  if (filename != nullptr) {
+    filenameStr = env->GetStringUTFChars(filename, nullptr);
+  }
   if ((AndroidBitmap_lockPixels(env, bitmap, &pixels)) >= 0) {
     if (openPSHelper) {
-      openPSHelper->changeImage(width, height, channel_count, (const unsigned char *) pixels);
+      openPSHelper->changeImage(width, height, channel_count, (const unsigned char *) pixels, filenameStr);
     }
+  }
+  if (filenameStr != nullptr) {
+    env->ReleaseStringUTFChars(filename, filenameStr);
   }
   AndroidBitmap_unlockPixels(env, bitmap);
 }

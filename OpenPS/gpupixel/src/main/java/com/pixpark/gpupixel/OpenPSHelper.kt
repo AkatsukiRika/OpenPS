@@ -35,7 +35,7 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         val savedBitmapName = getSavedBitmapName()
 
         renderView.postOnGLThread {
-            OpenPS.nativeInitWithImage(width, height, channelCount, bitmap)
+            OpenPS.nativeInitWithImage(width, height, channelCount, bitmap, savedBitmapName)
         }
 
         scope.launch(Dispatchers.IO) {
@@ -48,14 +48,14 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         val width = bitmap.width
         val height = bitmap.height
         val channelCount = BitmapUtils.getChannels(bitmap)
+        val savedBitmapName = getSavedBitmapName()
 
         renderView.postOnGLThread {
-            OpenPS.nativeChangeImage(width, height, channelCount, bitmap)
+            OpenPS.nativeChangeImage(width, height, channelCount, bitmap, savedBitmapName)
             requestRender()
         }
 
         scope.launch(Dispatchers.IO) {
-            val savedBitmapName = getSavedBitmapName()
             BitmapUtils.saveBitmapToFile(bitmap, GPUPixel.getExternalPath(), savedBitmapName)
             Log.d(TAG, "Changed bitmap saved to ${GPUPixel.getExternalPath()}/$savedBitmapName")
         }

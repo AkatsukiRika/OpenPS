@@ -1,5 +1,6 @@
 #include "openps_helper.h"
 #include "util.h"
+#include "stb_image.h"
 
 gpupixel::OpenPSHelper::OpenPSHelper() {
   targetView = std::make_shared<TargetView>();
@@ -37,11 +38,19 @@ void gpupixel::OpenPSHelper::initWithImage(int width, int height,
   }
 }
 
-void gpupixel::OpenPSHelper::changeImage(int width, int height, int channelCount, const unsigned char *pixels) {
+void gpupixel::OpenPSHelper::changeImage(int width, int height,
+                                         int channelCount,
+                                         const unsigned char *pixels,
+                                         const char* filename) {
   if (gpuSourceImage) {
     gpuSourceImage->init(width, height, channelCount, pixels);
     imageWidth = width;
     imageHeight = height;
+    if (filename) {
+      std::string filenameString(filename);
+      auto record = ImageRecord(filenameString);
+      undoRedoHelper.addRecord(record);
+    }
   }
 }
 
@@ -376,6 +385,22 @@ std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::undo() {
     setLevels(*openPSRecord);
     return openPSRecord;
   }
+
+  if (undoRedoHelper.getCurrentIndex() == 0) {
+    setLevels(*std::dynamic_pointer_cast<OpenPSRecord>(undoRedoHelper.getEmptyRecord()));
+  }
+
+  auto imageRecord = std::dynamic_pointer_cast<ImageRecord>(result);
+  if (check && imageRecord) {
+    int width, height, channelCount;
+    auto filename = Util::getExternalPathJni(imageRecord->filename);
+    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channelCount, 0);
+    if (data != nullptr) {
+      changeImage(width, height, channelCount, data);
+      stbi_image_free(data);
+    }
+  }
+
   return nullptr;
 }
 
@@ -388,6 +413,18 @@ std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::redo() {
     setLevels(*openPSRecord);
     return openPSRecord;
   }
+
+  auto imageRecord = std::dynamic_pointer_cast<ImageRecord>(result);
+  if (check && imageRecord) {
+    int width, height, channelCount;
+    auto filename = Util::getExternalPathJni(imageRecord->filename);
+    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &channelCount, 0);
+    if (data != nullptr) {
+      changeImage(width, height, channelCount, data);
+      stbi_image_free(data);
+    }
+  }
+
   return nullptr;
 }
 

@@ -24,13 +24,12 @@ public:
   bool canRedo();
   std::shared_ptr<AbstractRecord> undo();
   std::shared_ptr<AbstractRecord> redo();
+  int getCurrentIndex();
+  std::shared_ptr<AbstractRecord> getEmptyRecord();
 
 private:
   std::vector<std::shared_ptr<AbstractRecord>> recordList;
   int currentIndex = 0;
-
-  void addEmptyRecord();
-  std::shared_ptr<AbstractRecord> getEmptyRecord();
 };
 
 NS_GPUPIXEL_END

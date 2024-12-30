@@ -55,14 +55,12 @@ std::shared_ptr<AbstractRecord> gpupixel::UndoRedoHelper::redo() {
   return getEmptyRecord();
 }
 
-void gpupixel::UndoRedoHelper::addEmptyRecord() {
-  addRecord(*getEmptyRecord());
-}
-
-gpupixel::UndoRedoHelper::UndoRedoHelper() {
-  addEmptyRecord();
-}
+gpupixel::UndoRedoHelper::UndoRedoHelper() {}
 
 std::shared_ptr<AbstractRecord> gpupixel::UndoRedoHelper::getEmptyRecord() {
   return std::make_shared<OpenPSRecord>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+}
+
+int UndoRedoHelper::getCurrentIndex() {
+  return currentIndex;
 }
