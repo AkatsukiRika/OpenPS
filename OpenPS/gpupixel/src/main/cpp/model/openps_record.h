@@ -9,11 +9,12 @@
 
 #include "gpupixel_macros.h"
 #include "util.h"
+#include "abstract_record.h"
 #include <string>
 
 NS_GPUPIXEL_BEGIN
 
-class GPUPIXEL_API OpenPSRecord {
+class GPUPIXEL_API OpenPSRecord : public AbstractRecord {
 public:
   const float smoothLevel;
   const float whiteLevel;
@@ -29,7 +30,7 @@ public:
   const int customFilterType;
   const float customFilterIntensity;
 
-  std::string toString() const {
+  std::string toString() const override {
     return Util::str_format(
         "smoothLevel: %f, whiteLevel: %f, lipstickLevel: %f, blusherLevel: "
         "%f, eyeZoomLevel: %f, faceSlimLevel: %f, contrastLevel: %f, "
@@ -40,26 +41,31 @@ public:
         sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity);
   }
 
-  bool equals(const OpenPSRecord& anotherRecord) const {
+  bool equals(const AbstractRecord& anotherRecord) const override {
+    const OpenPSRecord* record = dynamic_cast<const OpenPSRecord*>(&anotherRecord);
+    if (!record) {
+      return false;
+    }
+
     bool customFilterEquals = false;
-    if (customFilterType == anotherRecord.customFilterType) {
+    if (customFilterType == record->customFilterType) {
       if (customFilterType == 0) {
         customFilterEquals = true;
       } else {
-        customFilterEquals = customFilterIntensity == anotherRecord.customFilterIntensity;
+        customFilterEquals = customFilterIntensity == record->customFilterIntensity;
       }
     }
-    return smoothLevel == anotherRecord.smoothLevel &&
-           whiteLevel == anotherRecord.whiteLevel &&
-           lipstickLevel == anotherRecord.lipstickLevel &&
-           blusherLevel == anotherRecord.blusherLevel &&
-           eyeZoomLevel == anotherRecord.eyeZoomLevel &&
-           faceSlimLevel == anotherRecord.faceSlimLevel &&
-           contrastLevel == anotherRecord.contrastLevel &&
-           exposureLevel == anotherRecord.exposureLevel &&
-           saturationLevel == anotherRecord.saturationLevel &&
-           sharpnessLevel == anotherRecord.sharpnessLevel &&
-           brightnessLevel == anotherRecord.brightnessLevel && customFilterEquals;
+    return smoothLevel == record->smoothLevel &&
+           whiteLevel == record->whiteLevel &&
+           lipstickLevel == record->lipstickLevel &&
+           blusherLevel == record->blusherLevel &&
+           eyeZoomLevel == record->eyeZoomLevel &&
+           faceSlimLevel == record->faceSlimLevel &&
+           contrastLevel == record->contrastLevel &&
+           exposureLevel == record->exposureLevel &&
+           saturationLevel == record->saturationLevel &&
+           sharpnessLevel == record->sharpnessLevel &&
+           brightnessLevel == record->brightnessLevel && customFilterEquals;
   }
 
   OpenPSRecord(float smoothLevel, float whiteLevel, float lipstickLevel,

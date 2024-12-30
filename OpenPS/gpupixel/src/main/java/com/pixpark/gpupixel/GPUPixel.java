@@ -33,6 +33,7 @@ public class GPUPixel {
     public static final int Rotate180 = 7;
 
     public static String resource_path;
+    public static String externalPath;
     private GPUPixelRenderer mRenderer = null;
     private GLSurfaceView mGLSurfaceView = null;
     private int mGLSurfaceViewRenderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY;
@@ -162,10 +163,15 @@ public class GPUPixel {
         String exPath = context.getExternalFilesDir(null).getAbsolutePath();
         copyAssetsToFiles(context, "resource", exPath + "/resource");
         resource_path = exPath + "/resource";
+        externalPath = exPath;
     }
 
     public static String getResource_path() {
         return resource_path;
+    }
+
+    public static String getExternalPath() {
+        return externalPath;
     }
 
     public static void  copyAssetsToFiles(Context context, String oldPath, String newPath) {

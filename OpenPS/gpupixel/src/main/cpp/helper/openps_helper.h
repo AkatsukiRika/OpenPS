@@ -10,7 +10,9 @@
 #include "gpupixel_macros.h"
 #include "gpupixel.h"
 #include "undo_redo_helper.h"
+#include "abstract_record.h"
 #include "openps_record.h"
+#include "image_record.h"
 
 NS_GPUPIXEL_BEGIN
 

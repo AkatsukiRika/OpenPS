@@ -1,6 +1,7 @@
 package com.pixpark.gpupixel
 
 import android.graphics.Bitmap
+import android.util.Log
 import com.pixpark.gpupixel.GPUPixel.GPUPixelLandmarkCallback
 import com.pixpark.gpupixel.model.LandmarkResult
 import com.pixpark.gpupixel.model.PixelsResult
@@ -8,22 +9,38 @@ import com.pixpark.gpupixel.model.RenderViewInfo
 import com.pixpark.gpupixel.utils.BitmapUtils
 import com.pixpark.gpupixel.view.OpenPSRenderView
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class OpenPSHelper(private val renderView: OpenPSRenderView) {
+    companion object {
+        const val TAG = "OpenPSHelper"
+    }
+
     private var landmarkCallback: GPUPixelLandmarkCallback? = null
     private var resultPixelsCallback: ((ByteArray, Int, Int, Long) -> Unit)? = null
+    private val scope = CoroutineScope(Dispatchers.Main + Job())
+    private var savedBitmapCount = 0
 
     fun initWithImage(bitmap: Bitmap) {
         val width = bitmap.width
         val height = bitmap.height
         val channelCount = BitmapUtils.getChannels(bitmap)
+        val savedBitmapName = getSavedBitmapName()
 
         renderView.postOnGLThread {
             OpenPS.nativeInitWithImage(width, height, channelCount, bitmap)
+        }
+
+        scope.launch(Dispatchers.IO) {
+            BitmapUtils.saveBitmapToFile(bitmap, GPUPixel.getExternalPath(), savedBitmapName)
+            Log.d(TAG, "Original bitmap saved to ${GPUPixel.getExternalPath()}/$savedBitmapName")
         }
     }
 
@@ -35,6 +52,12 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         renderView.postOnGLThread {
             OpenPS.nativeChangeImage(width, height, channelCount, bitmap)
             requestRender()
+        }
+
+        scope.launch(Dispatchers.IO) {
+            val savedBitmapName = getSavedBitmapName()
+            BitmapUtils.saveBitmapToFile(bitmap, GPUPixel.getExternalPath(), savedBitmapName)
+            Log.d(TAG, "Changed bitmap saved to ${GPUPixel.getExternalPath()}/$savedBitmapName")
         }
     }
 
@@ -194,6 +217,7 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
     }
 
     fun destroy() {
+        scope.cancel()
         OpenPS.nativeDestroy()
     }
 
@@ -249,6 +273,8 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
             requestRender()
         }
     }
+
+    private fun getSavedBitmapName() = "saved_bitmap_${savedBitmapCount++}.png"
 
     // C++层回调方法
     fun onLandmarkDetected(landmarks: FloatArray, rect: FloatArray) {
