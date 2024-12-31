@@ -7,10 +7,18 @@
 | Key | Value |
 | --- | ----- |
 | Supported Platforms | Android 6.0 or above |
-| Latest Version | 1.2.0 |
+| Latest Version | 1.3.0 |
 | GUI Language | English |
 
 ## Update Notes
+
+### Version 1.3.0
+
+- AI Elimination Feature
+    - Remove unwanted area from images using the MI-GAN model
+- UI Update
+    - Operation area divided into two modules: `Eliminate Pen` and `Image Effect`
+    - Seamless switching between modules is allowed, all effects can be stacked
 
 ### Version 1.2.0
 
@@ -83,6 +91,8 @@ The following open-source projects were referenced, studied, and used during sof
 [gpupixel: Cross-platform OpenGL rendering engine based on C++11](https://github.com/pixpark/gpupixel)
 
 [face-parsing.PyTorch: Open-source skin segmentation model](https://github.com/zllrunning/face-parsing.PyTorch)
+
+[MI-GAN: Image inpainting model on mobile devices](https://github.com/Picsart-AI-Research/MI-GAN)
 
 The following technical documentation summarizes the development process for reference:
 
