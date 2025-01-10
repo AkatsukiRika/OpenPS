@@ -1,5 +1,4 @@
 #include "InpaintModelProcessor.h"
-#include <onnxruntime_cxx_api.h>
 #include <MNN/Interpreter.hpp>
 #include <MNN/ImageProcess.hpp>
 #include <MNN/expr/Module.hpp>

@@ -17,19 +17,14 @@ find_package(OpenCV REQUIRED)
 set(TFLite_ROOT ${CMAKE_SOURCE_DIR}/lib/tensorflow-lite-2.16.1)
 include_directories(${TFLite_ROOT}/headers)
 
-set(ONNXRuntime_ROOT ${CMAKE_SOURCE_DIR}/lib/onnxruntime-android-1.20.0)
-include_directories(${ONNXRuntime_ROOT}/headers)
-
 set(MNN_ROOT ${CMAKE_SOURCE_DIR}/lib/mnn-3.0.0-android)
 include_directories(${MNN_ROOT}/include)
 
 if (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "armeabi-v7a")
     set(TFLite_LIB_DIR ${TFLite_ROOT}/jni/armeabi-v7a)
-    set(ONNXRuntime_LIB_DIR ${ONNXRuntime_ROOT}/jni/armeabi-v7a)
     set(MNN_LIB_DIR ${MNN_ROOT}/jni/armeabi-v7a)
 elseif (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "arm64-v8a")
     set(TFLite_LIB_DIR ${TFLite_ROOT}/jni/arm64-v8a)
-    set(ONNXRuntime_LIB_DIR ${ONNXRuntime_ROOT}/jni/arm64-v8a)
     set(MNN_LIB_DIR ${MNN_ROOT}/jni/arm64-v8a)
 else()
     message(FATAL_ERROR "Unsupported ABI: ${ANDROID_ABI}")
@@ -60,9 +55,6 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 add_library(tflite SHARED IMPORTED)
 set_target_properties(tflite PROPERTIES IMPORTED_LOCATION ${TFLite_LIB_DIR}/libtensorflowlite_jni.so)
 
-add_library(onnxruntime SHARED IMPORTED)
-set_target_properties(onnxruntime PROPERTIES IMPORTED_LOCATION ${ONNXRuntime_LIB_DIR}/libonnxruntime.so)
-
 add_library(c++_shared SHARED IMPORTED)
 set_target_properties(c++_shared PROPERTIES IMPORTED_LOCATION ${MNN_LIB_DIR}/libc++_shared.so)
 
@@ -84,5 +76,4 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         MNN
         MNN_Express
         tflite
-        onnxruntime
         ${OpenCV_LIBS})
