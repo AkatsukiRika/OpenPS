@@ -49,7 +49,7 @@ class EliminateViewModel : ViewModel() {
                 imageBitmap = bitmap,
                 maskBitmap = mask,
                 assetManager = context.assets,
-                modelFile = "migan_pipeline_v2.onnx"
+                modelFile = "migan_pipeline_v2.mnn"
             )
             resultBitmap.emit(result)
             inpaintStatus.emit(STATUS_SUCCESS)

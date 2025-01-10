@@ -19,7 +19,7 @@ private:
 
     static void preprocessMask(const cv::Mat& input, std::vector<uint8_t>& output);
 
-    static cv::Mat postprocessResult(const uint8_t* data, std::vector<int64_t>& dims);
+    static cv::Mat postprocessResult(const uint8_t* data, std::vector<int> dims);
 };
 
 #endif //OPENPS_INPAINTMODELPROCESSOR_H

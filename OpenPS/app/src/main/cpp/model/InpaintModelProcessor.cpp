@@ -1,12 +1,18 @@
 #include "InpaintModelProcessor.h"
 #include <onnxruntime_cxx_api.h>
+#include <MNN/Interpreter.hpp>
+#include <MNN/ImageProcess.hpp>
 
 cv::Mat InpaintModelProcessor::inpaint(const cv::Mat &image, const cv::Mat &mask, const char *modelBuffer, off_t modelSize) {
-    // 创建 ONNX Runtime 环境和会话
-    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "inpaint_model");
-    Ort::SessionOptions session_options;
-    std::vector<uint8_t> model_data(modelBuffer, modelBuffer + modelSize);
-    Ort::Session session(env, model_data.data(), modelSize, session_options);
+    // 创建 MNN 解释器
+    std::unique_ptr<MNN::Interpreter> interpreter(MNN::Interpreter::createFromBuffer(modelBuffer, modelSize));
+    MNN::ScheduleConfig config;
+    config.type = MNN_FORWARD_CPU;
+    config.numThread = 4;
+    MNN::BackendConfig backendConfig;
+    backendConfig.precision = MNN::BackendConfig::Precision_Low;
+    config.backendConfig = &backendConfig;
+    auto session = interpreter->createSession(config);
 
     // image由RGBA转换为RGB
     cv::Mat image_rgb;
@@ -22,33 +28,44 @@ cv::Mat InpaintModelProcessor::inpaint(const cv::Mat &image, const cv::Mat &mask
     preprocessImage(image_rgb, image_tensor);
     preprocessMask(mask_gray, mask_tensor);
 
-    // 设置输入维度
-    const int64_t input_dims[] = {1, 3, image_rgb.rows, image_rgb.cols};
-    const int64_t mask_dims[] = {1, 1, mask_gray.rows, mask_gray.cols};
+    // 获取输入张量
+    auto input_image = interpreter->getSessionInput(session, "image");
+    auto input_mask = interpreter->getSessionInput(session, "mask");
+
+    // 调整输入张量尺寸
+    std::vector<int> imageDims = {1, 3, image_rgb.rows, image_rgb.cols};
+    std::vector<int> maskDims = {1, 1, mask_gray.rows, mask_gray.cols};
+
+    interpreter->resizeTensor(input_image, imageDims);
+    interpreter->resizeTensor(input_mask, maskDims);
+
+    // 调整尺寸后重新创建Session
+    interpreter->resizeSession(session);
 
     // 创建输入张量
-    auto memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
-    std::vector<Ort::Value> input_tensors;
-    input_tensors.push_back(Ort::Value::CreateTensor<uint8_t>(
-        memory_info, image_tensor.data(), image_tensor.size(), input_dims, 4));
-    input_tensors.push_back(Ort::Value::CreateTensor<uint8_t>(
-        memory_info, mask_tensor.data(), mask_tensor.size(), mask_dims, 4));
+    std::unique_ptr<MNN::Tensor> imageTensor(MNN::Tensor::createHostTensorFromDevice(input_image));
+    std::unique_ptr<MNN::Tensor> maskTensor(MNN::Tensor::createHostTensorFromDevice(input_mask));
 
-    // 设置输入输出名称
-    std::vector<const char*> input_names = {"image", "mask"};
-    std::vector<const char*> output_names = {"result"};
+    // 复制数据到输入张量
+    memcpy(imageTensor->host<uint8_t>(), image_tensor.data(), image_tensor.size());
+    memcpy(maskTensor->host<uint8_t>(), mask_tensor.data(), mask_tensor.size());
+
+    input_image->copyFromHostTensor(imageTensor.get());
+    input_mask->copyFromHostTensor(maskTensor.get());
 
     // 运行推理
-    auto output_tensors = session.Run(Ort::RunOptions{},
-                                      input_names.data(), input_tensors.data(), input_names.size(),
-                                      output_names.data(), output_names.size());
+    interpreter->runSession(session);
 
-    // 处理输出结果
-    uint8_t* output_data = output_tensors[0].GetTensorMutableData<uint8_t>();
-    auto output_dims = output_tensors[0].GetTensorTypeAndShapeInfo().GetShape();
+    // 获取输出张量
+    auto output = interpreter->getSessionOutput(session, "result");
+    std::unique_ptr<MNN::Tensor> outputTensor(MNN::Tensor::create(
+        output->shape(),
+        halide_type_of<uint8_t>()
+    ));
+    output->copyToHostTensor(outputTensor.get());
 
     // 后处理并返回结果
-    return postprocessResult(output_data, output_dims);
+    return postprocessResult(outputTensor->host<uint8_t>(), outputTensor->shape());
 }
 
 void InpaintModelProcessor::preprocessImage(const cv::Mat &input, std::vector<uint8_t> &output) {
@@ -75,7 +92,7 @@ void InpaintModelProcessor::preprocessMask(const cv::Mat &input, std::vector<uin
     }
 }
 
-cv::Mat InpaintModelProcessor::postprocessResult(const uint8_t *data, std::vector<int64_t> &dims) {
+cv::Mat InpaintModelProcessor::postprocessResult(const uint8_t *data, std::vector<int> dims) {
     int height = dims[2];
     int width = dims[3];
     cv::Mat result(height, width, CV_8UC3);
