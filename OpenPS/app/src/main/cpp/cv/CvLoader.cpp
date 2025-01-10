@@ -3,6 +3,9 @@
 #include "../model/SkinModelProcessor.h"
 #include <android/log.h>
 #include <tensorflow/lite/c/c_api.h>
+#include <MNN/Interpreter.hpp>
+#include <MNN/Tensor.hpp>
+#include <MNN/ImageProcess.hpp>
 
 #define LOG_TAG "xuanTest"
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
@@ -52,109 +55,79 @@ int CvLoader::runSkinModelInference(const char *modelBuffer, off_t modelSize) {
     auto preprocessResult = SkinModelProcessor::preprocess(originalMat);
     LOGI("皮肤模型预处理完成, 预处理结果大小: %zu", preprocessResult.size());
 
-    // 加载TFLite模型
-    TfLiteModel* model = TfLiteModelCreate(modelBuffer, modelSize);
-    if (model == nullptr) {
-        LOGE("加载TFLite模型失败!");
+    // 创建MNN解释器
+    std::shared_ptr<MNN::Interpreter> interpreter(
+        MNN::Interpreter::createFromBuffer(modelBuffer, modelSize)
+    );
+    if (!interpreter) {
+        LOGE("加载MNN模型失败!");
         return 1;
     }
 
-    // 创建解释器选项
-    TfLiteInterpreterOptions* options = TfLiteInterpreterOptionsCreate();
-    TfLiteInterpreterOptionsSetNumThreads(options, 2);
+    // 创建会话配置
+    MNN::ScheduleConfig config;
+    config.numThread = 4;
 
-    // 创建解释器
-    TfLiteInterpreter* interpreter = TfLiteInterpreterCreate(model, options);
-    if (interpreter == nullptr) {
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("创建解释器失败!");
-        return 1;
-    }
-
-    // 分配Tensor Buffers
-    if (TfLiteInterpreterAllocateTensors(interpreter) != kTfLiteOk) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("分配Tensor Buffers失败!");
+    // 创建会话
+    MNN::Session* session = interpreter->createSession(config);
+    if (!session) {
+        LOGE("创建会话失败!");
         return 1;
     }
 
     // 获取输入Tensor
-    TfLiteTensor* inputTensor = TfLiteInterpreterGetInputTensor(interpreter, 0);
-    if (inputTensor == nullptr) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
+    MNN::Tensor* inputTensor = interpreter->getSessionInput(session, nullptr);
+    if (!inputTensor) {
         LOGE("获取输入Tensor失败!");
         return 1;
     }
 
-    // 获取输入类型和维度
-    TfLiteType tensorType = TfLiteTensorType(inputTensor);
-    int32_t tensorDims = TfLiteTensorNumDims(inputTensor);
-    LOGI("输入Tensor类型: %d", tensorType);
-    for (int32_t i = 0; i < tensorDims; i++) {
-        int32_t tensorDim = TfLiteTensorDim(inputTensor, i);
-        LOGI("输入Tensor维度: %d, 大小: %d", i, tensorDim);
+    // 获取输入Tensor的维度信息
+    auto inputDims = inputTensor->shape();
+    LOGI("输入Tensor维度: ");
+    for (int i = 0; i < inputDims.size(); ++i) {
+        LOGI("维度 %d: %d", i, inputDims[i]);
     }
 
     // 准备输入数据
-    if (TfLiteTensorCopyFromBuffer(inputTensor, preprocessResult.data(), preprocessResult.size() * sizeof(float_t)) != kTfLiteOk) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("准备输入数据失败!");
-        return 1;
-    }
+    std::unique_ptr<MNN::Tensor> inputTensorUser(
+        MNN::Tensor::create<float>(inputDims, nullptr)
+    );
+    memcpy(inputTensorUser->host<float>(), preprocessResult.data(), preprocessResult.size() * sizeof(float));
+    inputTensor->copyFromHostTensor(inputTensorUser.get());
 
     // 运行推理
-    if (TfLiteInterpreterInvoke(interpreter) != kTfLiteOk) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("运行推理失败!");
-        return 1;
-    }
+    interpreter->runSession(session);
 
     // 获取输出Tensor
-    const TfLiteTensor* outputTensor = TfLiteInterpreterGetOutputTensor(interpreter, 0);
+    MNN::Tensor* outputTensor = interpreter->getSessionOutput(session, nullptr);
     if (!outputTensor) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
         LOGE("获取输出Tensor失败!");
         return 1;
     }
 
-    // 获取输出类型和维度
-    tensorType = TfLiteTensorType(outputTensor);
-    tensorDims = TfLiteTensorNumDims(outputTensor);
-    LOGI("输出Tensor类型: %d", tensorType);
-    for (int32_t i = 0; i < tensorDims; i++) {
-        int32_t tensorDim = TfLiteTensorDim(outputTensor, i);
-        LOGI("输出Tensor维度: %d, 大小: %d", i, tensorDim);
+    // 获取输出Tensor的维度信息
+    auto outputDims = outputTensor->shape();
+    LOGI("输出Tensor维度: ");
+    for (int i = 0; i < outputDims.size(); ++i) {
+        LOGI("维度 %d: %d", i, outputDims[i]);
     }
 
     // 获取输出数据
-    std::vector<float16_t> outputData(TfLiteTensorByteSize(outputTensor) / sizeof(float16_t));
-    if (TfLiteTensorCopyToBuffer(outputTensor, outputData.data(), outputData.size() * sizeof(float16_t)) != kTfLiteOk) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
-        LOGE("获取输出数据失败!");
-        return 1;
-    }
+    std::unique_ptr<MNN::Tensor> outputTensorUser(
+        MNN::Tensor::create<float>(outputDims, nullptr)
+    );
+    outputTensor->copyToHostTensor(outputTensorUser.get());
+    std::vector<float> outputData(
+        outputTensorUser->host<float>(),
+        outputTensorUser->host<float>() + outputTensorUser->elementSize()
+    );
 
     // 后处理
     cv::Mat outputMat(1, 19 * 512 * 512, CV_32F, outputData.data());
     outputMat = outputMat.reshape(1, {1, 19, 512, 512});
     auto postprocessResult = SkinModelProcessor::postprocess(outputMat, originalMat.rows, originalMat.cols);
     if (postprocessResult.size() != 4) {
-        TfLiteInterpreterDelete(interpreter);
-        TfLiteModelDelete(model);
-        TfLiteInterpreterOptionsDelete(options);
         LOGE("皮肤模型后处理失败!");
         return 1;
     }
@@ -164,9 +137,8 @@ int CvLoader::runSkinModelInference(const char *modelBuffer, off_t modelSize) {
     skinMask = postprocessResult[1];
 
     // 清理
-    TfLiteInterpreterDelete(interpreter);
-    TfLiteModelDelete(model);
-    TfLiteInterpreterOptionsDelete(options);
+    interpreter->releaseModel();
+    interpreter->releaseSession(session);
 
     return 0;
 }

@@ -373,7 +373,7 @@ class EditViewModel : ViewModel() {
                         return@withContext
                     }
 
-                    result = NativeLib.runSkinModelInference(context.assets, "79999_iter_fp16.tflite")
+                    result = NativeLib.runSkinModelInference(context.assets, "79999_iter_fp16.mnn")
                     if (result != 0) {
                         // 加载失败
                         _loadStatus.emit(STATUS_ERROR)
