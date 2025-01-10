@@ -2,17 +2,30 @@
 #include <onnxruntime_cxx_api.h>
 #include <MNN/Interpreter.hpp>
 #include <MNN/ImageProcess.hpp>
+#include <MNN/expr/Module.hpp>
+#include <MNN/expr/Executor.hpp>
+#include <MNN/expr/ExprCreator.hpp>
 
 cv::Mat InpaintModelProcessor::inpaint(const cv::Mat &image, const cv::Mat &mask, const char *modelBuffer, off_t modelSize) {
-    // 创建 MNN 解释器
-    std::unique_ptr<MNN::Interpreter> interpreter(MNN::Interpreter::createFromBuffer(modelBuffer, modelSize));
-    MNN::ScheduleConfig config;
-    config.type = MNN_FORWARD_CPU;
-    config.numThread = 4;
-    MNN::BackendConfig backendConfig;
-    backendConfig.precision = MNN::BackendConfig::Precision_Low;
-    config.backendConfig = &backendConfig;
-    auto session = interpreter->createSession(config);
+    // 创建 RuntimeManager
+    MNN::ScheduleConfig sConfig;
+    sConfig.type = MNN_FORWARD_CPU;
+    sConfig.numThread = 4;
+
+    std::shared_ptr<MNN::Express::Executor::RuntimeManager> runtimeManager(
+        MNN::Express::Executor::RuntimeManager::createRuntimeManager(sConfig)
+    );
+
+    // 加载模型
+    std::shared_ptr<MNN::Express::Module> expressModule(
+        MNN::Express::Module::load(
+            {"image", "mask"},
+            {"result"},
+            reinterpret_cast<const uint8_t*>(modelBuffer),
+            modelSize,
+            runtimeManager
+        )
+    );
 
     // image由RGBA转换为RGB
     cv::Mat image_rgb;
@@ -29,43 +42,31 @@ cv::Mat InpaintModelProcessor::inpaint(const cv::Mat &image, const cv::Mat &mask
     preprocessMask(mask_gray, mask_tensor);
 
     // 获取输入张量
-    auto input_image = interpreter->getSessionInput(session, "image");
-    auto input_mask = interpreter->getSessionInput(session, "mask");
-
-    // 调整输入张量尺寸
-    std::vector<int> imageDims = {1, 3, image_rgb.rows, image_rgb.cols};
-    std::vector<int> maskDims = {1, 1, mask_gray.rows, mask_gray.cols};
-
-    interpreter->resizeTensor(input_image, imageDims);
-    interpreter->resizeTensor(input_mask, maskDims);
-
-    // 调整尺寸后重新创建Session
-    interpreter->resizeSession(session);
-
-    // 创建输入张量
-    std::unique_ptr<MNN::Tensor> imageTensor(MNN::Tensor::createHostTensorFromDevice(input_image));
-    std::unique_ptr<MNN::Tensor> maskTensor(MNN::Tensor::createHostTensorFromDevice(input_mask));
+    auto input_image = MNN::Express::_Input(
+        {1, 3, image_rgb.rows, image_rgb.cols},
+        MNN::Express::NCHW,
+        halide_type_of<uint8_t>()
+    );
+    auto input_mask = MNN::Express::_Input(
+        {1, 1, mask_gray.rows, mask_gray.cols},
+        MNN::Express::NCHW,
+        halide_type_of<uint8_t>()
+    );
 
     // 复制数据到输入张量
-    memcpy(imageTensor->host<uint8_t>(), image_tensor.data(), image_tensor.size());
-    memcpy(maskTensor->host<uint8_t>(), mask_tensor.data(), mask_tensor.size());
-
-    input_image->copyFromHostTensor(imageTensor.get());
-    input_mask->copyFromHostTensor(maskTensor.get());
+    memcpy(input_image->writeMap<uint8_t>(), image_tensor.data(), image_tensor.size());
+    memcpy(input_mask->writeMap<uint8_t>(), mask_tensor.data(), mask_tensor.size());
 
     // 运行推理
-    interpreter->runSession(session);
+    auto outputs = expressModule->onForward({input_image, input_mask});
 
     // 获取输出张量
-    auto output = interpreter->getSessionOutput(session, "result");
-    std::unique_ptr<MNN::Tensor> outputTensor(MNN::Tensor::create(
-        output->shape(),
-        halide_type_of<uint8_t>()
-    ));
-    output->copyToHostTensor(outputTensor.get());
+    auto output = outputs[0];
+    auto outputPtr = output->readMap<uint8_t>();
+    auto outputShape = output->getInfo()->dim;
 
     // 后处理并返回结果
-    return postprocessResult(outputTensor->host<uint8_t>(), outputTensor->shape());
+    return postprocessResult(outputPtr, outputShape);
 }
 
 void InpaintModelProcessor::preprocessImage(const cv::Mat &input, std::vector<uint8_t> &output) {

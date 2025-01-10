@@ -20,7 +20,7 @@ include_directories(${TFLite_ROOT}/headers)
 set(ONNXRuntime_ROOT ${CMAKE_SOURCE_DIR}/lib/onnxruntime-android-1.20.0)
 include_directories(${ONNXRuntime_ROOT}/headers)
 
-set(MNN_ROOT ${CMAKE_SOURCE_DIR}/lib/mnn-2.9.0-android)
+set(MNN_ROOT ${CMAKE_SOURCE_DIR}/lib/mnn-3.0.0-android)
 include_directories(${MNN_ROOT}/include)
 
 if (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "armeabi-v7a")
@@ -69,6 +69,9 @@ set_target_properties(c++_shared PROPERTIES IMPORTED_LOCATION ${MNN_LIB_DIR}/lib
 add_library(MNN SHARED IMPORTED)
 set_target_properties(MNN PROPERTIES IMPORTED_LOCATION ${MNN_LIB_DIR}/libMNN.so)
 
+add_library(MNN_Express SHARED IMPORTED)
+set_target_properties(MNN_Express PROPERTIES IMPORTED_LOCATION ${MNN_LIB_DIR}/libMNN_Express.so)
+
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this
 # build script, prebuilt third-party libraries, or Android system libraries.
@@ -79,6 +82,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         jnigraphics
         c++_shared
         MNN
+        MNN_Express
         tflite
         onnxruntime
         ${OpenCV_LIBS})
