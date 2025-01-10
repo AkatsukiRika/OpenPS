@@ -2,7 +2,6 @@
 #include "CvUtils.h"
 #include "../model/SkinModelProcessor.h"
 #include <android/log.h>
-#include <tensorflow/lite/c/c_api.h>
 #include <MNN/Interpreter.hpp>
 #include <MNN/Tensor.hpp>
 #include <MNN/ImageProcess.hpp>
