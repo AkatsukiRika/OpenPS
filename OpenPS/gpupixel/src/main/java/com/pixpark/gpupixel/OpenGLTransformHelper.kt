@@ -3,8 +3,10 @@ package com.pixpark.gpupixel
 import android.opengl.Matrix
 
 class OpenGLTransformHelper {
-    private var viewportWidth = 0f
-    private var viewportHeight = 0f
+    var viewportWidth = 0f
+        private set
+    var viewportHeight = 0f
+        private set
     private val glMatrix = FloatArray(16)
     private val tempMatrix = FloatArray(16)
     private var currentScale = 1f

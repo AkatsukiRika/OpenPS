@@ -69,50 +69,63 @@ class OpenPSRenderView : GLSurfaceView {
         this.callback = callback
     }
 
-    private fun postScale(scale: Float, focusX: Float, focusY: Float) {
-        matrix.postScale(scale, scale, focusX, focusY)
-        imageMatrix.postScale(scale, scale, focusX, focusY)
-        callback?.onMatrixChanged(matrix)
-        callback?.onImageMatrixChanged(imageMatrix)
-    }
-
-    private fun postTranslate(dx: Float, dy: Float) {
-        matrix.postTranslate(dx, dy)
-        imageMatrix.postTranslate(dx, dy)
-        callback?.onMatrixChanged(matrix)
-        callback?.onImageMatrixChanged(imageMatrix)
-    }
-
-    private fun resetMatrix() {
-        matrix.reset()
-        imageMatrix.set(baseMatrix)
-        callback?.onMatrixChanged(matrix)
-        callback?.onImageMatrixChanged(imageMatrix)
-    }
-
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
-            postScale(detector.scaleFactor, detector.focusX, detector.focusY)
             transformHelper.postScale(detector.scaleFactor, detector.focusX, detector.focusY)
             callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+            updateMatricesFromGL()
             return true
         }
     }
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-            postTranslate(-distanceX, -distanceY)
             transformHelper.postTranslate(-distanceX, -distanceY)
             callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+            updateMatricesFromGL()
             return true
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-            resetMatrix()
             transformHelper.reset()
             callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+            updateMatricesFromGL()
             return true
         }
+    }
+
+    private fun updateMatricesFromGL() {
+        val glMatrix = transformHelper.getGLMatrix()
+        val viewportWidth = transformHelper.viewportWidth
+        val viewportHeight = transformHelper.viewportHeight
+
+        // 创建 Android Matrix
+        val androidMatrix = Matrix()
+
+        // 1. 计算缩放分量（保持不变）
+        val scaleX = glMatrix[0]
+        val scaleY = glMatrix[5]
+
+        // 2. 修改平移分量的计算
+        // GL 坐标是从屏幕中心开始的，需要考虑图片初始位置
+        val centerX = viewportWidth / 2f
+        val centerY = viewportHeight / 2f
+
+        val translateX = glMatrix[12] * centerX
+        val translateY = -glMatrix[13] * centerY
+
+        // 3. 设置变换
+        androidMatrix.setScale(scaleX, scaleY, centerX, centerY)  // 围绕中心点缩放
+        androidMatrix.postTranslate(translateX, translateY)
+
+        // 更新 matrix
+        matrix.set(androidMatrix)
+        callback?.onMatrixChanged(matrix)
+
+        // 更新 imageMatrix
+        imageMatrix.set(baseMatrix)
+        imageMatrix.postConcat(androidMatrix)
+        callback?.onImageMatrixChanged(imageMatrix)
     }
 
     fun getImageMatrix() = Matrix(imageMatrix)
