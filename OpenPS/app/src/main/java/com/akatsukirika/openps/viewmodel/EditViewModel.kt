@@ -2,6 +2,7 @@ package com.akatsukirika.openps.viewmodel
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.RectF
 import android.net.Uri
 import androidx.lifecycle.ViewModel
@@ -49,6 +50,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
+import kotlin.math.max
 
 class EditViewModel : ViewModel() {
     interface Callback {
@@ -153,12 +155,13 @@ class EditViewModel : ViewModel() {
     fun loadImage(context: Context, uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             val bitmap = if (SettingsStore.photoSizeLimit != SettingsStore.PHOTO_SIZE_NO_LIMIT) {
+                val sizeLimit = getSizeLimit(context, uri)
                 Glide.with(context)
                     .asBitmap()
                     .load(uri)
                     .transform(EvenDimensionsTransformation())
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .override(getSizeLimit())
+                    .override(sizeLimit.first, sizeLimit.second)
                     .submit()
                     .get()
             } else {
@@ -430,6 +433,25 @@ class EditViewModel : ViewModel() {
         SettingsStore.PHOTO_SIZE_LIMIT_2K -> 2048
         SettingsStore.PHOTO_SIZE_LIMIT_1K -> 1024
         else -> Int.MAX_VALUE
+    }
+
+    private fun getSizeLimit(context: Context, uri: Uri): Pair<Int, Int> {
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        context.contentResolver.openInputStream(uri)?.use {
+            BitmapFactory.decodeStream(it, null, options)
+        }
+        val originalWidth = options.outWidth
+        val originalHeight = options.outHeight
+        val originalSize = max(originalWidth, originalHeight)
+        val sizeLimit = getSizeLimit()
+        return if (originalSize <= sizeLimit) {
+            Pair(originalWidth, originalHeight)
+        } else {
+            val scale = sizeLimit.toFloat() / originalSize
+            Pair((originalWidth * scale).toInt(), (originalHeight * scale).toInt())
+        }
     }
 
     private suspend fun refreshUndoRedo() {
