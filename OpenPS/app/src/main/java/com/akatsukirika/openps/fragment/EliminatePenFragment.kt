@@ -13,6 +13,8 @@ import com.akatsukirika.openps.compose.MODE_ERASER
 import com.akatsukirika.openps.compose.MODE_LARIAT
 import com.akatsukirika.openps.compose.MODE_PAINT
 import com.akatsukirika.openps.compose.MODE_GENERATE
+import com.akatsukirika.openps.compose.STATUS_CHECKING
+import com.akatsukirika.openps.compose.STATUS_ERROR
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.databinding.FragmentEliminatePenBinding
@@ -21,6 +23,7 @@ import com.akatsukirika.openps.utils.BitmapUtils.isFullyTransparent
 import com.akatsukirika.openps.view.EliminatePaintView
 import com.akatsukirika.openps.viewmodel.EliminateViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 interface EliminateFragmentCallback {
@@ -115,9 +118,12 @@ class EliminatePenFragment(
 
                     MODE_GENERATE -> {
                         lifecycleScope.launch(Dispatchers.IO) {
+                            viewModel.inpaintStatus.emit(STATUS_CHECKING)
                             val isFullyTransparent = binding.viewEliminatePaint.getDrawingAreaBitmap()?.isFullyTransparent()
                             if (isFullyTransparent == false) {
                                 viewModel.runInpaint(requireContext(), binding.viewEliminatePaint.getDrawingAreaMask())
+                            } else {
+                                viewModel.inpaintStatus.emit(STATUS_ERROR)
                             }
                         }
                     }
@@ -126,19 +132,31 @@ class EliminatePenFragment(
         }
         lifecycleScope.launch {
             viewModel?.inpaintStatus?.collect {
-                if (it == STATUS_LOADING) {
-                    progressDialog = ProgressDialog(requireContext()).apply {
-                        setCancelable(false)
-                        setCanceledOnTouchOutside(false)
-                        setMessage(requireContext().getString(R.string.inpaint_loading))
+                when (it) {
+                    STATUS_CHECKING -> {
+                        progressDialog = ProgressDialog(requireContext()).apply {
+                            setCancelable(false)
+                            setCanceledOnTouchOutside(false)
+                            setMessage(requireContext().getString(R.string.inpaint_checking))
+                        }
+                        progressDialog?.show()
                     }
-                    progressDialog?.show()
-                } else {
-                    progressDialog?.dismiss()
-                    if (it == STATUS_SUCCESS) {
+
+                    STATUS_LOADING -> {
+                        progressDialog?.setMessage(requireContext().getString(R.string.inpaint_loading))
+                    }
+
+                    STATUS_SUCCESS -> {
                         binding.viewEliminatePaint.clearDrawing(strokeOnly = true)
                         viewModel.mode.emit(MODE_PAINT)
                         viewModel.readyToGenerate.emit(false)
+                        progressDialog?.dismiss()
+                    }
+
+                    STATUS_ERROR -> {
+                        progressDialog?.setMessage(requireContext().getString(R.string.inpaint_failed))
+                        delay(3000)
+                        progressDialog?.dismiss()
                     }
                 }
             }

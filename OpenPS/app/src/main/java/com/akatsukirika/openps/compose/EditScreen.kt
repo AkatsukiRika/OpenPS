@@ -34,9 +34,10 @@ import com.akatsukirika.openps.viewmodel.EliminateViewModel
 
 // 处理状态
 const val STATUS_IDLE = 10
-const val STATUS_LOADING = 11
-const val STATUS_SUCCESS = 12
-const val STATUS_ERROR = 13
+const val STATUS_CHECKING = 11
+const val STATUS_LOADING = 12
+const val STATUS_SUCCESS = 13
+const val STATUS_ERROR = 14
 // 一级TAB
 const val TAB_BEAUTIFY = 0
 const val TAB_ADJUST = 1

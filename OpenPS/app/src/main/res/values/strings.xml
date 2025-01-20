@@ -49,7 +49,9 @@
     <string name="lariat">Lariat</string>
     <string name="eraser">Eraser</string>
     <string name="generate">Generate</string>
+    <string name="inpaint_checking">Validating inpaint area…</string>
     <string name="inpaint_loading">Inpaint in progress, please wait…</string>
+    <string name="inpaint_failed">Inpaint failed, please try again.</string>
     <string name="size_4k" translatable="false">4K</string>
     <string name="size_2k" translatable="false">2K</string>
     <string name="size_1k" translatable="false">1K</string>
