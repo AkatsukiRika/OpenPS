@@ -143,13 +143,8 @@ void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
 
 void gpupixel::OpenPSHelper::requestRender() {
   if (gpuSourceImage) {
-    std::shared_ptr<Filter> terminalFilter;
-    if (!filterList.empty()) {
-      terminalFilter = filterList.back();
-      Util::Log("MitakeRan", "terminalFilter: %s", terminalFilter->getFilterClassName().c_str());
-    }
-    if (matrixUpdated && terminalFilter && terminalFilter->getFramebuffer()) {
-      terminalFilter->updateTargets(0, false);
+    if (matrixUpdated && imageCompareFilter && imageCompareFilter->getFramebuffer()) {
+      imageCompareFilter->updateTargets(0, false);
       if (!targetView->updateMatrixState()) {
         gpuSourceImage->Render();
       }
