@@ -88,6 +88,7 @@
 #include "weak_pixel_inclusion_filter.h"
 #include "white_balance_filter.h"
 #include "sharpen_filter.h"
+#include "image_compare_filter.h"
 
 // custom filters
 #include "custom_filter.h"

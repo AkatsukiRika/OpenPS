@@ -19,6 +19,7 @@ gpupixel::OpenPSHelper::~OpenPSHelper() {
   sharpenFilter.reset();
   brightnessFilter.reset();
   customFilter.reset();
+  imageCompareFilter.reset();
   targetView.reset();
   targetRawDataOutput.reset();
   GPUPixelContext::destroy();
@@ -29,6 +30,9 @@ void gpupixel::OpenPSHelper::initWithImage(int width, int height,
                                            const unsigned char *pixels,
                                            const char* filename) {
   gpuSourceImage = SourceImage::create_from_memory(width, height, channelCount, pixels);
+  initialSourceImage = SourceImage::create_from_memory(width, height, channelCount, pixels);
+  imageCompareFilter = ImageCompareFilter::create();
+  imageCompareFilter->setOriginalImage(initialSourceImage);
   imageWidth = width;
   imageHeight = height;
   if (filename) {
@@ -74,7 +78,9 @@ void gpupixel::OpenPSHelper::getTargetViewInfo(float *info) {
 }
 
 void gpupixel::OpenPSHelper::buildBasicRenderPipeline() {
-  gpuSourceImage->addTarget(targetView);
+  gpuSourceImage
+    ->addTarget(imageCompareFilter)
+    ->addTarget(targetView);
 }
 
 void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
@@ -107,8 +113,9 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
     blusherFilter->SetFaceLandmarks(landmarks);
     faceReshapeFilter->SetFaceLandmarks(landmarks);
   });
-  gpuSourceImage->addTarget(targetView);
-  gpuSourceImage->addTarget(targetRawDataOutput);
+  gpuSourceImage->addTarget(imageCompareFilter);
+  imageCompareFilter->addTarget(targetView);
+  imageCompareFilter->addTarget(targetRawDataOutput);
 }
 
 void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
@@ -128,8 +135,9 @@ void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
     customFilter = CustomFilter::create();
     customFilter->setFilterClassName("CustomFilter");
     targetRawDataOutput = TargetRawDataOutput::create();
-    gpuSourceImage->addTarget(targetView);
-    gpuSourceImage->addTarget(targetRawDataOutput);
+    gpuSourceImage->addTarget(imageCompareFilter);
+    imageCompareFilter->addTarget(targetView);
+    imageCompareFilter->addTarget(targetRawDataOutput);
   }
 }
 
@@ -336,7 +344,7 @@ void gpupixel::OpenPSHelper::onCompareBegin() {
     customFilter->setIntensity(0);
   }
   if (currentImageFileName != initialImageFileName) {
-    changeImage(initialImageFileName);
+    imageCompareFilter->setIntensity(1);
   }
 }
 
@@ -374,7 +382,7 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
     customFilter->setIntensity(customFilterLevel);
   }
   if (currentImageFileName != initialImageFileName) {
-    changeImage(currentImageFileName);
+    imageCompareFilter->setIntensity(0);
   }
 }
 
@@ -509,8 +517,9 @@ void gpupixel::OpenPSHelper::refreshRenderPipeline() {
     for (auto filter : filterList) {
       lastSource = lastSource->addTarget(filter);
     }
-    lastSource->addTarget(targetView);
-    lastSource->addTarget(targetRawDataOutput);
+    lastSource->addTarget(imageCompareFilter);
+    imageCompareFilter->addTarget(targetView);
+    imageCompareFilter->addTarget(targetRawDataOutput);
   }
 }
 

@@ -85,6 +85,7 @@ public:
 
 private:
   std::shared_ptr<SourceImage> gpuSourceImage;
+  std::shared_ptr<SourceImage> initialSourceImage;
   std::shared_ptr<LipstickFilter> lipstickFilter;
   std::shared_ptr<BlusherFilter> blusherFilter;
   std::shared_ptr<FaceReshapeFilter> faceReshapeFilter;
@@ -95,6 +96,7 @@ private:
   std::shared_ptr<SharpenFilter> sharpenFilter;
   std::shared_ptr<BrightnessFilter> brightnessFilter;
   std::shared_ptr<CustomFilter> customFilter;
+  std::shared_ptr<ImageCompareFilter> imageCompareFilter;
   std::shared_ptr<TargetView> targetView;
   std::shared_ptr<TargetRawDataOutput> targetRawDataOutput;
   std::vector<std::shared_ptr<Filter>> filterList;
