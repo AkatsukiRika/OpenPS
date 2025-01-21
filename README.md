@@ -7,10 +7,23 @@
 | Key | Value |
 | --- | ----- |
 | Supported Platforms | Android 6.0 or above |
-| Latest Version | 1.3.0 |
+| Latest Version | 1.3.1 |
 | GUI Language | English |
 
 ## Update Notes
+
+### Version 1.3.1
+
+- Local AI Model Optimization
+    - Local AI models converted to MNN format
+    - Package size reduced from 110 MB in the previous version to 79 MB
+- Bug Fixes
+    - Fixed a bug where the Generate button in the Eliminate module was unresponsive for a period after being clicked on large images
+    - Fixed a bug where the Eliminate area, face frame, and actual image area were misaligned
+- Performance and Experience Optimization
+    - After setting the Photo Size Limit, small images selected from the gallery will not be enlarged
+    - Optimized time consumption for comparison after Eliminate operations
+    - Optimized time consumption for gesture zoom & move operations when Eliminate and other image operations are stacked
 
 ### Version 1.3.0
 
