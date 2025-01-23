@@ -52,6 +52,18 @@
     <string name="inpaint_checking">Validating inpaint area…</string>
     <string name="inpaint_loading">Inpaint in progress, please wait…</string>
     <string name="inpaint_failed">Inpaint failed, please try again.</string>
+    <string name="composition">Composition</string>
+    <string name="crop">Crop</string>
+    <string name="rotate">Rotate</string>
+    <string name="perspective">Perspective</string>
+    <string name="freeform">Freeform</string>
+    <string name="ratio_1_1" translatable="false">1:1</string>
+    <string name="ratio_2_3" translatable="false">2:3</string>
+    <string name="ratio_3_2" translatable="false">3:2</string>
+    <string name="ratio_3_4" translatable="false">3:4</string>
+    <string name="ratio_4_3" translatable="false">4:3</string>
+    <string name="ratio_9_16" translatable="false">9:16</string>
+    <string name="ratio_16_9" translatable="false">16:9</string>
     <string name="size_4k" translatable="false">4K</string>
     <string name="size_2k" translatable="false">2K</string>
     <string name="size_1k" translatable="false">1K</string>

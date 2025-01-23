@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.EditScreen
+import com.akatsukirika.openps.compose.MODULE_COMPOSITION
 import com.akatsukirika.openps.compose.MODULE_ELIMINATE_PEN
 import com.akatsukirika.openps.compose.MODULE_IMAGE_EFFECT
 import com.akatsukirika.openps.compose.MODULE_NONE
@@ -28,6 +29,7 @@ import com.akatsukirika.openps.fragment.EliminatePenFragment
 import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.FrameRateObserver
+import com.akatsukirika.openps.viewmodel.CompositionViewModel
 import com.akatsukirika.openps.viewmodel.EditViewModel
 import com.akatsukirika.openps.viewmodel.EliminateViewModel
 import com.pixpark.gpupixel.model.RenderViewInfo
@@ -47,6 +49,8 @@ class EditActivity : AppCompatActivity() {
     private val viewModel: EditViewModel by viewModels()
 
     private val eliminateViewModel: EliminateViewModel by viewModels()
+
+    private val compositionViewModel: CompositionViewModel by viewModels()
 
     private var eliminatePenFragment: EliminatePenFragment? = null
 
@@ -147,6 +151,10 @@ class EditActivity : AppCompatActivity() {
             launch {
                 viewModel.selectedModule.collect {
                     when (it) {
+                        MODULE_COMPOSITION -> {
+                            supportActionBar?.setTitle(R.string.composition)
+                            removeEliminatePenFragment()
+                        }
                         MODULE_ELIMINATE_PEN -> {
                             supportActionBar?.setTitle(R.string.eliminate_pen)
                             createEliminatePenFragment()
@@ -181,7 +189,7 @@ class EditActivity : AppCompatActivity() {
         }
 
         binding.composeView.setContent {
-            EditScreen(viewModel, eliminateViewModel)
+            EditScreen(viewModel, eliminateViewModel, compositionViewModel)
         }
     }
 

@@ -1,0 +1,164 @@
+package com.akatsukirika.openps.compose
+
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.akatsukirika.openps.R
+import com.akatsukirika.openps.utils.clickableNoIndication
+import com.akatsukirika.openps.viewmodel.CompositionViewModel
+
+enum class CompositionTab(val index: Int) {
+    CROP(0),
+    ROTATE(1),
+    PERSPECTIVE(2)
+}
+
+enum class CropOptions(
+    val index: Int,
+    @DrawableRes val iconRes: Int = R.drawable.ic_freeform,
+    @StringRes val nameRes: Int = R.string.freeform
+) {
+    CUSTOM(0, iconRes = R.drawable.ic_freeform, nameRes = R.string.freeform),
+    ORIGINAL(1, iconRes = R.drawable.ic_original, nameRes = R.string.filter_original),
+    RATIO_1_1(2, iconRes = R.drawable.ic_ratio_1_1, nameRes = R.string.ratio_1_1),
+    RATIO_2_3(3, iconRes = R.drawable.ic_ratio_2_3, nameRes = R.string.ratio_2_3),
+    RATIO_3_2(4, iconRes = R.drawable.ic_ratio_3_2, nameRes = R.string.ratio_3_2),
+    RATIO_3_4(5, iconRes = R.drawable.ic_ratio_3_4, nameRes = R.string.ratio_3_4),
+    RATIO_4_3(6, iconRes = R.drawable.ic_ratio_4_3, nameRes = R.string.ratio_4_3),
+    RATIO_9_16(7, iconRes = R.drawable.ic_ratio_9_16, nameRes = R.string.ratio_9_16),
+    RATIO_16_9(8, iconRes = R.drawable.ic_ratio_16_9, nameRes = R.string.ratio_16_9),
+}
+
+@Composable
+fun CompositionScreen(viewModel: CompositionViewModel) {
+    val selectedTab = viewModel.currentTab.collectAsState().value
+    val selectedCropOption = viewModel.currentCropOptions.collectAsState().value
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+        .background(AppColors.DarkBG)
+    ) {
+        CropOptionList(
+            modifier = Modifier.height(84.dp),
+            selected = selectedCropOption,
+            onSelect = {
+                viewModel.currentCropOptions.value = it
+            }
+        )
+
+        BottomTabRow(selectedTab = selectedTab, onSelect = {
+            viewModel.currentTab.value = it
+        })
+    }
+}
+
+@Composable
+private fun CropOptionList(
+    modifier: Modifier = Modifier,
+    selected: CropOptions,
+    onSelect: (CropOptions) -> Unit
+) {
+    LazyRow(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        item {
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+
+        items(CropOptions.entries) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .width(70.dp)
+                    .clickableNoIndication {
+                        onSelect(it)
+                    }
+            ) {
+                Icon(
+                    painter = painterResource(id = it.iconRes),
+                    contentDescription = null,
+                    tint = if (it == selected) AppColors.Green200 else Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Text(
+                    text = stringResource(id = it.nameRes),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = if (it == selected) AppColors.Green200 else Color.White
+                )
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+    }
+}
+
+@Composable
+private fun BottomTabRow(
+    modifier: Modifier = Modifier,
+    selectedTab: CompositionTab,
+    onSelect: (CompositionTab) -> Unit
+) {
+    TabRow(modifier = modifier, selectedTabIndex = selectedTab.index, backgroundColor = AppColors.DarkBG) {
+        Tab(selected = selectedTab == CompositionTab.CROP, onClick = {
+            onSelect(CompositionTab.CROP)
+        }) {
+            Text(
+                text = stringResource(id = R.string.crop),
+                color = if (selectedTab == CompositionTab.CROP) Color.White else Color.Gray,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Tab(selected = selectedTab == CompositionTab.ROTATE, onClick = {
+            onSelect(CompositionTab.ROTATE)
+        }) {
+            Text(
+                text = stringResource(id = R.string.rotate),
+                color = if (selectedTab == CompositionTab.ROTATE) Color.White else Color.Gray,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Tab(selected = selectedTab == CompositionTab.PERSPECTIVE, onClick = {
+            onSelect(CompositionTab.PERSPECTIVE)
+        }) {
+            Text(
+                text = stringResource(id = R.string.perspective),
+                color = if (selectedTab == CompositionTab.PERSPECTIVE) Color.White else Color.Gray,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}

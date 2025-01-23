@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
+import com.akatsukirika.openps.viewmodel.CompositionViewModel
 import com.akatsukirika.openps.viewmodel.EditViewModel
 import com.akatsukirika.openps.viewmodel.EliminateViewModel
 
@@ -44,11 +45,16 @@ const val TAB_ADJUST = 1
 const val TAB_FILTER = 2
 // 模块
 const val MODULE_NONE = -1
-const val MODULE_ELIMINATE_PEN = 0
-const val MODULE_IMAGE_EFFECT = 1
+const val MODULE_COMPOSITION = 0
+const val MODULE_ELIMINATE_PEN = 1
+const val MODULE_IMAGE_EFFECT = 2
 
 @Composable
-fun EditScreen(viewModel: EditViewModel, eliminateViewModel: EliminateViewModel) {
+fun EditScreen(
+    viewModel: EditViewModel,
+    eliminateViewModel: EliminateViewModel,
+    compositionViewModel: CompositionViewModel
+) {
     MaterialTheme {
         val selectedModule = viewModel.selectedModule.collectAsState(initial = MODULE_NONE).value
 
@@ -60,6 +66,10 @@ fun EditScreen(viewModel: EditViewModel, eliminateViewModel: EliminateViewModel)
 
             AnimatedVisibility(visible = selectedModule == MODULE_NONE) {
                 ModuleSelectLayout(viewModel)
+            }
+
+            AnimatedVisibility(visible = selectedModule == MODULE_COMPOSITION) {
+                CompositionScreen(compositionViewModel)
             }
 
             AnimatedVisibility(visible = selectedModule == MODULE_ELIMINATE_PEN) {
@@ -90,6 +100,30 @@ private fun ModuleSelectLayout(viewModel: EditViewModel) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clickable {
+                    viewModel.selectedModule.value = MODULE_COMPOSITION
+                }
+                .padding(vertical = 16.dp, horizontal = 12.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_composition),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(22.dp)
+            )
+
+            Spacer(modifier = Modifier.height(1.dp))
+
+            Text(
+                text = stringResource(id = R.string.composition),
+                color = Color.White,
+                fontSize = 11.sp
+            )
+        }
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
