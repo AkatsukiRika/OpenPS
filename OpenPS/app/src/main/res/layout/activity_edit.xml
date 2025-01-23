@@ -34,7 +34,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <FrameLayout
-        android:id="@+id/fl_eliminate_pen"
+        android:id="@+id/fl_functional"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

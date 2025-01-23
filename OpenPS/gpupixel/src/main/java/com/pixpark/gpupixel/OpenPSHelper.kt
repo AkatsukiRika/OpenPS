@@ -39,8 +39,10 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
 
         scope.launch(Dispatchers.IO) {
-            BitmapUtils.saveBitmapToFile(bitmap, GPUPixel.getExternalPath(), savedBitmapName)
-            Log.d(TAG, "Original bitmap saved to ${GPUPixel.getExternalPath()}/$savedBitmapName")
+            GPUPixel.getExternalPath()?.let { externalPath ->
+                BitmapUtils.saveBitmapToFile(bitmap, externalPath, savedBitmapName)
+                Log.d(TAG, "Original bitmap saved to $externalPath/$savedBitmapName")
+            }
         }
     }
 

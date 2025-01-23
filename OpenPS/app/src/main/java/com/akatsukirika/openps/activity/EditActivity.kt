@@ -25,6 +25,7 @@ import com.akatsukirika.openps.compose.MODULE_NONE
 import com.akatsukirika.openps.compose.STATUS_LOADING
 import com.akatsukirika.openps.compose.STATUS_SUCCESS
 import com.akatsukirika.openps.databinding.ActivityEditBinding
+import com.akatsukirika.openps.fragment.CompositionFragment
 import com.akatsukirika.openps.fragment.EliminatePenFragment
 import com.akatsukirika.openps.interop.NativeLib
 import com.akatsukirika.openps.store.SettingsStore
@@ -53,6 +54,8 @@ class EditActivity : AppCompatActivity() {
     private val compositionViewModel: CompositionViewModel by viewModels()
 
     private var eliminatePenFragment: EliminatePenFragment? = null
+
+    private var compositionFragment: CompositionFragment? = null
 
     // 原图->屏幕内居中适配的矩阵
     private val baseImageMatrix = Matrix()
@@ -153,20 +156,22 @@ class EditActivity : AppCompatActivity() {
                     when (it) {
                         MODULE_COMPOSITION -> {
                             supportActionBar?.setTitle(R.string.composition)
-                            removeEliminatePenFragment()
+                            removeFunctionalFragment()
                             binding.surfaceView.resetTransform()
+                            createCompositionFragment()
                         }
                         MODULE_ELIMINATE_PEN -> {
                             supportActionBar?.setTitle(R.string.eliminate_pen)
+                            removeFunctionalFragment()
                             createEliminatePenFragment()
                         }
                         MODULE_IMAGE_EFFECT -> {
                             supportActionBar?.setTitle(R.string.image_effect)
-                            removeEliminatePenFragment()
+                            removeFunctionalFragment()
                         }
                         MODULE_NONE -> {
                             supportActionBar?.setTitle(R.string.image_edit)
-                            removeEliminatePenFragment()
+                            removeFunctionalFragment()
                         }
                     }
                 }
@@ -281,12 +286,20 @@ class EditActivity : AppCompatActivity() {
         eliminateViewModel.matrix.value = binding.surfaceView.getImageMatrix()
         eliminatePenFragment = EliminatePenFragment(eliminateViewModel, binding.surfaceView)
         supportFragmentManager.beginTransaction()
-            .add(R.id.fl_eliminate_pen, eliminatePenFragment!!)
+            .add(R.id.fl_functional, eliminatePenFragment!!)
             .commit()
     }
 
-    private fun removeEliminatePenFragment() {
-        eliminatePenFragment?.let {
+    private fun createCompositionFragment() {
+        compositionFragment = CompositionFragment(compositionViewModel)
+        supportFragmentManager.beginTransaction()
+            .add(R.id.fl_functional, compositionFragment!!)
+            .commit()
+    }
+
+    private fun removeFunctionalFragment() {
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fl_functional)
+        currentFragment?.let {
             supportFragmentManager.beginTransaction()
                 .remove(it)
                 .commit()
@@ -306,6 +319,7 @@ class EditActivity : AppCompatActivity() {
         baseImageMatrix.postScale(baseScaleX, baseScaleY)
         baseImageMatrix.postTranslate(0f, translateY)
         binding.surfaceView.initImageMatrix(baseImageMatrix)
+        compositionViewModel.renderViewInfo = renderViewInfo
     }
 
     companion object {
