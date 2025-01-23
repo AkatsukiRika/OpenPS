@@ -69,6 +69,12 @@ class OpenPSRenderView : GLSurfaceView {
         this.callback = callback
     }
 
+    fun resetTransform() {
+        transformHelper.reset()
+        callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+        updateMatricesFromGL()
+    }
+
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             transformHelper.postScale(detector.scaleFactor, detector.focusX, detector.focusY)
@@ -87,9 +93,7 @@ class OpenPSRenderView : GLSurfaceView {
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-            transformHelper.reset()
-            callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
-            updateMatricesFromGL()
+            resetTransform()
             return true
         }
     }

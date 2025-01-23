@@ -64,6 +64,12 @@
     <string name="ratio_4_3" translatable="false">4:3</string>
     <string name="ratio_9_16" translatable="false">9:16</string>
     <string name="ratio_16_9" translatable="false">16:9</string>
+    <string name="rotate_left">Left</string>
+    <string name="rotate_right">Right</string>
+    <string name="rotate_mirror">Mirror</string>
+    <string name="rotate_flip">Flip</string>
+    <string name="perspective_vertical">Vertical</string>
+    <string name="perspective_horizontal">Horizontal</string>
     <string name="size_4k" translatable="false">4K</string>
     <string name="size_2k" translatable="false">2K</string>
     <string name="size_1k" translatable="false">1K</string>

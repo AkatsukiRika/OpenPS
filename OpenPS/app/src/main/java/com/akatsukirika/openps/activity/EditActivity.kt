@@ -154,6 +154,7 @@ class EditActivity : AppCompatActivity() {
                         MODULE_COMPOSITION -> {
                             supportActionBar?.setTitle(R.string.composition)
                             removeEliminatePenFragment()
+                            binding.surfaceView.resetTransform()
                         }
                         MODULE_ELIMINATE_PEN -> {
                             supportActionBar?.setTitle(R.string.eliminate_pen)

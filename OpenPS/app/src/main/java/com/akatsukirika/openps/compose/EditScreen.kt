@@ -59,10 +59,12 @@ fun EditScreen(
         val selectedModule = viewModel.selectedModule.collectAsState(initial = MODULE_NONE).value
 
         Column(modifier = Modifier.fillMaxWidth()) {
-            OperationRow(
-                viewModel = viewModel,
-                modifier = Modifier.align(Alignment.End)
-            )
+            if (selectedModule != MODULE_COMPOSITION) {
+                OperationRow(
+                    viewModel = viewModel,
+                    modifier = Modifier.align(Alignment.End)
+                )
+            }
 
             AnimatedVisibility(visible = selectedModule == MODULE_NONE) {
                 ModuleSelectLayout(viewModel)
