@@ -8,12 +8,18 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -29,17 +35,24 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import com.akatsukirika.openps.R
+import com.akatsukirika.openps.compose.AppTheme
 import com.akatsukirika.openps.viewmodel.CompositionViewModel
 import kotlin.math.max
 import kotlin.math.min
 
 class CompositionFragment(private val viewModel: CompositionViewModel) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        viewModel.initStates()
+
         return ComposeView(requireContext()).apply {
             setContent {
-                CompositionFragScreen(viewModel)
+                AppTheme {
+                    CompositionFragScreen(viewModel)
+                }
             }
         }
     }
@@ -64,6 +77,7 @@ fun CompositionFragScreen(viewModel: CompositionViewModel) {
 
         Rect(offset = Offset(offsetX, offsetY), size = Size(sizeWidth, sizeHeight))
     }
+    val canSave = viewModel.canSave.collectAsState().value
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -72,7 +86,24 @@ fun CompositionFragScreen(viewModel: CompositionViewModel) {
             height = it.height
         }
     ) {
-        DraggableRect(initialRect = initialRect, onRectChanged = {})
+        DraggableRect(initialRect = initialRect, onRectChanged = {
+            viewModel.canSave.value =
+                        (it.left == initialRect.left &&
+                        it.top == initialRect.top &&
+                        it.right == initialRect.right &&
+                        it.bottom == initialRect.bottom).not()
+        })
+
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 32.dp),
+            shape = RoundedCornerShape(100.dp),
+            enabled = canSave
+        ) {
+            Text(text = stringResource(id = R.string.save_changes))
+        }
     }
 }
 
@@ -199,7 +230,8 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
                         change.position.y in (rect.top - detectArea)..(rect.top + detectArea) -> DraggingMode.DRAGGING_TOP
                         change.position.y in (rect.bottom - detectArea)..(rect.bottom + detectArea) -> DraggingMode.DRAGGING_BOTTOM
                         change.position.x in (rect.left + detectArea)..(rect.right - detectArea) &&
-                        change.position.y in (rect.top + detectArea)..(rect.bottom - detectArea) -> DraggingMode.DRAGGING_INSIDE
+                                change.position.y in (rect.top + detectArea)..(rect.bottom - detectArea) -> DraggingMode.DRAGGING_INSIDE
+
                         else -> DraggingMode.NOT_DRAGGING
                     }
                 }

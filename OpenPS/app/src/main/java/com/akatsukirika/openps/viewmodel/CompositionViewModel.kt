@@ -11,5 +11,13 @@ class CompositionViewModel : ViewModel() {
 
     val currentCropOptions = MutableStateFlow(CropOptions.CUSTOM)
 
+    val canSave = MutableStateFlow(false)
+
     var renderViewInfo: RenderViewInfo? = null
+
+    fun initStates() {
+        currentTab.value = CompositionTab.CROP
+        currentCropOptions.value = CropOptions.CUSTOM
+        canSave.value = false
+    }
 }

@@ -24,6 +24,7 @@
     <string name="size_no_limit">No Limit</string>
     <string name="show_face_rect">Show Face Rect</string>
     <string name="save_to_gallery">Save to Gallery</string>
+    <string name="save_changes">Save Changes</string>
     <string name="back_to_home">Back to Home</string>
     <string name="beautify">Beautify</string>
     <string name="adjust">Adjust</string>
