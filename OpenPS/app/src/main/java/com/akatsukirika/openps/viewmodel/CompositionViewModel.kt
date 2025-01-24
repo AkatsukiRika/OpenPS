@@ -13,6 +13,9 @@ class CompositionViewModel : ViewModel() {
 
     val canSave = MutableStateFlow(false)
 
+    // 底部编辑区的高度（不包含Undo/Redo区域）
+    val bottomScreenHeight = MutableStateFlow(0f)
+
     var renderViewInfo: RenderViewInfo? = null
 
     fun initStates() {

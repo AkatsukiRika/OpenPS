@@ -69,8 +69,8 @@ class OpenPSRenderView : GLSurfaceView {
         this.callback = callback
     }
 
-    fun resetTransform() {
-        transformHelper.reset()
+    fun resetTransform(bottomPadding: Float = 0f) {
+        transformHelper.reset(bottomPadding)
         callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
         updateMatricesFromGL()
     }

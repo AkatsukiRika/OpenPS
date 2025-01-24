@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -29,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,38 +64,58 @@ enum class CropOptions(
 }
 
 @Composable
-fun CompositionScreen(viewModel: CompositionViewModel) {
+fun CompositionScreen(viewModel: CompositionViewModel, visible: Boolean) {
     val selectedTab = viewModel.currentTab.collectAsState().value
     val selectedCropOption = viewModel.currentCropOptions.collectAsState().value
+    val canSave = viewModel.canSave.collectAsState().value
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-        .background(AppColors.DarkBG)
-    ) {
-        when (selectedTab) {
-            CompositionTab.CROP -> {
-                CropOptionList(
-                    modifier = Modifier.height(84.dp),
-                    selected = selectedCropOption,
-                    onSelect = {
-                        viewModel.currentCropOptions.value = it
-                    }
-                )
-            }
-
-            CompositionTab.ROTATE -> {
-                RotateOptionList(modifier = Modifier.height(84.dp))
-            }
-
-            CompositionTab.PERSPECTIVE -> {
-                PerspectiveOptionList(modifier = Modifier.height(84.dp))
-            }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier.padding(bottom = 8.dp),
+            shape = RoundedCornerShape(100.dp),
+            enabled = canSave
+        ) {
+            Text(text = stringResource(id = R.string.save_changes))
         }
 
-        BottomTabRow(selectedTab = selectedTab, onSelect = {
-            viewModel.currentTab.value = it
-        })
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+            .background(AppColors.DarkBG)
+            .onSizeChanged {
+                val height = it.height
+                if (visible) {
+                    viewModel.bottomScreenHeight.value = height.toFloat()
+                } else {
+                    viewModel.bottomScreenHeight.value = 0f
+                }
+            }
+        ) {
+            when (selectedTab) {
+                CompositionTab.CROP -> {
+                    CropOptionList(
+                        modifier = Modifier.height(84.dp),
+                        selected = selectedCropOption,
+                        onSelect = {
+                            viewModel.currentCropOptions.value = it
+                        }
+                    )
+                }
+
+                CompositionTab.ROTATE -> {
+                    RotateOptionList(modifier = Modifier.height(84.dp))
+                }
+
+                CompositionTab.PERSPECTIVE -> {
+                    PerspectiveOptionList(modifier = Modifier.height(84.dp))
+                }
+            }
+
+            BottomTabRow(selectedTab = selectedTab, onSelect = {
+                viewModel.currentTab.value = it
+            })
+        }
     }
 }
 

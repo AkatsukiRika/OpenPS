@@ -1,6 +1,7 @@
 package com.pixpark.gpupixel
 
 import android.opengl.Matrix
+import com.pixpark.gpupixel.model.RenderViewInfo
 
 class OpenGLTransformHelper {
     var viewportWidth = 0f
@@ -10,12 +11,19 @@ class OpenGLTransformHelper {
     private val glMatrix = FloatArray(16)
     private val tempMatrix = FloatArray(16)
     private var currentScale = 1f
+    private var renderViewInfo: RenderViewInfo? = null
+    private var bottomPadding: Float = 0f
 
     init {
         Matrix.setIdentityM(glMatrix, 0)
     }
 
-    fun setViewportSize(width: Float, height: Float) {
+    fun setRenderViewInfo(info: RenderViewInfo) {
+        renderViewInfo = info
+        setViewportSize(info.viewWidth, info.viewHeight)
+    }
+
+    private fun setViewportSize(width: Float, height: Float) {
         viewportWidth = width
         viewportHeight = height
     }
@@ -43,9 +51,18 @@ class OpenGLTransformHelper {
         Matrix.translateM(glMatrix, 0, glDx, glDy, 0f)
     }
 
-    fun reset() {
+    fun reset(bottomPadding: Float) {
         Matrix.setIdentityM(glMatrix, 0)
         currentScale = 1f
+
+        this.bottomPadding = bottomPadding
+        renderViewInfo?.let {
+            val top = it.viewHeight * (1 - it.scaledHeight) / 2
+            if (top >= bottomPadding / 2) {
+                postTranslate(0f, -bottomPadding / 2)
+            } else {
+            }
+        }
     }
 
     fun getGLMatrix() = glMatrix

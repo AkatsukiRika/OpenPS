@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -55,7 +54,7 @@ fun EditScreen(
     eliminateViewModel: EliminateViewModel,
     compositionViewModel: CompositionViewModel
 ) {
-    MaterialTheme {
+    AppTheme {
         val selectedModule = viewModel.selectedModule.collectAsState(initial = MODULE_NONE).value
 
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -71,7 +70,7 @@ fun EditScreen(
             }
 
             AnimatedVisibility(visible = selectedModule == MODULE_COMPOSITION) {
-                CompositionScreen(compositionViewModel)
+                CompositionScreen(compositionViewModel, visible = selectedModule == MODULE_COMPOSITION)
             }
 
             AnimatedVisibility(visible = selectedModule == MODULE_ELIMINATE_PEN) {

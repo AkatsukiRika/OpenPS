@@ -62,13 +62,14 @@ class CompositionFragment(private val viewModel: CompositionViewModel) : Fragmen
 
 @Composable
 fun CompositionFragScreen(viewModel: CompositionViewModel) {
+    val bottomScreenHeight = viewModel.bottomScreenHeight.collectAsState().value
     var width by remember {
         mutableIntStateOf(0)
     }
     var height by remember {
         mutableIntStateOf(0)
     }
-    val initialRect = remember(width, height) {
+    val initialRect = remember(width, height, bottomScreenHeight) {
         val scaledWidth = viewModel.renderViewInfo?.scaledWidth ?: 0f
         val scaledHeight = viewModel.renderViewInfo?.scaledHeight ?: 0f
 
@@ -77,9 +78,8 @@ fun CompositionFragScreen(viewModel: CompositionViewModel) {
         val sizeWidth = scaledWidth * width
         val sizeHeight = scaledHeight * height
 
-        Rect(offset = Offset(offsetX, offsetY), size = Size(sizeWidth, sizeHeight))
+        Rect(offset = Offset(offsetX, offsetY - bottomScreenHeight / 2), size = Size(sizeWidth, sizeHeight))
     }
-    val canSave = viewModel.canSave.collectAsState().value
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -95,17 +95,6 @@ fun CompositionFragScreen(viewModel: CompositionViewModel) {
                         it.right == initialRect.right &&
                         it.bottom == initialRect.bottom).not()
         })
-
-        Button(
-            onClick = { /*TODO*/ },
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 32.dp),
-            shape = RoundedCornerShape(100.dp),
-            enabled = canSave
-        ) {
-            Text(text = stringResource(id = R.string.save_changes))
-        }
     }
 }
 

@@ -107,7 +107,7 @@ class EditActivity : AppCompatActivity() {
                         info.scaledHeight,
                         faceRectF
                     )
-                    binding.surfaceView.transformHelper.setViewportSize(info.viewWidth, info.viewHeight)
+                    binding.surfaceView.transformHelper.setRenderViewInfo(info)
                     initBaseMatrix(info)
                 }
 
@@ -116,7 +116,7 @@ class EditActivity : AppCompatActivity() {
                 }
 
                 override fun onRenderViewInfoReady(info: RenderViewInfo) {
-                    binding.surfaceView.transformHelper.setViewportSize(info.viewWidth, info.viewHeight)
+                    binding.surfaceView.transformHelper.setRenderViewInfo(info)
                     initBaseMatrix(info)
                 }
             }
@@ -182,6 +182,12 @@ class EditActivity : AppCompatActivity() {
                     if (it != null) {
                         viewModel.changeImage(it)
                     }
+                }
+            }
+
+            launch {
+                compositionViewModel.bottomScreenHeight.collect {
+                    binding.surfaceView.resetTransform(bottomPadding = it)
                 }
             }
         }
@@ -314,7 +320,7 @@ class EditActivity : AppCompatActivity() {
         val baseScaleX = scaledWidth / imageWidth
         val baseScaleY = scaledHeight / imageHeight
         val translateY = (renderViewInfo.viewHeight - scaledHeight) / 2
-        Log.d(TAG, "baseScaleX: $baseScaleX, baseScaleY: $baseScaleY, translateY: $translateY")
+        Log.d(TAG, "renderViewInfo: $renderViewInfo, baseScaleX: $baseScaleX, baseScaleY: $baseScaleY, translateY: $translateY")
         baseImageMatrix.reset()
         baseImageMatrix.postScale(baseScaleX, baseScaleY)
         baseImageMatrix.postTranslate(0f, translateY)
