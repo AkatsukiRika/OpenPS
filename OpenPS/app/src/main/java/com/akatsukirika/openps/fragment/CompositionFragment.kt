@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.compose.AppTheme
+import com.akatsukirika.openps.compose.CropOptions
 import com.akatsukirika.openps.viewmodel.CompositionViewModel
 import kotlin.math.max
 import kotlin.math.min
@@ -86,7 +88,7 @@ fun CompositionFragScreen(viewModel: CompositionViewModel) {
             height = it.height
         }
     ) {
-        DraggableRect(initialRect = initialRect, onRectChanged = {
+        DraggableRect(viewModel, initialRect = initialRect, onRectChanged = {
             viewModel.canSave.value =
                         (it.left == initialRect.left &&
                         it.top == initialRect.top &&
@@ -114,7 +116,7 @@ enum class DraggingMode {
 }
 
 @Composable
-private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
+private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, onRectChanged: (Rect) -> Unit) {
     val density = LocalDensity.current
     var rect by remember(initialRect) {
         mutableStateOf(initialRect)
@@ -147,6 +149,35 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
     }
     val minCropAreaSize = with(density) {
         100.dp.toPx()
+    }
+    val currentCropOptions = viewModel.currentCropOptions.collectAsState().value
+
+    fun resetWithRatio(ratio: Float) {
+        val initialRatio = initialRect.width / initialRect.height
+        rect = if (initialRatio < ratio) {
+            // 宽度占满initialRect的宽度，高在initialRect内居中按比例适配
+            val newHeight = initialRect.width / ratio
+            val newTop = initialRect.top + (initialRect.height - newHeight) / 2
+            rect.copy(left = initialRect.left, top = newTop, right = initialRect.right, bottom = newTop + newHeight)
+        } else {
+            // 高度占满initialRect的高度，宽在initialRect内居中按比例适配
+            val newWidth = initialRect.height * ratio
+            val newLeft = initialRect.left + (initialRect.width - newWidth) / 2
+            rect.copy(left = newLeft, top = initialRect.top, right = newLeft + newWidth, bottom = initialRect.bottom)
+        }
+        onRectChanged(rect)
+    }
+
+    LaunchedEffect(key1 = currentCropOptions) {
+        when (currentCropOptions) {
+            CropOptions.CUSTOM, CropOptions.ORIGINAL -> {
+                rect = rect.copy(left = initialRect.left, top = initialRect.top, right = initialRect.right, bottom = initialRect.bottom)
+                onRectChanged(rect)
+            }
+            else -> {
+                resetWithRatio(currentCropOptions.ratio)
+            }
+        }
     }
 
     /**
@@ -188,7 +219,9 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
             val direction = if (isHorizontal) Offset(1f, 0f) else Offset(0f, 1f)
 
             for (i in 0..4) {
-                paint.strokeWidth = if (i % 2 == 0) strokeSize else gridStrokeSize
+                paint.strokeWidth = if (i == 2 && currentCropOptions != CropOptions.CUSTOM) {
+                    gridStrokeSize
+                } else if (i % 2 == 0) strokeSize else gridStrokeSize
                 val segmentStart = start + direction * (length * i / 5)
                 val segmentEnd = start + direction * (length * (i + 1) / 5)
                 canvas.drawLine(p1 = segmentStart, p2 = segmentEnd, paint)
@@ -245,12 +278,16 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
                     draggingMode = when {
                         change.position.x in (rect.left - detectArea)..(rect.left + detectArea) &&
                                 change.position.y in (rect.top - detectArea)..(rect.top + detectArea) -> DraggingMode.DRAGGING_TOP_LEFT
+
                         change.position.x in (rect.right - detectArea)..(rect.right + detectArea) &&
                                 change.position.y in (rect.top - detectArea)..(rect.top + detectArea) -> DraggingMode.DRAGGING_TOP_RIGHT
+
                         change.position.x in (rect.left - detectArea)..(rect.left + detectArea) &&
                                 change.position.y in (rect.bottom - detectArea)..(rect.bottom + detectArea) -> DraggingMode.DRAGGING_BOTTOM_LEFT
+
                         change.position.x in (rect.right - detectArea)..(rect.right + detectArea) &&
                                 change.position.y in (rect.bottom - detectArea)..(rect.bottom + detectArea) -> DraggingMode.DRAGGING_BOTTOM_RIGHT
+
                         change.position.x in (rect.left - detectArea)..(rect.left + detectArea) -> DraggingMode.DRAGGING_LEFT
                         change.position.x in (rect.right - detectArea)..(rect.right + detectArea) -> DraggingMode.DRAGGING_RIGHT
                         change.position.y in (rect.top - detectArea)..(rect.top + detectArea) -> DraggingMode.DRAGGING_TOP
@@ -271,6 +308,7 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
                         if (rect.bottom - newTop < minCropAreaSize) newTop = rect.bottom - minCropAreaSize
                         rect.copy(left = newLeft, top = newTop)
                     }
+
                     DraggingMode.DRAGGING_TOP_RIGHT -> {
                         var newRight = min(size.width.toFloat(), rect.right + dragAmount.x)
                         var newTop = max(initialRect.top, rect.top + dragAmount.y)
@@ -278,6 +316,7 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
                         if (rect.bottom - newTop < minCropAreaSize) newTop = rect.bottom - minCropAreaSize
                         rect.copy(right = newRight, top = newTop)
                     }
+
                     DraggingMode.DRAGGING_BOTTOM_LEFT -> {
                         var newLeft = max(0f, rect.left + dragAmount.x)
                         var newBottom = min(initialRect.bottom, rect.bottom + dragAmount.y)
@@ -285,6 +324,7 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
                         if (newBottom - rect.top < minCropAreaSize) newBottom = rect.top + minCropAreaSize
                         rect.copy(left = newLeft, bottom = newBottom)
                     }
+
                     DraggingMode.DRAGGING_BOTTOM_RIGHT -> {
                         var newRight = min(size.width.toFloat(), rect.right + dragAmount.x)
                         var newBottom = min(initialRect.bottom, rect.bottom + dragAmount.y)

@@ -47,17 +47,18 @@ enum class CompositionTab(val index: Int) {
 enum class CropOptions(
     val index: Int,
     @DrawableRes val iconRes: Int = R.drawable.ic_freeform,
-    @StringRes val nameRes: Int = R.string.freeform
+    @StringRes val nameRes: Int = R.string.freeform,
+    val ratio: Float = 0f
 ) {
     CUSTOM(0, iconRes = R.drawable.ic_freeform, nameRes = R.string.freeform),
     ORIGINAL(1, iconRes = R.drawable.ic_original, nameRes = R.string.filter_original),
-    RATIO_1_1(2, iconRes = R.drawable.ic_ratio_1_1, nameRes = R.string.ratio_1_1),
-    RATIO_2_3(3, iconRes = R.drawable.ic_ratio_2_3, nameRes = R.string.ratio_2_3),
-    RATIO_3_2(4, iconRes = R.drawable.ic_ratio_3_2, nameRes = R.string.ratio_3_2),
-    RATIO_3_4(5, iconRes = R.drawable.ic_ratio_3_4, nameRes = R.string.ratio_3_4),
-    RATIO_4_3(6, iconRes = R.drawable.ic_ratio_4_3, nameRes = R.string.ratio_4_3),
-    RATIO_9_16(7, iconRes = R.drawable.ic_ratio_9_16, nameRes = R.string.ratio_9_16),
-    RATIO_16_9(8, iconRes = R.drawable.ic_ratio_16_9, nameRes = R.string.ratio_16_9),
+    RATIO_1_1(2, iconRes = R.drawable.ic_ratio_1_1, nameRes = R.string.ratio_1_1, ratio = 1f),
+    RATIO_2_3(3, iconRes = R.drawable.ic_ratio_2_3, nameRes = R.string.ratio_2_3, ratio = 2 / 3f),
+    RATIO_3_2(4, iconRes = R.drawable.ic_ratio_3_2, nameRes = R.string.ratio_3_2, ratio = 3 / 2f),
+    RATIO_3_4(5, iconRes = R.drawable.ic_ratio_3_4, nameRes = R.string.ratio_3_4, ratio = 3 / 4f),
+    RATIO_4_3(6, iconRes = R.drawable.ic_ratio_4_3, nameRes = R.string.ratio_4_3, ratio = 4 / 3f),
+    RATIO_9_16(7, iconRes = R.drawable.ic_ratio_9_16, nameRes = R.string.ratio_9_16, ratio = 9 / 16f),
+    RATIO_16_9(8, iconRes = R.drawable.ic_ratio_16_9, nameRes = R.string.ratio_16_9, ratio = 16 / 9f),
 }
 
 @Composable
