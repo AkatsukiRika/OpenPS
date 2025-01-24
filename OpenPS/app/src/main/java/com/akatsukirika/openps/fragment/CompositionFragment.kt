@@ -76,6 +76,10 @@ fun CompositionFragScreen(viewModel: CompositionViewModel) {
     }
 }
 
+enum class DraggingMode {
+    NOT_DRAGGING, DRAGGING_INSIDE, DRAGGING_LEFT, DRAGGING_RIGHT, DRAGGING_TOP, DRAGGING_BOTTOM
+}
+
 @Composable
 private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
     val density = LocalDensity.current
@@ -97,7 +101,7 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
     }
     val gridPaint = remember {
         Paint().apply {
-            color = Color.White
+            color = Color.White.copy(alpha = 0.5f)
             strokeWidth = gridStrokeSize
             style = PaintingStyle.Stroke
         }
@@ -105,8 +109,11 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
     val detectArea = with(density) {
         36.dp.toPx()
     }
-    var isDragging by remember {
-        mutableStateOf(false)
+    var draggingMode by remember {
+        mutableStateOf(DraggingMode.NOT_DRAGGING)
+    }
+    val minCropAreaSize = with(density) {
+        100.dp.toPx()
     }
 
     /**
@@ -177,32 +184,64 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
         .fillMaxSize()
         .pointerInput(Unit) {
             detectDragGestures(
-                onDragStart = {
-                    isDragging = true
-                },
                 onDragEnd = {
-                    isDragging = false
+                    draggingMode = DraggingMode.NOT_DRAGGING
                 },
                 onDragCancel = {
-                    isDragging = false
+                    draggingMode = DraggingMode.NOT_DRAGGING
                 }
             ) { change, dragAmount ->
-                val newRect = when {
+                if (draggingMode == DraggingMode.NOT_DRAGGING) {
+                    // 状态转移
+                    draggingMode = when {
+                        change.position.x in (rect.left - detectArea)..(rect.left + detectArea) -> DraggingMode.DRAGGING_LEFT
+                        change.position.x in (rect.right - detectArea)..(rect.right + detectArea) -> DraggingMode.DRAGGING_RIGHT
+                        change.position.y in (rect.top - detectArea)..(rect.top + detectArea) -> DraggingMode.DRAGGING_TOP
+                        change.position.y in (rect.bottom - detectArea)..(rect.bottom + detectArea) -> DraggingMode.DRAGGING_BOTTOM
+                        change.position.x in (rect.left + detectArea)..(rect.right - detectArea) &&
+                        change.position.y in (rect.top + detectArea)..(rect.bottom - detectArea) -> DraggingMode.DRAGGING_INSIDE
+                        else -> DraggingMode.NOT_DRAGGING
+                    }
+                }
+
+                val newRect = when (draggingMode) {
                     // 拖动左边
-                    change.position.x in (rect.left - detectArea)..(rect.left + detectArea) -> {
-                        rect.copy(left = max(0f, rect.left + dragAmount.x))
+                    DraggingMode.DRAGGING_LEFT -> {
+                        var newLeft = max(0f, rect.left + dragAmount.x)
+                        if (rect.right - newLeft < minCropAreaSize) {
+                            newLeft = rect.right - minCropAreaSize
+                        }
+                        rect.copy(left = newLeft)
                     }
                     // 拖动右边
-                    change.position.x in (rect.right - detectArea)..(rect.right + detectArea) -> {
-                        rect.copy(right = min(size.width.toFloat(), rect.right + dragAmount.x))
+                    DraggingMode.DRAGGING_RIGHT -> {
+                        var newRight = min(size.width.toFloat(), rect.right + dragAmount.x)
+                        if (newRight - rect.left < minCropAreaSize) {
+                            newRight = rect.left + minCropAreaSize
+                        }
+                        rect.copy(right = newRight)
                     }
                     // 拖动上边
-                    change.position.y in (rect.top - detectArea)..(rect.top + detectArea) -> {
-                        rect.copy(top = max(0f, rect.top + dragAmount.y))
+                    DraggingMode.DRAGGING_TOP -> {
+                        var newTop = max(initialRect.top, rect.top + dragAmount.y)
+                        if (rect.bottom - newTop < minCropAreaSize) {
+                            newTop = rect.bottom - minCropAreaSize
+                        }
+                        rect.copy(top = newTop)
                     }
                     // 拖动下边
-                    change.position.y in (rect.bottom - detectArea)..(rect.bottom + detectArea) -> {
-                        rect.copy(bottom = min(size.height.toFloat(), rect.bottom + dragAmount.y))
+                    DraggingMode.DRAGGING_BOTTOM -> {
+                        var newBottom = min(initialRect.bottom, rect.bottom + dragAmount.y)
+                        if (newBottom - rect.top < minCropAreaSize) {
+                            newBottom = rect.top + minCropAreaSize
+                        }
+                        rect.copy(bottom = newBottom)
+                    }
+                    // 在裁剪区域内部拖动时，移动整个区域
+                    DraggingMode.DRAGGING_INSIDE -> {
+                        val newLeft = (rect.left + dragAmount.x).coerceIn(initialRect.left, initialRect.right - rect.width)
+                        val newTop = (rect.top + dragAmount.y).coerceIn(initialRect.top, initialRect.bottom - rect.height)
+                        rect.copy(left = newLeft, top = newTop, right = newLeft + rect.width, bottom = newTop + rect.height)
                     }
 
                     else -> rect
@@ -218,7 +257,7 @@ private fun DraggableRect(initialRect: Rect, onRectChanged: (Rect) -> Unit) {
             drawCropArea(canvas)
 
             // 拖动时绘制九宫格
-            if (isDragging) {
+            if (draggingMode != DraggingMode.NOT_DRAGGING) {
                 drawGrid(canvas)
             }
         }
