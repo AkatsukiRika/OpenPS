@@ -79,13 +79,13 @@ class OpenPSRenderView : GLSurfaceView {
     }
 
     fun doMirrorTransform() {
-        transformHelper.postScaleNonUniform(-1f, 1f)
+        transformHelper.mirror()
         callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
         updateMatricesFromGL()
     }
 
     fun doFlipTransform() {
-        transformHelper.postScaleNonUniform(1f, -1f)
+        transformHelper.flip()
         callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
         updateMatricesFromGL()
     }

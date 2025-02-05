@@ -74,13 +74,15 @@ fun CompositionScreen(viewModel: CompositionViewModel, visible: Boolean) {
     val canSave = viewModel.canSave.collectAsState().value
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Button(
-            onClick = { /*TODO*/ },
-            modifier = Modifier.padding(bottom = 8.dp),
-            shape = RoundedCornerShape(100.dp),
-            enabled = canSave
-        ) {
-            Text(text = stringResource(id = R.string.save_changes))
+        if (selectedTab == CompositionTab.CROP) {
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.padding(bottom = 8.dp),
+                shape = RoundedCornerShape(100.dp),
+                enabled = canSave
+            ) {
+                Text(text = stringResource(id = R.string.save_changes))
+            }
         }
 
         Column(modifier = Modifier

@@ -17,6 +17,8 @@ class OpenGLTransformHelper {
     private var bottomPadding: Float = 0f
     private val initialRenderRect = RectF()
     private val renderRect = RectF()
+    private var isMirrored = false
+    private var isFlipped = false
 
     init {
         Matrix.setIdentityM(glMatrix, 0)
@@ -54,7 +56,17 @@ class OpenGLTransformHelper {
         Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
     }
 
-    fun postScaleNonUniform(scaleX: Float, scaleY: Float) {
+    fun mirror() {
+        isMirrored = !isMirrored
+        postScaleNonUniform(-1f, 1f)
+    }
+
+    fun flip() {
+        isFlipped = !isFlipped
+        postScaleNonUniform(1f, -1f)
+    }
+
+    private fun postScaleNonUniform(scaleX: Float, scaleY: Float) {
         // 使用 renderRect 的中心作为旋转/缩放的焦点
         val centerX = renderRect.centerX()
         val centerY = renderRect.centerY()
@@ -100,6 +112,12 @@ class OpenGLTransformHelper {
                 rectTransformMatrix.postScale(scale, scale, it.viewWidth / 2, it.viewHeight / 2)
                 rectTransformMatrix.postTranslate(0f, -bottomPadding / 2)
                 renderRect.transform(rectTransformMatrix)
+            }
+            if (isMirrored) {
+                postScaleNonUniform(-1f, 1f)
+            }
+            if (isFlipped) {
+                postScaleNonUniform(1f, -1f)
             }
         }
     }
