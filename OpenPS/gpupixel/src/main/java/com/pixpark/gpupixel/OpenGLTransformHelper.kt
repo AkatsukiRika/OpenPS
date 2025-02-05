@@ -1,6 +1,8 @@
 package com.pixpark.gpupixel
 
+import android.graphics.RectF
 import android.opengl.Matrix
+import androidx.core.graphics.transform
 import com.pixpark.gpupixel.model.RenderViewInfo
 
 class OpenGLTransformHelper {
@@ -13,6 +15,8 @@ class OpenGLTransformHelper {
     private var currentScale = 1f
     private var renderViewInfo: RenderViewInfo? = null
     private var bottomPadding: Float = 0f
+    private val initialRenderRect = RectF()
+    private val renderRect = RectF()
 
     init {
         Matrix.setIdentityM(glMatrix, 0)
@@ -21,6 +25,12 @@ class OpenGLTransformHelper {
     fun setRenderViewInfo(info: RenderViewInfo) {
         renderViewInfo = info
         setViewportSize(info.viewWidth, info.viewHeight)
+        initialRenderRect.set(
+            ((1 - info.scaledWidth) / 2) * info.viewWidth,
+            ((1 - info.scaledHeight) / 2) * info.viewHeight,
+            ((1 + info.scaledWidth) / 2) * info.viewWidth,
+            ((1 + info.scaledHeight) / 2) * info.viewHeight
+        )
     }
 
     private fun setViewportSize(width: Float, height: Float) {
@@ -58,12 +68,26 @@ class OpenGLTransformHelper {
         this.bottomPadding = bottomPadding
         renderViewInfo?.let {
             val top = it.viewHeight * (1 - it.scaledHeight) / 2
+            val rectTransformMatrix = android.graphics.Matrix()
+            renderRect.set(initialRenderRect)
             if (top >= bottomPadding / 2) {
                 postTranslate(0f, -bottomPadding / 2)
+                rectTransformMatrix.postTranslate(0f, -bottomPadding / 2)
+                renderRect.transform(rectTransformMatrix)
             } else {
+                val oldRenderHeight = it.viewHeight * it.scaledHeight
+                val newRenderHeight = it.viewHeight - bottomPadding
+                val scale = newRenderHeight / oldRenderHeight
+                postScale(scale, it.viewWidth / 2, it.viewHeight / 2)
+                postTranslate(0f, -bottomPadding / 2)
+                rectTransformMatrix.postScale(scale, scale, it.viewWidth / 2, it.viewHeight / 2)
+                rectTransformMatrix.postTranslate(0f, -bottomPadding / 2)
+                renderRect.transform(rectTransformMatrix)
             }
         }
     }
 
     fun getGLMatrix() = glMatrix
+
+    fun getRenderRect() = renderRect
 }

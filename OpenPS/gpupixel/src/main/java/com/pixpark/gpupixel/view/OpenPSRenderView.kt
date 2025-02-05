@@ -3,6 +3,7 @@ package com.pixpark.gpupixel.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Matrix
+import android.graphics.RectF
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.GestureDetector
@@ -16,6 +17,7 @@ class OpenPSRenderView : GLSurfaceView {
         fun onImageMatrixChanged(matrix: Matrix)
         fun onGLMatrixChanged(glMatrix: FloatArray)
         fun onFrameRateChanged(fps: Double)
+        fun onRenderRectChanged(renderRect: RectF)
     }
 
     constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
@@ -72,6 +74,7 @@ class OpenPSRenderView : GLSurfaceView {
     fun resetTransform(bottomPadding: Float = 0f) {
         transformHelper.reset(bottomPadding)
         callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+        callback?.onRenderRectChanged(transformHelper.getRenderRect())
         updateMatricesFromGL()
     }
 

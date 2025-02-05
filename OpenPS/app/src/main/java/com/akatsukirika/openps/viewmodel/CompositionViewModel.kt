@@ -1,5 +1,6 @@
 package com.akatsukirika.openps.viewmodel
 
+import android.graphics.RectF
 import androidx.lifecycle.ViewModel
 import com.akatsukirika.openps.compose.CompositionTab
 import com.akatsukirika.openps.compose.CropOptions
@@ -15,6 +16,9 @@ class CompositionViewModel : ViewModel() {
 
     // 底部编辑区的高度（不包含Undo/Redo区域）
     val bottomScreenHeight = MutableStateFlow(0f)
+
+    // 图片渲染区域
+    val renderRect = MutableStateFlow(RectF())
 
     var renderViewInfo: RenderViewInfo? = null
 

@@ -95,6 +95,10 @@ class EditActivity : AppCompatActivity() {
             override fun onFrameRateChanged(fps: Double) {
                 viewModel.glFrameRate.value = fps
             }
+
+            override fun onRenderRectChanged(renderRect: RectF) {
+                compositionViewModel.renderRect.value = RectF(renderRect)
+            }
         })
         viewModel.init(
             renderView = binding.surfaceView,
