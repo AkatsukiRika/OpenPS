@@ -33,13 +33,17 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import com.akatsukirika.openps.activity.EditActivity
 import com.akatsukirika.openps.compose.AppTheme
 import com.akatsukirika.openps.compose.CropOptions
 import com.akatsukirika.openps.viewmodel.CompositionViewModel
 import kotlin.math.max
 import kotlin.math.min
 
-class CompositionFragment(private val viewModel: CompositionViewModel) : Fragment() {
+class CompositionFragment : Fragment() {
+    private val viewModel: CompositionViewModel
+        get() = (requireActivity() as EditActivity).compositionViewModel
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewModel.initStates()
 

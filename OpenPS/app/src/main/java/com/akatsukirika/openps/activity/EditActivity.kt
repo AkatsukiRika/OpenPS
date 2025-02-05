@@ -51,7 +51,7 @@ class EditActivity : AppCompatActivity() {
 
     private val eliminateViewModel: EliminateViewModel by viewModels()
 
-    private val compositionViewModel: CompositionViewModel by viewModels()
+    val compositionViewModel: CompositionViewModel by viewModels()
 
     private var eliminatePenFragment: EliminatePenFragment? = null
 
@@ -301,7 +301,7 @@ class EditActivity : AppCompatActivity() {
     }
 
     private fun createCompositionFragment() {
-        compositionFragment = CompositionFragment(compositionViewModel)
+        compositionFragment = CompositionFragment()
         supportFragmentManager.beginTransaction()
             .add(R.id.fl_functional, compositionFragment!!)
             .commit()
