@@ -33,10 +33,13 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.akatsukirika.openps.activity.EditActivity
 import com.akatsukirika.openps.compose.AppTheme
 import com.akatsukirika.openps.compose.CropOptions
 import com.akatsukirika.openps.viewmodel.CompositionViewModel
+import com.pixpark.gpupixel.view.OpenPSRenderView
+import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 
@@ -44,8 +47,25 @@ class CompositionFragment : Fragment() {
     private val viewModel: CompositionViewModel
         get() = (requireActivity() as EditActivity).compositionViewModel
 
+    private val renderView: OpenPSRenderView
+        get() = (requireActivity() as EditActivity).binding.surfaceView
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewModel.initStates()
+
+        lifecycleScope.launch {
+            launch {
+                viewModel.mirrorEvent.collect {
+                    renderView.doMirrorTransform()
+                }
+            }
+
+            launch {
+                viewModel.flipEvent.collect {
+                    renderView.doFlipTransform()
+                }
+            }
+        }
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -309,18 +329,14 @@ private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, on
                     }
                     // 拖动左边
                     DraggingMode.DRAGGING_LEFT -> {
-                        var newLeft = max(0f, rect.left + dragAmount.x)
-                        if (rect.right - newLeft < minCropAreaSize) {
-                            newLeft = rect.right - minCropAreaSize
-                        }
+                        val newLeft = (rect.left + dragAmount.x)
+                            .coerceIn(initialRect.left, rect.right - minCropAreaSize)
                         rect.copy(left = newLeft)
                     }
                     // 拖动右边
                     DraggingMode.DRAGGING_RIGHT -> {
-                        var newRight = min(size.width.toFloat(), rect.right + dragAmount.x)
-                        if (newRight - rect.left < minCropAreaSize) {
-                            newRight = rect.left + minCropAreaSize
-                        }
+                        val newRight = (rect.right + dragAmount.x)
+                            .coerceIn(rect.left + minCropAreaSize, initialRect.right)
                         rect.copy(right = newRight)
                     }
                     // 拖动上边

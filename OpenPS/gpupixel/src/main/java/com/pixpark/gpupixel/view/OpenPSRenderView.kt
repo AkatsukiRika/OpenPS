@@ -78,6 +78,18 @@ class OpenPSRenderView : GLSurfaceView {
         updateMatricesFromGL()
     }
 
+    fun doMirrorTransform() {
+        transformHelper.postScaleNonUniform(-1f, 1f)
+        callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+        updateMatricesFromGL()
+    }
+
+    fun doFlipTransform() {
+        transformHelper.postScaleNonUniform(1f, -1f)
+        callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+        updateMatricesFromGL()
+    }
+
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             transformHelper.postScale(detector.scaleFactor, detector.focusX, detector.focusY)

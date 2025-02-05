@@ -24,6 +24,7 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +40,9 @@ import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.utils.clickableNoIndication
 import com.akatsukirika.openps.viewmodel.CompositionViewModel
+import com.akatsukirika.openps.viewmodel.FlipEvent
+import com.akatsukirika.openps.viewmodel.MirrorEvent
+import kotlinx.coroutines.launch
 
 enum class CompositionTab(val index: Int) {
     CROP(0),
@@ -104,7 +108,7 @@ fun CompositionScreen(viewModel: CompositionViewModel, visible: Boolean) {
                 }
 
                 CompositionTab.ROTATE -> {
-                    RotateOptionList(modifier = Modifier.height(84.dp))
+                    RotateOptionList(modifier = Modifier.height(84.dp), viewModel)
                 }
 
                 CompositionTab.PERSPECTIVE -> {
@@ -164,7 +168,9 @@ private fun CropOptionList(
 }
 
 @Composable
-private fun RotateOptionList(modifier: Modifier = Modifier) {
+private fun RotateOptionList(modifier: Modifier = Modifier, viewModel: CompositionViewModel) {
+    val scope = rememberCoroutineScope()
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -233,7 +239,11 @@ private fun RotateOptionList(modifier: Modifier = Modifier) {
                 .padding(end = 16.dp)
                 .width(70.dp)
                 .fillMaxHeight()
-                .clickable {}
+                .clickable {
+                    scope.launch {
+                        viewModel.mirrorEvent.emit(MirrorEvent)
+                    }
+                }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_mirror),
@@ -258,7 +268,11 @@ private fun RotateOptionList(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .width(70.dp)
                 .fillMaxHeight()
-                .clickable {}
+                .clickable {
+                    scope.launch {
+                        viewModel.flipEvent.emit(FlipEvent)
+                    }
+                }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_mirror),

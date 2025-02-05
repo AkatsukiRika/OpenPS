@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class EditActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityEditBinding
+    lateinit var binding: ActivityEditBinding
     private var imageUri: Uri? = null
 
     private var showFaceRect: Boolean = false

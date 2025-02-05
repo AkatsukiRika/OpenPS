@@ -54,6 +54,23 @@ class OpenGLTransformHelper {
         Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
     }
 
+    fun postScaleNonUniform(scaleX: Float, scaleY: Float) {
+        // 使用 renderRect 的中心作为旋转/缩放的焦点
+        val centerX = renderRect.centerX()
+        val centerY = renderRect.centerY()
+
+        // 将焦点从屏幕坐标转换到 OpenGL 坐标系 [-1, 1] 范围内
+        val glFocusX = (centerX - viewportWidth / 2f) / (viewportWidth / 2f)
+        val glFocusY = (viewportHeight / 2f - centerY) / (viewportHeight / 2f)
+
+        Matrix.setIdentityM(tempMatrix, 0)
+        Matrix.translateM(tempMatrix, 0, glFocusX, glFocusY, 0f)
+        Matrix.scaleM(tempMatrix, 0, scaleX, scaleY, 1f)
+        Matrix.translateM(tempMatrix, 0, -glFocusX, -glFocusY, 0f)
+
+        Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
+    }
+
     fun postTranslate(dx: Float, dy: Float) {
         val glDx = (dx / viewportWidth) * 2f / currentScale
         val glDy = (-dy / viewportHeight) * 2f / currentScale
