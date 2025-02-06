@@ -32,6 +32,15 @@ class CompositionViewModel : ViewModel() {
         currentCropOptions.value = CropOptions.CUSTOM
         canSave.value = false
     }
+
+    fun getRatio(): Float {
+        val renderRect = renderRect.value
+        return when (currentCropOptions.value) {
+            CropOptions.CUSTOM -> 0f
+            CropOptions.ORIGINAL -> renderRect.width() / renderRect.height()
+            else -> currentCropOptions.value.ratio
+        }
+    }
 }
 
 data object MirrorEvent

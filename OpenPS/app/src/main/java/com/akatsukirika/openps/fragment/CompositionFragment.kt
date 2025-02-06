@@ -326,7 +326,7 @@ private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, on
                         if (rect.right - newLeft < minCropArea.first) newLeft = rect.right - minCropArea.first
                         if (rect.bottom - newTop < minCropArea.second) newTop = rect.bottom - minCropArea.second
 
-                        val ratio = viewModel.currentCropOptions.value.ratio
+                        val ratio = viewModel.getRatio()
                         if (ratio != 0f) {
                             // 计算基于左边界的理想高度
                             val heightFromLeft = (rect.right - newLeft) / ratio
@@ -360,7 +360,7 @@ private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, on
                         if (rect.bottom - newTop < minCropArea.second) newTop = rect.bottom - minCropArea.second
 
                         // 处理比例约束
-                        val ratio = viewModel.currentCropOptions.value.ratio
+                        val ratio = viewModel.getRatio()
                         if (ratio != 0f) {
                             val heightFromRight = (newRight - rect.left) / ratio
                             val widthFromTop = (rect.bottom - newTop) * ratio
@@ -389,7 +389,7 @@ private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, on
                         if (newBottom - rect.top < minCropArea.second) newBottom = rect.top + minCropArea.second
 
                         // 处理比例约束
-                        val ratio = viewModel.currentCropOptions.value.ratio
+                        val ratio = viewModel.getRatio()
                         if (ratio != 0f) {
                             val heightFromLeft = (rect.right - newLeft) / ratio
                             val widthFromBottom = (newBottom - rect.top) * ratio
@@ -418,7 +418,7 @@ private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, on
                         if (newBottom - rect.top < minCropArea.second) newBottom = rect.top + minCropArea.second
 
                         // 处理比例约束
-                        val ratio = viewModel.currentCropOptions.value.ratio
+                        val ratio = viewModel.getRatio()
                         if (ratio != 0f) {
                             val heightFromRight = (newRight - rect.left) / ratio
                             val widthFromBottom = (newBottom - rect.top) * ratio

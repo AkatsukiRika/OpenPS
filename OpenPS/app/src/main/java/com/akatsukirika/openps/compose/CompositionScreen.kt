@@ -388,15 +388,15 @@ private fun BottomTabRow(
             )
         }
 
-        Tab(selected = selectedTab == CompositionTab.PERSPECTIVE, onClick = {
-            onSelect(CompositionTab.PERSPECTIVE)
-        }) {
-            Text(
-                text = stringResource(id = R.string.perspective),
-                color = if (selectedTab == CompositionTab.PERSPECTIVE) Color.White else Color.Gray,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+//        Tab(selected = selectedTab == CompositionTab.PERSPECTIVE, onClick = {
+//            onSelect(CompositionTab.PERSPECTIVE)
+//        }) {
+//            Text(
+//                text = stringResource(id = R.string.perspective),
+//                color = if (selectedTab == CompositionTab.PERSPECTIVE) Color.White else Color.Gray,
+//                fontSize = 12.sp,
+//                fontWeight = FontWeight.Bold
+//            )
+//        }
     }
 }
