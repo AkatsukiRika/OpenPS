@@ -257,6 +257,29 @@ private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, on
         }
     }
 
+    fun getDragAmountY(dragAmount: Offset): Float {
+        val ratio = viewModel.currentCropOptions.value.ratio
+        val dragAmountY = if (ratio != 0f) {
+            dragAmount.x / ratio
+        } else {
+            dragAmount.y
+        }
+        return dragAmountY
+    }
+
+    fun getMinCropArea(): Pair<Float, Float> {
+        val ratio = viewModel.currentCropOptions.value.ratio
+        return if (ratio == 0f) {
+            Pair(minCropAreaSize, minCropAreaSize)
+        } else {
+            if (ratio > 1) {
+                Pair(minCropAreaSize, minCropAreaSize / ratio)
+            } else {
+                Pair(minCropAreaSize * ratio, minCropAreaSize)
+            }
+        }
+    }
+
     Canvas(modifier = Modifier
         .fillMaxSize()
         .pointerInput(Unit) {
@@ -297,74 +320,169 @@ private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, on
                 val newRect = when (draggingMode) {
                     // 四个角落的拖拽
                     DraggingMode.DRAGGING_TOP_LEFT -> {
-                        var newLeft = max(0f, rect.left + dragAmount.x)
+                        var newLeft = max(initialRect.left, rect.left + dragAmount.x)
                         var newTop = max(initialRect.top, rect.top + dragAmount.y)
-                        if (rect.right - newLeft < minCropAreaSize) newLeft = rect.right - minCropAreaSize
-                        if (rect.bottom - newTop < minCropAreaSize) newTop = rect.bottom - minCropAreaSize
+                        val minCropArea = getMinCropArea()
+                        if (rect.right - newLeft < minCropArea.first) newLeft = rect.right - minCropArea.first
+                        if (rect.bottom - newTop < minCropArea.second) newTop = rect.bottom - minCropArea.second
+
+                        val ratio = viewModel.currentCropOptions.value.ratio
+                        if (ratio != 0f) {
+                            // 计算基于左边界的理想高度
+                            val heightFromLeft = (rect.right - newLeft) / ratio
+                            // 计算基于上边界的理想宽度
+                            val widthFromTop = (rect.bottom - newTop) * ratio
+
+                            if (newLeft == initialRect.left) {
+                                // 如果左边到达边界，调整上边以保持比例
+                                newTop = rect.bottom - heightFromLeft
+                            } else if (newTop == initialRect.top) {
+                                // 如果上边到达边界，调整左边以保持比例
+                                newLeft = rect.right - widthFromTop
+                            } else {
+                                // 选择限制最严格的一边
+                                if (heightFromLeft > rect.bottom - newTop) {
+                                    newTop = rect.bottom - heightFromLeft
+                                } else {
+                                    newLeft = rect.right - widthFromTop
+                                }
+                            }
+                        }
+
                         rect.copy(left = newLeft, top = newTop)
                     }
 
                     DraggingMode.DRAGGING_TOP_RIGHT -> {
-                        var newRight = min(size.width.toFloat(), rect.right + dragAmount.x)
-                        var newTop = max(initialRect.top, rect.top + dragAmount.y)
-                        if (newRight - rect.left < minCropAreaSize) newRight = rect.left + minCropAreaSize
-                        if (rect.bottom - newTop < minCropAreaSize) newTop = rect.bottom - minCropAreaSize
+                        var newRight = min(initialRect.right, rect.right + dragAmount.x)
+                        var newTop = max(initialRect.top, rect.top + getDragAmountY(Offset(-dragAmount.x, dragAmount.y)))
+                        val minCropArea = getMinCropArea()
+                        if (newRight - rect.left < minCropArea.first) newRight = rect.left + minCropArea.first
+                        if (rect.bottom - newTop < minCropArea.second) newTop = rect.bottom - minCropArea.second
+
+                        // 处理比例约束
+                        val ratio = viewModel.currentCropOptions.value.ratio
+                        if (ratio != 0f) {
+                            val heightFromRight = (newRight - rect.left) / ratio
+                            val widthFromTop = (rect.bottom - newTop) * ratio
+
+                            if (newRight == initialRect.right) {
+                                newTop = rect.bottom - heightFromRight
+                            } else if (newTop == initialRect.top) {
+                                newRight = rect.left + widthFromTop
+                            } else {
+                                if (heightFromRight > rect.bottom - newTop) {
+                                    newTop = rect.bottom - heightFromRight
+                                } else {
+                                    newRight = rect.left + widthFromTop
+                                }
+                            }
+                        }
+
                         rect.copy(right = newRight, top = newTop)
                     }
 
                     DraggingMode.DRAGGING_BOTTOM_LEFT -> {
-                        var newLeft = max(0f, rect.left + dragAmount.x)
-                        var newBottom = min(initialRect.bottom, rect.bottom + dragAmount.y)
-                        if (rect.right - newLeft < minCropAreaSize) newLeft = rect.right - minCropAreaSize
-                        if (newBottom - rect.top < minCropAreaSize) newBottom = rect.top + minCropAreaSize
+                        var newLeft = max(initialRect.left, rect.left + dragAmount.x)
+                        var newBottom = min(initialRect.bottom, rect.bottom + getDragAmountY(Offset(-dragAmount.x, dragAmount.y)))
+                        val minCropArea = getMinCropArea()
+                        if (rect.right - newLeft < minCropArea.first) newLeft = rect.right - minCropArea.first
+                        if (newBottom - rect.top < minCropArea.second) newBottom = rect.top + minCropArea.second
+
+                        // 处理比例约束
+                        val ratio = viewModel.currentCropOptions.value.ratio
+                        if (ratio != 0f) {
+                            val heightFromLeft = (rect.right - newLeft) / ratio
+                            val widthFromBottom = (newBottom - rect.top) * ratio
+
+                            if (newLeft == 0f) {
+                                newBottom = rect.top + heightFromLeft
+                            } else if (newBottom == initialRect.bottom) {
+                                newLeft = rect.right - widthFromBottom
+                            } else {
+                                if (heightFromLeft < newBottom - rect.top) {
+                                    newBottom = rect.top + heightFromLeft
+                                } else {
+                                    newLeft = rect.right - widthFromBottom
+                                }
+                            }
+                        }
+
                         rect.copy(left = newLeft, bottom = newBottom)
                     }
 
                     DraggingMode.DRAGGING_BOTTOM_RIGHT -> {
-                        var newRight = min(size.width.toFloat(), rect.right + dragAmount.x)
-                        var newBottom = min(initialRect.bottom, rect.bottom + dragAmount.y)
-                        if (newRight - rect.left < minCropAreaSize) newRight = rect.left + minCropAreaSize
-                        if (newBottom - rect.top < minCropAreaSize) newBottom = rect.top + minCropAreaSize
+                        var newRight = min(initialRect.right, rect.right + dragAmount.x)
+                        var newBottom = min(initialRect.bottom, rect.bottom + getDragAmountY(dragAmount))
+                        val minCropArea = getMinCropArea()
+                        if (newRight - rect.left < minCropArea.first) newRight = rect.left + minCropArea.first
+                        if (newBottom - rect.top < minCropArea.second) newBottom = rect.top + minCropArea.second
+
+                        // 处理比例约束
+                        val ratio = viewModel.currentCropOptions.value.ratio
+                        if (ratio != 0f) {
+                            val heightFromRight = (newRight - rect.left) / ratio
+                            val widthFromBottom = (newBottom - rect.top) * ratio
+
+                            if (newRight == size.width.toFloat()) {
+                                newBottom = rect.top + heightFromRight
+                            } else if (newBottom == initialRect.bottom) {
+                                newRight = rect.left + widthFromBottom
+                            } else {
+                                if (heightFromRight < newBottom - rect.top) {
+                                    newBottom = rect.top + heightFromRight
+                                } else {
+                                    newRight = rect.left + widthFromBottom
+                                }
+                            }
+                        }
+
                         rect.copy(right = newRight, bottom = newBottom)
                     }
                     // 拖动左边
                     DraggingMode.DRAGGING_LEFT -> {
-                        val newLeft = (rect.left + dragAmount.x)
-                            .coerceIn(initialRect.left, rect.right - minCropAreaSize)
-                        rect.copy(left = newLeft)
+                        if (viewModel.currentCropOptions.value == CropOptions.CUSTOM) {
+                            val newLeft = (rect.left + dragAmount.x)
+                                .coerceIn(initialRect.left, rect.right - minCropAreaSize)
+                            rect.copy(left = newLeft)
+                        } else rect
                     }
                     // 拖动右边
                     DraggingMode.DRAGGING_RIGHT -> {
-                        val newRight = (rect.right + dragAmount.x)
-                            .coerceIn(rect.left + minCropAreaSize, initialRect.right)
-                        rect.copy(right = newRight)
+                        if (viewModel.currentCropOptions.value == CropOptions.CUSTOM) {
+                            val newRight = (rect.right + dragAmount.x)
+                                .coerceIn(rect.left + minCropAreaSize, initialRect.right)
+                            rect.copy(right = newRight)
+                        } else rect
                     }
                     // 拖动上边
                     DraggingMode.DRAGGING_TOP -> {
-                        var newTop = max(initialRect.top, rect.top + dragAmount.y)
-                        if (rect.bottom - newTop < minCropAreaSize) {
-                            newTop = rect.bottom - minCropAreaSize
-                        }
-                        rect.copy(top = newTop)
+                        if (viewModel.currentCropOptions.value == CropOptions.CUSTOM) {
+                            var newTop = max(initialRect.top, rect.top + dragAmount.y)
+                            if (rect.bottom - newTop < minCropAreaSize) {
+                                newTop = rect.bottom - minCropAreaSize
+                            }
+                            rect.copy(top = newTop)
+                        } else rect
                     }
                     // 拖动下边
                     DraggingMode.DRAGGING_BOTTOM -> {
-                        var newBottom = min(initialRect.bottom, rect.bottom + dragAmount.y)
-                        if (newBottom - rect.top < minCropAreaSize) {
-                            newBottom = rect.top + minCropAreaSize
-                        }
-                        rect.copy(bottom = newBottom)
+                        if (viewModel.currentCropOptions.value == CropOptions.CUSTOM) {
+                            var newBottom = min(initialRect.bottom, rect.bottom + dragAmount.y)
+                            if (newBottom - rect.top < minCropAreaSize) {
+                                newBottom = rect.top + minCropAreaSize
+                            }
+                            rect.copy(bottom = newBottom)
+                        } else rect
                     }
                     // 在裁剪区域内部拖动时，移动整个区域
                     DraggingMode.DRAGGING_INSIDE -> {
-                        try {
-                            val newLeft = (rect.left + dragAmount.x).coerceIn(initialRect.left, initialRect.right - rect.width)
-                            val newTop = (rect.top + dragAmount.y).coerceIn(initialRect.top, initialRect.bottom - rect.height)
-                            rect.copy(left = newLeft, top = newTop, right = newLeft + rect.width, bottom = newTop + rect.height)
-                        } catch (e: IllegalArgumentException) {
-                            e.printStackTrace()
-                            rect
-                        }
+                        val newLeft = runCatching {
+                            (rect.left + dragAmount.x).coerceIn(initialRect.left, initialRect.right - rect.width)
+                        }.getOrNull() ?: rect.left
+                        val newTop = runCatching {
+                            (rect.top + dragAmount.y).coerceIn(initialRect.top, initialRect.bottom - rect.height)
+                        }.getOrNull() ?: rect.top
+                        rect.copy(left = newLeft, top = newTop, right = newLeft + rect.width, bottom = newTop + rect.height)
                     }
 
                     else -> rect
