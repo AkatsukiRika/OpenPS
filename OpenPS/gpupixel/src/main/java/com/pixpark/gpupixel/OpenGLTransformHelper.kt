@@ -56,14 +56,18 @@ class OpenGLTransformHelper {
         Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
     }
 
-    fun mirror() {
-        isMirrored = !isMirrored
-        postScaleNonUniform(-1f, 1f)
+    fun mirror(newState: Boolean) {
+        if (newState != isMirrored) {
+            postScaleNonUniform(-1f, 1f)
+        }
+        isMirrored = newState
     }
 
-    fun flip() {
-        isFlipped = !isFlipped
-        postScaleNonUniform(1f, -1f)
+    fun flip(newState: Boolean) {
+        if (newState != isFlipped) {
+            postScaleNonUniform(1f, -1f)
+        }
+        isFlipped = newState
     }
 
     private fun postScaleNonUniform(scaleX: Float, scaleY: Float) {
@@ -90,7 +94,7 @@ class OpenGLTransformHelper {
         Matrix.translateM(glMatrix, 0, glDx, glDy, 0f)
     }
 
-    fun reset(bottomPadding: Float) {
+    fun reset(bottomPadding: Float, saveMirrorState: Boolean) {
         Matrix.setIdentityM(glMatrix, 0)
         currentScale = 1f
 
@@ -113,11 +117,13 @@ class OpenGLTransformHelper {
                 rectTransformMatrix.postTranslate(0f, -bottomPadding / 2)
                 renderRect.transform(rectTransformMatrix)
             }
-            if (isMirrored) {
-                postScaleNonUniform(-1f, 1f)
-            }
-            if (isFlipped) {
-                postScaleNonUniform(1f, -1f)
+            if (saveMirrorState) {
+                if (isMirrored) {
+                    postScaleNonUniform(-1f, 1f)
+                }
+                if (isFlipped) {
+                    postScaleNonUniform(1f, -1f)
+                }
             }
         }
     }

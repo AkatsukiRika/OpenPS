@@ -55,14 +55,14 @@ class CompositionFragment : Fragment() {
 
         lifecycleScope.launch {
             launch {
-                viewModel.mirrorEvent.collect {
-                    renderView.doMirrorTransform()
+                viewModel.isMirrored.collect {
+                    renderView.doMirrorTransform(it)
                 }
             }
 
             launch {
-                viewModel.flipEvent.collect {
-                    renderView.doFlipTransform()
+                viewModel.isFlipped.collect {
+                    renderView.doFlipTransform(it)
                 }
             }
         }
@@ -95,7 +95,7 @@ fun CompositionFragScreen(viewModel: CompositionViewModel) {
         }
     ) {
         DraggableRect(viewModel, initialRect = initialRect, onRectChanged = {
-            viewModel.canSave.value =
+            viewModel.isRectChanged.value =
                         (it.left == initialRect.left &&
                         it.top == initialRect.top &&
                         it.right == initialRect.right &&

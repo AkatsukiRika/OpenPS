@@ -40,8 +40,6 @@ import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.utils.clickableNoIndication
 import com.akatsukirika.openps.viewmodel.CompositionViewModel
-import com.akatsukirika.openps.viewmodel.FlipEvent
-import com.akatsukirika.openps.viewmodel.MirrorEvent
 import kotlinx.coroutines.launch
 
 enum class CompositionTab(val index: Int) {
@@ -74,15 +72,13 @@ fun CompositionScreen(viewModel: CompositionViewModel, visible: Boolean) {
     val canSave = viewModel.canSave.collectAsState().value
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        if (selectedTab == CompositionTab.CROP) {
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.padding(bottom = 8.dp),
-                shape = RoundedCornerShape(100.dp),
-                enabled = canSave
-            ) {
-                Text(text = stringResource(id = R.string.save_changes))
-            }
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier.padding(bottom = 8.dp),
+            shape = RoundedCornerShape(100.dp),
+            enabled = canSave
+        ) {
+            Text(text = stringResource(id = R.string.save_changes))
         }
 
         Column(modifier = Modifier
@@ -243,7 +239,7 @@ private fun RotateOptionList(modifier: Modifier = Modifier, viewModel: Compositi
                 .fillMaxHeight()
                 .clickable {
                     scope.launch {
-                        viewModel.mirrorEvent.emit(MirrorEvent)
+                        viewModel.isMirrored.emit(!viewModel.isMirrored.value)
                     }
                 }
         ) {
@@ -272,7 +268,7 @@ private fun RotateOptionList(modifier: Modifier = Modifier, viewModel: Compositi
                 .fillMaxHeight()
                 .clickable {
                     scope.launch {
-                        viewModel.flipEvent.emit(FlipEvent)
+                        viewModel.isFlipped.emit(!viewModel.isFlipped.value)
                     }
                 }
         ) {

@@ -71,21 +71,21 @@ class OpenPSRenderView : GLSurfaceView {
         this.callback = callback
     }
 
-    fun resetTransform(bottomPadding: Float = 0f) {
-        transformHelper.reset(bottomPadding)
+    fun resetTransform(bottomPadding: Float = 0f, saveMirrorState: Boolean = false) {
+        transformHelper.reset(bottomPadding, saveMirrorState)
         callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
         callback?.onRenderRectChanged(transformHelper.getRenderRect())
         updateMatricesFromGL()
     }
 
-    fun doMirrorTransform() {
-        transformHelper.mirror()
+    fun doMirrorTransform(newState: Boolean) {
+        transformHelper.mirror(newState)
         callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
         updateMatricesFromGL()
     }
 
-    fun doFlipTransform() {
-        transformHelper.flip()
+    fun doFlipTransform(newState: Boolean) {
+        transformHelper.flip(newState)
         callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
         updateMatricesFromGL()
     }

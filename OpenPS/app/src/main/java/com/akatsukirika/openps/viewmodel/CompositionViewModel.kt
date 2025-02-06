@@ -2,22 +2,26 @@ package com.akatsukirika.openps.viewmodel
 
 import android.graphics.RectF
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.compose.CompositionTab
 import com.akatsukirika.openps.compose.CropOptions
 import com.pixpark.gpupixel.model.RenderViewInfo
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class CompositionViewModel : ViewModel() {
     val currentTab = MutableStateFlow(CompositionTab.CROP)
 
     val currentCropOptions = MutableStateFlow(CropOptions.CUSTOM)
 
+    val isRectChanged = MutableStateFlow(false)
+
+    val isMirrored = MutableStateFlow(false)
+
+    val isFlipped = MutableStateFlow(false)
+
     val canSave = MutableStateFlow(false)
-
-    val mirrorEvent = MutableSharedFlow<MirrorEvent>()
-
-    val flipEvent = MutableSharedFlow<FlipEvent>()
 
     // 底部编辑区的高度（不包含Undo/Redo区域）
     val bottomScreenHeight = MutableStateFlow(0f)
@@ -30,7 +34,15 @@ class CompositionViewModel : ViewModel() {
     fun initStates() {
         currentTab.value = CompositionTab.CROP
         currentCropOptions.value = CropOptions.CUSTOM
+        isRectChanged.value = false
+        isMirrored.value = false
+        isFlipped.value = false
         canSave.value = false
+        viewModelScope.launch {
+            combine(isRectChanged, isMirrored, isFlipped) { flow1, flow2, flow3 ->
+                canSave.value = flow1 || flow2 || flow3
+            }.collect {}
+        }
     }
 
     fun getRatio(): Float {
@@ -42,7 +54,3 @@ class CompositionViewModel : ViewModel() {
         }
     }
 }
-
-data object MirrorEvent
-
-data object FlipEvent
