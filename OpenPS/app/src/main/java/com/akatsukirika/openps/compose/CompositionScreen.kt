@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.akatsukirika.openps.R
 import com.akatsukirika.openps.utils.clickableNoIndication
 import com.akatsukirika.openps.viewmodel.CompositionViewModel
+import com.akatsukirika.openps.viewmodel.SaveEvent
 import kotlinx.coroutines.launch
 
 enum class CompositionTab(val index: Int) {
@@ -67,13 +68,18 @@ enum class CropOptions(
 
 @Composable
 fun CompositionScreen(viewModel: CompositionViewModel, visible: Boolean) {
+    val scope = rememberCoroutineScope()
     val selectedTab = viewModel.currentTab.collectAsState().value
     val selectedCropOption = viewModel.currentCropOptions.collectAsState().value
     val canSave = viewModel.canSave.collectAsState().value
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                scope.launch {
+                    viewModel.saveEvent.emit(SaveEvent)
+                }
+            },
             modifier = Modifier.padding(bottom = 8.dp),
             shape = RoundedCornerShape(100.dp),
             enabled = canSave

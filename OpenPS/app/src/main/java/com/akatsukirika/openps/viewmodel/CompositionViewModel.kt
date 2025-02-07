@@ -1,11 +1,16 @@
 package com.akatsukirika.openps.viewmodel
 
+import android.graphics.Bitmap
 import android.graphics.RectF
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.compose.CompositionTab
 import com.akatsukirika.openps.compose.CropOptions
+import com.akatsukirika.openps.utils.BitmapUtils
+import com.akatsukirika.openps.utils.BitmapUtils.scaleToEven
 import com.pixpark.gpupixel.model.RenderViewInfo
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -15,7 +20,7 @@ class CompositionViewModel : ViewModel() {
 
     val currentCropOptions = MutableStateFlow(CropOptions.CUSTOM)
 
-    val isRectChanged = MutableStateFlow(false)
+    private val isRectChanged = MutableStateFlow(false)
 
     val isMirrored = MutableStateFlow(false)
 
@@ -29,19 +34,48 @@ class CompositionViewModel : ViewModel() {
     // 图片渲染区域
     val renderRect = MutableStateFlow(RectF())
 
+    // 裁剪出来的区域
+    val croppedRect = MutableStateFlow(RectF())
+
+    val saveEvent = MutableSharedFlow<SaveEvent>(replay = 0)
+
+    val resultBitmap = MutableStateFlow<Bitmap?>(null)
+
     var renderViewInfo: RenderViewInfo? = null
 
-    fun initStates() {
+    private var originalBitmap: Bitmap? = null
+
+    fun initStates(originalBitmap: Bitmap? = null) {
         currentTab.value = CompositionTab.CROP
         currentCropOptions.value = CropOptions.CUSTOM
         isRectChanged.value = false
         isMirrored.value = false
         isFlipped.value = false
         canSave.value = false
+        this.originalBitmap = originalBitmap
+        resultBitmap.value = null
         viewModelScope.launch {
-            combine(isRectChanged, isMirrored, isFlipped) { flow1, flow2, flow3 ->
-                canSave.value = flow1 || flow2 || flow3
-            }.collect {}
+            launch {
+                combine(renderRect, croppedRect) { initialRect, it ->
+                    isRectChanged.value =
+                        (it.left == initialRect.left &&
+                                it.top == initialRect.top &&
+                                it.right == initialRect.right &&
+                                it.bottom == initialRect.bottom).not()
+                }.collect {}
+            }
+
+            launch {
+                combine(isRectChanged, isMirrored, isFlipped) { flow1, flow2, flow3 ->
+                    canSave.value = flow1 || flow2 || flow3
+                }.collect {}
+            }
+
+            launch {
+                saveEvent.collect {
+                    save()
+                }
+            }
         }
     }
 
@@ -53,4 +87,21 @@ class CompositionViewModel : ViewModel() {
             else -> currentCropOptions.value.ratio
         }
     }
+
+    fun save() {
+        val initialRect = renderRect.value
+        val cropRect = croppedRect.value
+        val newLeft = (cropRect.left - initialRect.left) / (initialRect.right - initialRect.left)
+        val newTop = (cropRect.top - initialRect.top) / (initialRect.bottom - initialRect.top)
+        val newRight = (cropRect.right - initialRect.left) / (initialRect.right - initialRect.left)
+        val newBottom = (cropRect.bottom - initialRect.top) / (initialRect.bottom - initialRect.top)
+        Log.d("CompositionViewModel", "newLeft: $newLeft, newTop: $newTop, newRight: $newRight, newBottom: $newBottom")
+        originalBitmap?.let {
+            val croppedBitmap = BitmapUtils.cropBitmap(it, newLeft, newTop, newRight, newBottom).scaleToEven()
+            Log.d("CompositionViewModel", "croppedBitmap: ${croppedBitmap.width}, ${croppedBitmap.height}")
+            resultBitmap.value = croppedBitmap
+        }
+    }
 }
+
+data object SaveEvent

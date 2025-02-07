@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.toAndroidRectF
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -51,7 +52,7 @@ class CompositionFragment : Fragment() {
         get() = (requireActivity() as EditActivity).binding.surfaceView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        viewModel.initStates()
+        viewModel.initStates((requireActivity() as EditActivity).viewModel.originalBitmap)
 
         lifecycleScope.launch {
             launch {
@@ -95,11 +96,7 @@ fun CompositionFragScreen(viewModel: CompositionViewModel) {
         }
     ) {
         DraggableRect(viewModel, initialRect = initialRect, onRectChanged = {
-            viewModel.isRectChanged.value =
-                        (it.left == initialRect.left &&
-                        it.top == initialRect.top &&
-                        it.right == initialRect.right &&
-                        it.bottom == initialRect.bottom).not()
+            viewModel.croppedRect.value = it.toAndroidRectF()
         })
     }
 }

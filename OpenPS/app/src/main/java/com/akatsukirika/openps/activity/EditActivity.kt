@@ -47,7 +47,7 @@ class EditActivity : AppCompatActivity() {
 
     private var showFaceRect: Boolean = false
 
-    private val viewModel: EditViewModel by viewModels()
+    val viewModel: EditViewModel by viewModels()
 
     private val eliminateViewModel: EliminateViewModel by viewModels()
 
@@ -185,6 +185,15 @@ class EditActivity : AppCompatActivity() {
                 eliminateViewModel.resultBitmap.collect {
                     if (it != null) {
                         viewModel.changeImage(it)
+                    }
+                }
+            }
+
+            launch {
+                compositionViewModel.resultBitmap.collect {
+                    if (it != null) {
+                        viewModel.changeImage(it)
+                        viewModel.selectedModule.value = MODULE_NONE
                     }
                 }
             }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
@@ -134,6 +135,31 @@ object BitmapUtils {
             }
         }
         return true
+    }
+
+    fun Bitmap.scaleToEven(): Bitmap {
+        // 获取Bitmap的当前宽度和高度
+        val bitmap = this
+        val width = bitmap.width
+        val height = bitmap.height
+
+        // 计算目标宽度和高度
+        val targetWidth = if (width % 2 == 0) width else width + 1
+        val targetHeight = if (height % 2 == 0) height else height + 1
+
+        // 如果宽度和高度都是偶数，直接返回原Bitmap
+        if (targetWidth == width && targetHeight == height) {
+            return bitmap
+        }
+
+        // 创建一个缩放矩阵
+        val scaleWidth = targetWidth.toFloat() / width
+        val scaleHeight = targetHeight.toFloat() / height
+        val matrix = Matrix()
+        matrix.postScale(scaleWidth, scaleHeight)
+
+        // 创建一个新的Bitmap
+        return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true)
     }
 
     suspend fun getBitmap(context: Context, model: Any?) = withContext(Dispatchers.IO) {
