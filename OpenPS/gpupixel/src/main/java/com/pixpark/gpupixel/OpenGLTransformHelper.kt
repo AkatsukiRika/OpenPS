@@ -89,11 +89,15 @@ class OpenGLTransformHelper {
         Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
     }
 
-    fun postTranslate(dx: Float, dy: Float) {
+    fun postTranslate(dx: Float, dy: Float, fromUser: Boolean = true) {
         val glDx = (dx / viewportWidth) * 2f / currentScale
         val glDy = (-dy / viewportHeight) * 2f / currentScale
 
-        Matrix.translateM(glMatrix, 0, glDx, glDy, 0f)
+        if (fromUser) {
+            Matrix.translateM(glMatrix, 0, if (isMirrored) -glDx else glDx, if (isFlipped) -glDy else glDy, 0f)
+        } else {
+            Matrix.translateM(glMatrix, 0, glDx, glDy, 0f)
+        }
     }
 
     fun reset(bottomPadding: Float) {
@@ -106,7 +110,7 @@ class OpenGLTransformHelper {
             val rectTransformMatrix = android.graphics.Matrix()
             renderRect.set(initialRenderRect)
             if (top >= bottomPadding / 2) {
-                postTranslate(0f, -bottomPadding / 2)
+                postTranslate(0f, -bottomPadding / 2, fromUser = false)
                 rectTransformMatrix.postTranslate(0f, -bottomPadding / 2)
                 renderRect.transform(rectTransformMatrix)
             } else {
@@ -114,7 +118,7 @@ class OpenGLTransformHelper {
                 val newRenderHeight = it.viewHeight - bottomPadding
                 val scale = newRenderHeight / oldRenderHeight
                 postScale(scale, it.viewWidth / 2, it.viewHeight / 2)
-                postTranslate(0f, -bottomPadding / 2)
+                postTranslate(0f, -bottomPadding / 2, fromUser = false)
                 rectTransformMatrix.postScale(scale, scale, it.viewWidth / 2, it.viewHeight / 2)
                 rectTransformMatrix.postTranslate(0f, -bottomPadding / 2)
                 renderRect.transform(rectTransformMatrix)
