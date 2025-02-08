@@ -46,6 +46,15 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun updateTransform() {
+        renderView.postOnGLThread {
+            val mirrored = renderView.transformHelper.isMirrored
+            val flipped = renderView.transformHelper.isFlipped
+            OpenPS.nativeUpdateTransform(mirrored, flipped)
+            requestRender()
+        }
+    }
+
     fun changeImage(bitmap: Bitmap) {
         val width = bitmap.width
         val height = bitmap.height

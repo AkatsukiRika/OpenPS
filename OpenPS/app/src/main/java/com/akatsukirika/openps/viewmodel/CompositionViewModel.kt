@@ -45,15 +45,13 @@ class CompositionViewModel : ViewModel() {
 
     private var originalBitmap: Bitmap? = null
 
-    fun initStates(originalBitmap: Bitmap? = null) {
-        currentTab.value = CompositionTab.CROP
-        currentCropOptions.value = CropOptions.CUSTOM
-        isRectChanged.value = false
-        isMirrored.value = false
-        isFlipped.value = false
-        canSave.value = false
-        this.originalBitmap = originalBitmap
-        resultBitmap.value = null
+    private var initialMirrorState: Boolean = false
+
+    private var initialFlipState: Boolean = false
+
+    private var isSave = false
+
+    init {
         viewModelScope.launch {
             launch {
                 combine(renderRect, croppedRect) { initialRect, it ->
@@ -67,7 +65,7 @@ class CompositionViewModel : ViewModel() {
 
             launch {
                 combine(isRectChanged, isMirrored, isFlipped) { flow1, flow2, flow3 ->
-                    canSave.value = flow1 || flow2 || flow3
+                    canSave.value = flow1 || (flow2 != initialMirrorState) || (flow3 != initialFlipState)
                 }.collect {}
             }
 
@@ -77,6 +75,20 @@ class CompositionViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    fun initStates(originalBitmap: Bitmap? = null, mirrorState: Boolean, flipState: Boolean) {
+        currentTab.value = CompositionTab.CROP
+        currentCropOptions.value = CropOptions.CUSTOM
+        isRectChanged.value = false
+        isMirrored.value = mirrorState
+        initialMirrorState = mirrorState
+        isFlipped.value = flipState
+        initialFlipState = flipState
+        canSave.value = false
+        isSave = false
+        this.originalBitmap = originalBitmap
+        resultBitmap.value = null
     }
 
     fun getRatio(): Float {
@@ -89,6 +101,7 @@ class CompositionViewModel : ViewModel() {
     }
 
     fun save() {
+        isSave = true
         val initialRect = renderRect.value
         val cropRect = croppedRect.value
         val newLeft = (cropRect.left - initialRect.left) / (initialRect.right - initialRect.left)
@@ -100,6 +113,13 @@ class CompositionViewModel : ViewModel() {
             val croppedBitmap = BitmapUtils.cropBitmap(it, newLeft, newTop, newRight, newBottom).scaleToEven()
             Log.d("CompositionViewModel", "croppedBitmap: ${croppedBitmap.width}, ${croppedBitmap.height}")
             resultBitmap.value = croppedBitmap
+        }
+    }
+
+    fun restoreTransformStates() {
+        if (!isSave) {
+            isMirrored.value = initialMirrorState
+            isFlipped.value = initialFlipState
         }
     }
 }

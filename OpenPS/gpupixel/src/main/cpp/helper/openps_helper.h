@@ -25,6 +25,8 @@ public:
 
   void changeImage(int width, int height, int channelCount, const unsigned char* pixels, const char* filename = nullptr);
 
+  void updateTransform(bool mirrored, bool flipped);
+
   void changeImage(std::string filename);
 
   void onTargetViewSizeChanged(int width, int height);
@@ -118,6 +120,8 @@ private:
   float brightnessLevel = DEFAULT_LEVEL;
   float customFilterLevel = DEFAULT_LEVEL;
   std::string currentImageFileName = "";
+  bool isMirrored = false;
+  bool isFlipped = false;
 
   int imageWidth = 0;
   int imageHeight = 0;

@@ -13,5 +13,7 @@ data class OpenPSRecord(
     val sharpenLevel: Float,
     val brightnessLevel: Float,
     val customFilterType: Int,
-    val customFilterIntensity: Float
+    val customFilterIntensity: Float,
+    val isMirrored: Boolean,
+    val isFlipped: Boolean
 )

@@ -17,8 +17,10 @@ class OpenGLTransformHelper {
     private var bottomPadding: Float = 0f
     private val initialRenderRect = RectF()
     private val renderRect = RectF()
-    private var isMirrored = false
-    private var isFlipped = false
+    var isMirrored = false
+        private set
+    var isFlipped = false
+        private set
 
     init {
         Matrix.setIdentityM(glMatrix, 0)
@@ -94,7 +96,7 @@ class OpenGLTransformHelper {
         Matrix.translateM(glMatrix, 0, glDx, glDy, 0f)
     }
 
-    fun reset(bottomPadding: Float, saveMirrorState: Boolean) {
+    fun reset(bottomPadding: Float) {
         Matrix.setIdentityM(glMatrix, 0)
         currentScale = 1f
 
@@ -117,13 +119,11 @@ class OpenGLTransformHelper {
                 rectTransformMatrix.postTranslate(0f, -bottomPadding / 2)
                 renderRect.transform(rectTransformMatrix)
             }
-            if (saveMirrorState) {
-                if (isMirrored) {
-                    postScaleNonUniform(-1f, 1f)
-                }
-                if (isFlipped) {
-                    postScaleNonUniform(1f, -1f)
-                }
+            if (isMirrored) {
+                postScaleNonUniform(-1f, 1f)
+            }
+            if (isFlipped) {
+                postScaleNonUniform(1f, -1f)
             }
         }
     }

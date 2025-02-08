@@ -52,7 +52,11 @@ class CompositionFragment : Fragment() {
         get() = (requireActivity() as EditActivity).binding.surfaceView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        viewModel.initStates((requireActivity() as EditActivity).viewModel.originalBitmap)
+        viewModel.initStates(
+            originalBitmap = (requireActivity() as EditActivity).viewModel.originalBitmap,
+            mirrorState = renderView.transformHelper.isMirrored,
+            flipState = renderView.transformHelper.isFlipped
+        )
 
         lifecycleScope.launch {
             launch {
@@ -75,6 +79,11 @@ class CompositionFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.restoreTransformStates()
     }
 }
 

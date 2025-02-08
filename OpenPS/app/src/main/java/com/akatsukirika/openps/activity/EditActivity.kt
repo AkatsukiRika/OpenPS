@@ -123,6 +123,14 @@ class EditActivity : AppCompatActivity() {
                     binding.surfaceView.transformHelper.setRenderViewInfo(info)
                     initBaseMatrix(info)
                 }
+
+                override fun mirror(newState: Boolean) {
+                    binding.surfaceView.doMirrorTransform(newState)
+                }
+
+                override fun flip(newState: Boolean) {
+                    binding.surfaceView.doFlipTransform(newState)
+                }
             }
         )
 
@@ -192,7 +200,7 @@ class EditActivity : AppCompatActivity() {
             launch {
                 compositionViewModel.resultBitmap.collect {
                     if (it != null) {
-                        viewModel.changeImage(it)
+                        viewModel.changeImage(it, updateTransform = true)
                         viewModel.selectedModule.value = MODULE_NONE
                     }
                 }

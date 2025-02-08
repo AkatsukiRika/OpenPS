@@ -57,6 +57,8 @@ class EditViewModel : ViewModel() {
         fun showOverlayView(info: RenderViewInfo, faceRectF: RectF)
         fun setDebugImage(bitmap: Bitmap)
         fun onRenderViewInfoReady(info: RenderViewInfo)
+        fun mirror(newState: Boolean)
+        fun flip(newState: Boolean)
     }
 
     var helper: OpenPSHelper? = null
@@ -221,7 +223,13 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun changeImage(bitmap: Bitmap) {
+    /**
+     * @param updateTransform 构图房间保存更改时传true
+     */
+    fun changeImage(bitmap: Bitmap, updateTransform: Boolean = false) {
+        if (updateTransform) {
+            helper?.updateTransform()
+        }
         helper?.changeImage(bitmap)
         viewModelScope.launch {
             refreshUndoRedo()
@@ -285,6 +293,7 @@ class EditViewModel : ViewModel() {
             val record = helper?.undo()
             record?.let {
                 updateMap(it)
+                updateTransform(it)
             }
             refreshUndoRedo()
         }
@@ -298,6 +307,7 @@ class EditViewModel : ViewModel() {
             val record = helper?.redo()
             record?.let {
                 updateMap(it)
+                updateTransform(it)
             }
             refreshUndoRedo()
         }
@@ -331,6 +341,11 @@ class EditViewModel : ViewModel() {
             _currentLevel.value = record.customFilterIntensity
             _selectedFilterIndex.value = record.customFilterType
         }
+    }
+
+    private fun updateTransform(record: OpenPSRecord) {
+        callback?.mirror(record.isMirrored)
+        callback?.flip(record.isFlipped)
     }
 
     private fun startImageFilter(context: Context, bitmap: Bitmap) {
