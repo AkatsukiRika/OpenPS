@@ -192,7 +192,7 @@ class EditActivity : AppCompatActivity() {
             launch {
                 eliminateViewModel.resultBitmap.collect {
                     if (it != null) {
-                        viewModel.changeImage(it)
+                        viewModel.changeImage(it, binding.surfaceView.transformHelper)
                     }
                 }
             }
@@ -200,7 +200,7 @@ class EditActivity : AppCompatActivity() {
             launch {
                 compositionViewModel.resultBitmap.collect {
                     if (it != null) {
-                        viewModel.changeImage(it, updateTransform = true)
+                        viewModel.changeImage(it, binding.surfaceView.transformHelper, updateTransform = true)
                         viewModel.selectedModule.value = MODULE_NONE
                     }
                 }

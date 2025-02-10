@@ -39,6 +39,7 @@ import com.akatsukirika.openps.utils.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
+import com.pixpark.gpupixel.OpenGLTransformHelper
 import com.pixpark.gpupixel.OpenPSHelper
 import com.pixpark.gpupixel.model.OpenPSRecord
 import com.pixpark.gpupixel.model.RenderViewInfo
@@ -69,6 +70,9 @@ class EditViewModel : ViewModel() {
     private var skinMaskBitmap: Bitmap? = null
 
     var originalBitmap: Bitmap? = null
+        private set
+
+    var currentBitmap: Bitmap? = null
         private set
 
     private val _loadStatus = MutableStateFlow(STATUS_IDLE)
@@ -176,6 +180,7 @@ class EditViewModel : ViewModel() {
                     .get()
             }
             originalBitmap = bitmap
+            currentBitmap = originalBitmap
             startImageFilter(context, bitmap)
         }
     }
@@ -226,13 +231,19 @@ class EditViewModel : ViewModel() {
     /**
      * @param updateTransform 构图房间保存更改时传true
      */
-    fun changeImage(bitmap: Bitmap, updateTransform: Boolean = false) {
+    fun changeImage(bitmap: Bitmap, transformHelper: OpenGLTransformHelper, updateTransform: Boolean = false) {
         if (updateTransform) {
             helper?.updateTransform()
         }
         helper?.changeImage(bitmap)
+        currentBitmap = bitmap
         viewModelScope.launch {
             refreshUndoRedo()
+            if (updateTransform) {
+                helper?.getRenderViewInfo()?.let {
+                    transformHelper.setRenderViewInfo(it)
+                }
+            }
         }
     }
 

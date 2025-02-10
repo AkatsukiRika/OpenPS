@@ -53,7 +53,7 @@ class CompositionFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewModel.initStates(
-            originalBitmap = (requireActivity() as EditActivity).viewModel.originalBitmap,
+            originalBitmap = (requireActivity() as EditActivity).viewModel.currentBitmap,
             mirrorState = renderView.transformHelper.isMirrored,
             flipState = renderView.transformHelper.isFlipped
         )
