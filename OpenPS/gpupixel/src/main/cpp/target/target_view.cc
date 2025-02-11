@@ -69,6 +69,8 @@ void TargetView::setInputFramebuffer(
          lastInputFramebuffer->getHeight() == framebuffer->getHeight() &&
          lastInputRotation == rotationMode))) {
     _updateDisplayVertices();
+  } else if (_isCompare) {
+    _updateDisplayVertices();
   }
 }
 
@@ -133,6 +135,14 @@ bool TargetView::updateMatrixState() {
   return true;
 }
 
+void TargetView::onCompareBegin() {
+  _isCompare = true;
+}
+
+void TargetView::onCompareEnd() {
+  _isCompare = false;
+}
+
 void TargetView::update(int64_t frameTime) {
   CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
@@ -177,6 +187,8 @@ void TargetView::_updateDisplayVertices() {
         _viewWidth / (float)rotatedFramebufferWidth * rotatedFramebufferHeight;
   }
 
+  bool isNotInit = _initialScaledWidth == -1 && _initialScaledHeight == -1;
+
   float scaledWidth = 1.0;
   float scaledHeight = 1.0;
   if (_fillMode == FillMode::PreserveAspectRatio) {
@@ -187,17 +199,34 @@ void TargetView::_updateDisplayVertices() {
     scaledHeight = _viewHeight / insetFramebufferWidth;
   }
 
-  _displayVertices[0] = -scaledWidth;
-  _displayVertices[1] = -scaledHeight;
-  _displayVertices[2] = scaledWidth;
-  _displayVertices[3] = -scaledHeight;
-  _displayVertices[4] = -scaledWidth;
-  _displayVertices[5] = scaledHeight;
-  _displayVertices[6] = scaledWidth;
-  _displayVertices[7] = scaledHeight;
+  if (_isCompare && !isNotInit) {
+    _displayVertices[0] = -_initialScaledWidth;
+    _displayVertices[1] = -_initialScaledHeight;
+    _displayVertices[2] = _initialScaledWidth;
+    _displayVertices[3] = -_initialScaledHeight;
+    _displayVertices[4] = -_initialScaledWidth;
+    _displayVertices[5] = _initialScaledHeight;
+    _displayVertices[6] = _initialScaledWidth;
+    _displayVertices[7] = _initialScaledHeight;
+  } else {
+    _displayVertices[0] = -scaledWidth;
+    _displayVertices[1] = -scaledHeight;
+    _displayVertices[2] = scaledWidth;
+    _displayVertices[3] = -scaledHeight;
+    _displayVertices[4] = -scaledWidth;
+    _displayVertices[5] = scaledHeight;
+    _displayVertices[6] = scaledWidth;
+    _displayVertices[7] = scaledHeight;
+  }
+  Util::Log("TargetView", "updateDisplayVertices, isNotInit=%d, isCompare=%d", isNotInit, _isCompare);
 
   _scaledWidth = scaledWidth;
   _scaledHeight = scaledHeight;
+  if (isNotInit) {
+    _initialScaledWidth = scaledWidth;
+    _initialScaledHeight = scaledHeight;
+    Util::Log("TargetView", "Set initialScaledWidth=%f, initialScaledHeight=%f", _initialScaledWidth, _initialScaledHeight);
+  }
 }
 
 const GLfloat* TargetView::_getTexureCoordinate(RotationMode rotationMode) {

@@ -34,6 +34,8 @@ class GPUPIXEL_API TargetView : public Target {
   void getViewInfo(float* info);
   void setMVPMatrix(const Matrix4& mvpMatrix);
   bool updateMatrixState();
+  void onCompareBegin();
+  void onCompareEnd();
   virtual void update(int64_t frameTime) override;
 
  private:
@@ -41,8 +43,11 @@ class GPUPIXEL_API TargetView : public Target {
   int _viewHeight;
   float _scaledWidth;
   float _scaledHeight;
+  float _initialScaledWidth = -1;
+  float _initialScaledHeight = -1;
   FillMode _fillMode;
   bool _mirror = false;
+  bool _isCompare = false;
   GLProgram* _displayProgram;
   GLuint _positionAttribLocation;
   GLuint _texCoordAttribLocation;

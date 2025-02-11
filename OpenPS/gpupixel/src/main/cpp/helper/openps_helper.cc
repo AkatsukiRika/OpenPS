@@ -311,6 +311,9 @@ void gpupixel::OpenPSHelper::applyCustomFilter(int type, float level, bool addRe
 }
 
 void gpupixel::OpenPSHelper::onCompareBegin() {
+  if (targetView) {
+    targetView->onCompareBegin();
+  }
   if (beautyFaceFilter) {
     beautyFaceFilter->setBlurAlpha(0);
     beautyFaceFilter->setWhite(0);
@@ -383,6 +386,9 @@ void gpupixel::OpenPSHelper::onCompareEnd() {
   }
   if (currentImageFileName != initialImageFileName) {
     imageCompareFilter->setIntensity(0);
+  }
+  if (targetView) {
+    targetView->onCompareEnd();
   }
 }
 
