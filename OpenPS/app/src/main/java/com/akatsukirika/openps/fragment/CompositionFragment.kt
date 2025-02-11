@@ -1,6 +1,7 @@
 package com.akatsukirika.openps.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -68,6 +69,13 @@ class CompositionFragment : Fragment() {
             launch {
                 viewModel.isFlipped.collect {
                     renderView.doFlipTransform(it)
+                }
+            }
+
+            launch {
+                viewModel.rotationDegrees.collect {
+                    Log.d("CompositionFragment", "rotationDegrees = $it")
+                    renderView.doRotateTransform(it)
                 }
             }
         }

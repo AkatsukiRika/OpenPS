@@ -187,7 +187,9 @@ private fun RotateOptionList(modifier: Modifier = Modifier, viewModel: Compositi
                 .padding(end = 16.dp)
                 .width(70.dp)
                 .fillMaxHeight()
-                .clickable {}
+                .clickable {
+                    viewModel.rotateLeft()
+                }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_rotate_left),
@@ -213,7 +215,9 @@ private fun RotateOptionList(modifier: Modifier = Modifier, viewModel: Compositi
                 .padding(end = 16.dp)
                 .width(70.dp)
                 .fillMaxHeight()
-                .clickable {}
+                .clickable {
+                    viewModel.rotateRight()
+                }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_rotate_left),

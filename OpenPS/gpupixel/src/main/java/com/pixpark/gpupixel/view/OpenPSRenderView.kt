@@ -90,6 +90,12 @@ class OpenPSRenderView : GLSurfaceView {
         updateMatricesFromGL()
     }
 
+    fun doRotateTransform(newDegrees: Int) {
+        transformHelper.postRotate(newDegrees.toFloat())
+        callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+        updateMatricesFromGL()
+    }
+
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             transformHelper.postScale(detector.scaleFactor, detector.focusX, detector.focusY)

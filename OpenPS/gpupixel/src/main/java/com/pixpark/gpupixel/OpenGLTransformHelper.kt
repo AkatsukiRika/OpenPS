@@ -21,6 +21,7 @@ class OpenGLTransformHelper {
         private set
     var isFlipped = false
         private set
+    private var currentRotation: Float = 0f
 
     init {
         Matrix.setIdentityM(glMatrix, 0)
@@ -55,6 +56,31 @@ class OpenGLTransformHelper {
         Matrix.scaleM(tempMatrix, 0, effectiveScale, effectiveScale, 1f)
         Matrix.translateM(tempMatrix, 0, -glFocusX, -glFocusY, 0f)
 
+        Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
+    }
+
+    fun postRotate(rotationDegrees: Float) {
+        val deltaRotation = rotationDegrees - currentRotation
+        currentRotation = rotationDegrees
+
+        // 使用 renderRect 的中心作为旋转/缩放的焦点
+        val centerX = renderRect.centerX()
+        val centerY = renderRect.centerY()
+
+        // 将焦点从屏幕坐标转换到 OpenGL 坐标系 [-1, 1] 范围内
+        val glFocusX = (centerX - viewportWidth / 2f) / (viewportWidth / 2f)
+        val glFocusY = (viewportHeight / 2f - centerY) / (viewportHeight / 2f)
+
+        // 使用临时矩阵构造旋转变换
+        Matrix.setIdentityM(tempMatrix, 0)
+        // 将旋转中心平移到原点
+        Matrix.translateM(tempMatrix, 0, glFocusX, glFocusY, 0f)
+        // 绕 z 轴旋转指定角度
+        Matrix.rotateM(tempMatrix, 0, deltaRotation, 0f, 0f, 1f)
+        // 将旋转中心平移回原位置
+        Matrix.translateM(tempMatrix, 0, -glFocusX, -glFocusY, 0f)
+
+        // 将计算后的旋转矩阵与当前的 glMatrix 相乘
         Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
     }
 

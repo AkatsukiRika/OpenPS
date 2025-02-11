@@ -26,6 +26,8 @@ class CompositionViewModel : ViewModel() {
 
     val isFlipped = MutableStateFlow(false)
 
+    val rotationDegrees = MutableStateFlow(0)
+
     val canSave = MutableStateFlow(false)
 
     // 底部编辑区的高度（不包含Undo/Redo区域）
@@ -114,6 +116,16 @@ class CompositionViewModel : ViewModel() {
             Log.d("CompositionViewModel", "croppedBitmap: ${croppedBitmap.width}, ${croppedBitmap.height}")
             resultBitmap.value = croppedBitmap
         }
+    }
+
+    fun rotateLeft() {
+        val newRotationDegrees = (rotationDegrees.value + 90) % 360
+        rotationDegrees.value = newRotationDegrees
+    }
+
+    fun rotateRight() {
+        val newRotationDegrees = (rotationDegrees.value - 90) % 360
+        rotationDegrees.value = newRotationDegrees
     }
 
     fun restoreTransformStates() {
