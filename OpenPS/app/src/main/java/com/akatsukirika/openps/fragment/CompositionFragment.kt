@@ -59,6 +59,8 @@ class CompositionFragment : Fragment() {
             flipState = renderView.transformHelper.isFlipped
         )
 
+        renderView.enterComposition()
+
         lifecycleScope.launch {
             launch {
                 viewModel.isMirrored.collect {

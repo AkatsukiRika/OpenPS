@@ -71,6 +71,10 @@ class OpenPSRenderView : GLSurfaceView {
         this.callback = callback
     }
 
+    fun enterComposition() {
+        transformHelper.isFirstRotate = true
+    }
+
     fun resetTransform(bottomPadding: Float = 0f) {
         transformHelper.reset(bottomPadding)
         callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
