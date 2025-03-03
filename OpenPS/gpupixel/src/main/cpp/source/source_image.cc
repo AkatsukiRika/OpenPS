@@ -51,6 +51,7 @@ void SourceImage::init(int width, int height, int channel_count, const unsigned 
     }
     this->setFramebuffer(_framebuffer);
     CHECK_GL(glBindTexture(GL_TEXTURE_2D, this->getFramebuffer()->getTexture()));
+    CHECK_GL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
   if(channel_count == 3) {
     CHECK_GL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                           GL_UNSIGNED_BYTE, pixels));
