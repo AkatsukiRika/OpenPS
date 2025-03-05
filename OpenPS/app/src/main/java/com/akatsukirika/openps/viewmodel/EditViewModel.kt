@@ -231,7 +231,7 @@ class EditViewModel : ViewModel() {
     /**
      * @param updateTransform 构图房间保存更改时传true
      */
-    fun changeImage(bitmap: Bitmap, transformHelper: OpenGLTransformHelper, updateTransform: Boolean = false) {
+    fun changeImage(bitmap: Bitmap, updateTransform: Boolean = false) {
         if (updateTransform) {
             helper?.updateTransform()
         }
@@ -241,7 +241,7 @@ class EditViewModel : ViewModel() {
             refreshUndoRedo()
             if (updateTransform) {
                 helper?.getRenderViewInfo()?.let {
-                    transformHelper.setRenderViewInfo(it)
+                    callback?.onRenderViewInfoReady(it)
                 }
             }
         }

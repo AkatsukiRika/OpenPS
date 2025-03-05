@@ -192,7 +192,7 @@ class EditActivity : AppCompatActivity() {
             launch {
                 eliminateViewModel.resultBitmap.collect {
                     if (it != null) {
-                        viewModel.changeImage(it, binding.surfaceView.transformHelper)
+                        viewModel.changeImage(it)
                     }
                 }
             }
@@ -200,7 +200,7 @@ class EditActivity : AppCompatActivity() {
             launch {
                 compositionViewModel.resultBitmap.collect {
                     if (it != null) {
-                        viewModel.changeImage(it, binding.surfaceView.transformHelper, updateTransform = true)
+                        viewModel.changeImage(it, updateTransform = true)
                         viewModel.selectedModule.value = MODULE_NONE
                     }
                 }
@@ -334,8 +334,8 @@ class EditActivity : AppCompatActivity() {
     }
 
     private fun initBaseMatrix(renderViewInfo: RenderViewInfo) {
-        val imageWidth = viewModel.originalBitmap?.width ?: return
-        val imageHeight = viewModel.originalBitmap?.height ?: return
+        val imageWidth = viewModel.currentBitmap?.width ?: return
+        val imageHeight = viewModel.currentBitmap?.height ?: return
         val scaledWidth = renderViewInfo.scaledWidth * renderViewInfo.viewWidth
         val scaledHeight = renderViewInfo.scaledHeight * renderViewInfo.viewHeight
         val baseScaleX = scaledWidth / imageWidth
