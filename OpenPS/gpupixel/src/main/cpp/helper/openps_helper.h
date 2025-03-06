@@ -25,7 +25,7 @@ public:
 
   void changeImage(int width, int height, int channelCount, const unsigned char* pixels, const char* filename = nullptr);
 
-  void updateTransform(bool mirrored, bool flipped);
+  void updateTransform(bool mirrored, bool flipped, float cropLeft, float cropTop, float cropRight, float cropBottom);
 
   void changeImage(std::string filename);
 
@@ -122,6 +122,10 @@ private:
   std::string currentImageFileName = "";
   bool isMirrored = false;
   bool isFlipped = false;
+  float croppedLeft = 0;
+  float croppedTop = 0;
+  float croppedRight = 1;
+  float croppedBottom = 1;
 
   int imageWidth = 0;
   int imageHeight = 0;

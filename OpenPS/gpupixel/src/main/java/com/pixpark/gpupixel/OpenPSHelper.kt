@@ -50,7 +50,11 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         renderView.postOnGLThread {
             val mirrored = renderView.transformHelper.isMirrored
             val flipped = renderView.transformHelper.isFlipped
-            OpenPS.nativeUpdateTransform(mirrored, flipped)
+            val cropLeft = renderView.transformHelper.cropLeft
+            val cropTop = renderView.transformHelper.cropTop
+            val cropRight = renderView.transformHelper.cropRight
+            val cropBottom = renderView.transformHelper.cropBottom
+            OpenPS.nativeUpdateTransform(mirrored, flipped, cropLeft, cropTop, cropRight, cropBottom)
             requestRender()
         }
     }

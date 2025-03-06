@@ -41,9 +41,12 @@ Java_com_pixpark_gpupixel_OpenPS_nativeInitWithImage(JNIEnv *env, jobject thiz,
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeUpdateTransform(JNIEnv *env, jobject thiz, jboolean mirrored, jboolean flipped) {
+Java_com_pixpark_gpupixel_OpenPS_nativeUpdateTransform(JNIEnv *env, jobject thiz,
+                                                       jboolean mirrored, jboolean flipped,
+                                                       jfloat crop_left, jfloat crop_top,
+                                                       jfloat crop_right, jfloat crop_bottom) {
   if (openPSHelper) {
-    openPSHelper->updateTransform(mirrored, flipped);
+    openPSHelper->updateTransform(mirrored, flipped, crop_left, crop_top, crop_right, crop_bottom);
   }
 }
 

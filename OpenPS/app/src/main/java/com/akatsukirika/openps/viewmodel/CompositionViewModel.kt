@@ -39,6 +39,12 @@ class CompositionViewModel : ViewModel() {
     // 裁剪出来的区域
     val croppedRect = MutableStateFlow(RectF())
 
+    // 裁剪出来的区域（归一化）
+    val croppedRectF = MutableStateFlow(RectF(0f, 0f, 1f, 1f))
+
+    // 上次裁剪的区域（归一化）
+    private var lastCroppedRectF: RectF = RectF(0f, 0f, 1f, 1f)
+
     val saveEvent = MutableSharedFlow<SaveEvent>(replay = 0)
 
     val resultBitmap = MutableStateFlow<Bitmap?>(null)
@@ -110,7 +116,13 @@ class CompositionViewModel : ViewModel() {
         val newTop = (cropRect.top - initialRect.top) / (initialRect.bottom - initialRect.top)
         val newRight = (cropRect.right - initialRect.left) / (initialRect.right - initialRect.left)
         val newBottom = (cropRect.bottom - initialRect.top) / (initialRect.bottom - initialRect.top)
-        Log.d("CompositionViewModel", "newLeft: $newLeft, newTop: $newTop, newRight: $newRight, newBottom: $newBottom")
+        lastCroppedRectF = croppedRectF.value
+        croppedRectF.value = RectF(
+            lastCroppedRectF.left + newLeft * (lastCroppedRectF.right - lastCroppedRectF.left),
+            lastCroppedRectF.top + newTop * (lastCroppedRectF.bottom - lastCroppedRectF.top),
+            lastCroppedRectF.left + newRight * (lastCroppedRectF.right - lastCroppedRectF.left),
+            lastCroppedRectF.top + newBottom * (lastCroppedRectF.bottom - lastCroppedRectF.top)
+        )
         originalBitmap?.let {
             val croppedBitmap = BitmapUtils.cropBitmap(it, newLeft, newTop, newRight, newBottom).scaleToEven()
             Log.d("CompositionViewModel", "croppedBitmap: ${croppedBitmap.width}, ${croppedBitmap.height}")

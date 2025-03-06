@@ -80,6 +80,13 @@ class CompositionFragment : Fragment() {
                     renderView.doRotateTransform(it)
                 }
             }
+
+            launch {
+                viewModel.croppedRectF.collect {
+                    Log.d("CompositionFragment", "croppedRect = $it")
+                    renderView.transformHelper.setCropRect(it)
+                }
+            }
         }
 
         return ComposeView(requireContext()).apply {
