@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.RectF
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.R
@@ -39,7 +40,6 @@ import com.akatsukirika.openps.utils.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
-import com.pixpark.gpupixel.OpenGLTransformHelper
 import com.pixpark.gpupixel.OpenPSHelper
 import com.pixpark.gpupixel.model.OpenPSRecord
 import com.pixpark.gpupixel.model.RenderViewInfo
@@ -60,6 +60,7 @@ class EditViewModel : ViewModel() {
         fun onRenderViewInfoReady(info: RenderViewInfo)
         fun mirror(newState: Boolean)
         fun flip(newState: Boolean)
+        fun setCropRect(rect: RectF)
     }
 
     var helper: OpenPSHelper? = null
@@ -243,8 +244,19 @@ class EditViewModel : ViewModel() {
                 helper?.getRenderViewInfo()?.let {
                     callback?.onRenderViewInfoReady(it)
                 }
+                cropSkinMask()
             }
         }
+    }
+
+    /**
+     * 构图更改，根据裁剪区域将皮肤掩膜一同裁剪
+     */
+    private suspend fun cropSkinMask() = withContext(Dispatchers.IO) {
+        val cropRect = helper?.getCropRect() ?: return@withContext
+        val originalSkinMask = skinMaskBitmap ?: return@withContext
+        val cropResult = BitmapUtils.cropBitmap(originalSkinMask, cropRect.left, cropRect.top, cropRect.right, cropRect.bottom)
+        Log.d("xuanTest", "cropResult width: ${cropResult.width}, height: ${cropResult.height}")
     }
 
     private fun updateHelperValue(addRecord: Boolean = false) {
@@ -357,6 +369,10 @@ class EditViewModel : ViewModel() {
     private fun updateTransform(record: OpenPSRecord) {
         callback?.mirror(record.isMirrored)
         callback?.flip(record.isFlipped)
+        callback?.setCropRect(RectF(record.croppedLeft, record.croppedTop, record.croppedRight, record.croppedBottom))
+        viewModelScope.launch {
+            cropSkinMask()
+        }
     }
 
     private fun startImageFilter(context: Context, bitmap: Bitmap) {

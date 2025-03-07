@@ -1,6 +1,7 @@
 package com.pixpark.gpupixel
 
 import android.graphics.Bitmap
+import android.graphics.RectF
 import android.util.Log
 import com.pixpark.gpupixel.GPUPixel.GPUPixelLandmarkCallback
 import com.pixpark.gpupixel.model.LandmarkResult
@@ -58,6 +59,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
             requestRender()
         }
     }
+
+    fun getCropRect() = RectF(
+        renderView.transformHelper.cropLeft,
+        renderView.transformHelper.cropTop,
+        renderView.transformHelper.cropRight,
+        renderView.transformHelper.cropBottom
+    )
 
     fun changeImage(bitmap: Bitmap) {
         val width = bitmap.width

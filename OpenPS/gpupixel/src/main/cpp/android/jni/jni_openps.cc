@@ -298,12 +298,13 @@ Java_com_pixpark_gpupixel_OpenPS_nativeUndo(JNIEnv *env, jobject thiz) {
       return nullptr;
     }
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
-    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFZZ)V");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFZZFFFF)V");
     jobject kotlinObject = env->NewObject(kotlinClass, constructor, record->smoothLevel, record->whiteLevel,
                                           record->lipstickLevel, record->blusherLevel, record->eyeZoomLevel,
                                           record->faceSlimLevel, record->contrastLevel, record->exposureLevel,
                                           record->saturationLevel, record->sharpnessLevel, record->brightnessLevel,
-                                          record->customFilterType, record->customFilterIntensity, record->isMirrored, record->isFlipped);
+                                          record->customFilterType, record->customFilterIntensity, record->isMirrored, record->isFlipped,
+                                          record->croppedLeft, record->croppedTop, record->croppedRight, record->croppedBottom);
     return kotlinObject;
   }
   return nullptr;
@@ -317,12 +318,13 @@ Java_com_pixpark_gpupixel_OpenPS_nativeRedo(JNIEnv *env, jobject thiz) {
       return nullptr;
     }
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
-    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFZZ)V");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFZZFFFF)V");
     jobject kotlinObject = env->NewObject(kotlinClass, constructor, record->smoothLevel, record->whiteLevel,
                                           record->lipstickLevel, record->blusherLevel, record->eyeZoomLevel,
                                           record->faceSlimLevel, record->contrastLevel, record->exposureLevel,
                                           record->saturationLevel, record->sharpnessLevel, record->brightnessLevel,
-                                          record->customFilterType, record->customFilterIntensity, record->isMirrored, record->isFlipped);
+                                          record->customFilterType, record->customFilterIntensity, record->isMirrored, record->isFlipped,
+                                          record->croppedLeft, record->croppedTop, record->croppedRight, record->croppedBottom);
     return kotlinObject;
   }
   return nullptr;

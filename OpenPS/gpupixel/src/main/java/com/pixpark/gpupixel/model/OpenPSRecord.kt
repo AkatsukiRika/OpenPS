@@ -15,5 +15,9 @@ data class OpenPSRecord(
     val customFilterType: Int,
     val customFilterIntensity: Float,
     val isMirrored: Boolean,
-    val isFlipped: Boolean
+    val isFlipped: Boolean,
+    val croppedLeft: Float,
+    val croppedTop: Float,
+    val croppedRight: Float,
+    val croppedBottom: Float,
 )

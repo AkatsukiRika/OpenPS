@@ -131,6 +131,10 @@ class EditActivity : AppCompatActivity() {
                 override fun flip(newState: Boolean) {
                     binding.surfaceView.doFlipTransform(newState)
                 }
+
+                override fun setCropRect(rect: RectF) {
+                    binding.surfaceView.transformHelper.setCropRect(rect)
+                }
             }
         )
 
