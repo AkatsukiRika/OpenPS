@@ -54,6 +54,10 @@ import kotlin.math.abs
 import kotlin.math.max
 
 class EditViewModel : ViewModel() {
+    companion object {
+        const val FILENAME_SKIN_MASK = "skin_mask.png"
+    }
+
     interface Callback {
         fun showOverlayView(info: RenderViewInfo, faceRectF: RectF)
         fun setDebugImage(bitmap: Bitmap)
@@ -256,7 +260,8 @@ class EditViewModel : ViewModel() {
         val cropRect = helper?.getCropRect() ?: return@withContext
         val originalSkinMask = skinMaskBitmap ?: return@withContext
         val cropResult = BitmapUtils.cropBitmap(originalSkinMask, cropRect.left, cropRect.top, cropRect.right, cropRect.bottom)
-        Log.d("xuanTest", "cropResult width: ${cropResult.width}, height: ${cropResult.height}")
+        BitmapUtils.saveBitmapToFile(cropResult, GPUPixel.getResource_path(), FILENAME_SKIN_MASK)
+        helper?.updateSkinMask()
     }
 
     private fun updateHelperValue(addRecord: Boolean = false) {
@@ -439,7 +444,7 @@ class EditViewModel : ViewModel() {
                     // 5. 把皮肤分割结果保存到资源目录
                     skinMaskBitmap = BitmapUtils.mergeBitmap(bitmap, skinMaskBitmap!!, faceRectLeft, faceRectTop, faceRectRight, faceRectBottom)
                     skinMaskBitmap?.let {
-                        BitmapUtils.saveBitmapToFile(it, GPUPixel.getResource_path(), "skin_mask.png")
+                        BitmapUtils.saveBitmapToFile(it, GPUPixel.getResource_path(), FILENAME_SKIN_MASK)
 
                         withContext(Dispatchers.Main) {
                             callback?.setDebugImage(it)

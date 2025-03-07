@@ -26,6 +26,7 @@ class GPUPIXEL_API BeautyFaceFilter : public FilterGroup {
   void setBlurAlpha(float blurAlpha);
   void setWhite(float white);
   void setRadius(float sigma);
+  void updateSkinMask();
 
   virtual void setInputFramebuffer(std::shared_ptr<Framebuffer> framebuffer,
                                    RotationMode rotationMode /* = NoRotation*/,

@@ -69,6 +69,8 @@ public:
 
   void applyCustomFilter(int type, float level = 1, bool addRecord = false);
 
+  void updateSkinMask();
+
   void onCompareBegin();
 
   void onCompareEnd();

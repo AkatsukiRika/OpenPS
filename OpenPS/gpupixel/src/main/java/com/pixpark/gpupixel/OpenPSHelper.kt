@@ -190,6 +190,13 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
+    fun updateSkinMask() {
+        renderView.postOnGLThread {
+            OpenPS.nativeUpdateSkinMask()
+            requestRender()
+        }
+    }
+
     fun onCompareBegin() {
         renderView.postOnGLThread {
             OpenPS.nativeCompareBegin()

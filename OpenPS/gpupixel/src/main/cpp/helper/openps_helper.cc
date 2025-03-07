@@ -314,6 +314,12 @@ void gpupixel::OpenPSHelper::applyCustomFilter(int type, float level, bool addRe
   }
 }
 
+void gpupixel::OpenPSHelper::updateSkinMask() {
+  if (beautyFaceFilter) {
+    beautyFaceFilter->updateSkinMask();
+  }
+}
+
 void gpupixel::OpenPSHelper::onCompareBegin() {
   if (targetView) {
     targetView->onCompareBegin();

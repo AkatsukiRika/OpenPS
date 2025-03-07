@@ -23,7 +23,7 @@ class GPUPIXEL_API BeautyFaceUnitFilter : public Filter {
   void setSharpen(float sharpen);
   void setBlurAlpha(float blurAlpha);
   void setWhite(float white);
-  void setSkinMaskTexture(const int width, const int height, int channel_count, const unsigned char *data);
+  void updateSkinMaskTexture();
 
  protected:
   BeautyFaceUnitFilter();

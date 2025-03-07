@@ -61,6 +61,8 @@ internal object OpenPS {
 
     external fun nativeApplyCustomFilter(type: Int, level: Float = 1f, addRecord: Boolean = false)
 
+    external fun nativeUpdateSkinMask()
+
     external fun nativeCompareBegin()
 
     external fun nativeCompareEnd()

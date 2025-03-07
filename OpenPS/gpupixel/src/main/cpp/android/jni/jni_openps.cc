@@ -252,6 +252,13 @@ Java_com_pixpark_gpupixel_OpenPS_nativeApplyCustomFilter(JNIEnv *env, jobject th
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeUpdateSkinMask(JNIEnv *env, jobject thiz) {
+  if (openPSHelper) {
+    openPSHelper->updateSkinMask();
+  }
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeCompareBegin(JNIEnv *env, jobject thiz) {
   if (openPSHelper) {
     openPSHelper->onCompareBegin();
