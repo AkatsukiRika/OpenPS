@@ -150,6 +150,26 @@ Java_com_pixpark_gpupixel_OpenPS_nativeSetLandmarkCallback(JNIEnv *env, jobject 
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_pixpark_gpupixel_OpenPS_nativeManualDetectFace(JNIEnv *env, jobject thiz, jobject receiver) {
+  if (openPSHelper) {
+    jobject globalReceiver = env->NewGlobalRef(receiver);
+    openPSHelper->manualDetectFace([env, globalReceiver](std::vector<float> landmarks, std::vector<float> rect) {
+      jclass receiverClass = env->GetObjectClass(globalReceiver);
+      jmethodID methodId = env->GetMethodID(receiverClass, "onLandmarkDetected", "([F[F)V");
+
+      jfloatArray arr = env->NewFloatArray(landmarks.size());
+      env->SetFloatArrayRegion( arr, 0, landmarks.size(), landmarks.data());
+      jfloatArray rectArr = env->NewFloatArray(rect.size());
+      env->SetFloatArrayRegion(rectArr, 0, rect.size(), rect.data());
+      env->CallVoidMethod(globalReceiver, methodId, arr, rectArr);
+
+      env->DeleteLocalRef(arr);
+      env->DeleteLocalRef(rectArr);
+    });
+  }
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeSetRawOutputCallback(JNIEnv *env, jobject thiz, jobject receiver) {
   if (openPSHelper) {
     jobject globalReceiver = env->NewGlobalRef(receiver);

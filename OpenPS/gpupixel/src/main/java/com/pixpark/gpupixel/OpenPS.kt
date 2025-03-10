@@ -35,6 +35,8 @@ internal object OpenPS {
 
     external fun nativeSetLandmarkCallback(receiver: Any)
 
+    external fun nativeManualDetectFace(receiver: Any)
+
     external fun nativeSetRawOutputCallback(receiver: Any)
 
     external fun nativeSetSmoothLevel(level: Float, addRecord: Boolean = false)

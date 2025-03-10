@@ -267,6 +267,20 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         deferred.await()
     }
 
+    suspend fun getManualDetectFaceLandmark(): LandmarkResult = withContext(Dispatchers.Main) {
+        val deferred = CompletableDeferred<LandmarkResult>()
+
+        manualDetectFace(object : GPUPixelLandmarkCallback {
+            override fun onFaceLandmark(landmarks: FloatArray?) {}
+
+            override fun onFaceLandmark(landmarks: FloatArray?, rect: FloatArray?) {
+                deferred.complete(LandmarkResult(landmarks, rect))
+            }
+        })
+
+        deferred.await()
+    }
+
     suspend fun getResultPixels(): PixelsResult = withContext(Dispatchers.Main) {
         val deferred = CompletableDeferred<PixelsResult>()
 
@@ -293,6 +307,15 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
 
         renderView.postOnGLThread {
             OpenPS.nativeSetLandmarkCallback(this)
+            requestRender()
+        }
+    }
+
+    private fun manualDetectFace(callback: GPUPixelLandmarkCallback) {
+        landmarkCallback = callback
+
+        renderView.postOnGLThread {
+            OpenPS.nativeManualDetectFace(this)
             requestRender()
         }
     }

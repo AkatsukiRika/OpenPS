@@ -43,6 +43,8 @@ public:
 
   void setLandmarkCallback(FaceDetectorCallback callback);
 
+  void manualDetectFace(const FaceDetectorCallback& callback);
+
   void setRawOutputCallback(RawOutputCallback callback);
 
   void setSmoothLevel(float level, bool addRecord = false);

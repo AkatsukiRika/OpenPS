@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.RectF
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.R
@@ -37,6 +36,7 @@ import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.BitmapUtils
 import com.akatsukirika.openps.utils.EvenDimensionsTransformation
 import com.akatsukirika.openps.utils.ToastUtils
+import com.akatsukirika.openps.utils.appContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
@@ -249,6 +249,7 @@ class EditViewModel : ViewModel() {
                     callback?.onRenderViewInfoReady(it)
                 }
                 cropSkinMask()
+                manualDetectFace()
             }
         }
     }
@@ -321,7 +322,7 @@ class EditViewModel : ViewModel() {
             val record = helper?.undo()
             record?.let {
                 updateMap(it)
-                updateTransform(it)
+                updateAfterComposition(it)
             }
             refreshUndoRedo()
         }
@@ -335,7 +336,7 @@ class EditViewModel : ViewModel() {
             val record = helper?.redo()
             record?.let {
                 updateMap(it)
-                updateTransform(it)
+                updateAfterComposition(it)
             }
             refreshUndoRedo()
         }
@@ -371,13 +372,14 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    private fun updateTransform(record: OpenPSRecord) {
+    private fun updateAfterComposition(record: OpenPSRecord) {
         callback?.mirror(record.isMirrored)
         callback?.flip(record.isFlipped)
         callback?.setCropRect(RectF(record.croppedLeft, record.croppedTop, record.croppedRight, record.croppedBottom))
         viewModelScope.launch {
             cropSkinMask()
         }
+        manualDetectFace()
     }
 
     private fun startImageFilter(context: Context, bitmap: Bitmap) {
@@ -471,6 +473,46 @@ class EditViewModel : ViewModel() {
                     helper?.buildNoFaceRenderPipeline()
                     helper?.requestRender()
                 }
+            }
+        }
+    }
+
+    /**
+     * 构图房间换图后，用新图重新检测人脸点
+     */
+    private fun manualDetectFace() {
+        viewModelScope.launch(Dispatchers.Main) {
+            _loadStatus.emit(STATUS_LOADING)
+
+            // 1. 从Native层获取VNN人脸识别的结果
+            val landmarkResult = helper?.getManualDetectFaceLandmark()
+            val rect = landmarkResult?.rect
+            if (rect != null && rect.size == 4) {
+                val rectLeft = rect[0]
+                val rectTop = rect[1]
+                val rectRight = rect[2]
+                val rectBottom = rect[3]
+                val rectWidth = abs(rectRight - rectLeft)
+                val rectHeight = abs(rectBottom - rectTop)
+
+                // 2. 适当扩大人脸框的区域
+                faceRectLeft = (rectLeft - rectWidth * faceRectExpandRatio).coerceAtLeast(0f)
+                faceRectTop = (rectTop - rectHeight * faceRectExpandRatio).coerceAtLeast(0f)
+                faceRectRight = (rectRight + rectWidth * faceRectExpandRatio).coerceAtMost(1f)
+                faceRectBottom = (rectBottom + rectHeight * faceRectExpandRatio).coerceAtMost(1f)
+
+                // 3. 根据原图缩放比例展示人脸框
+                val renderViewInfo = helper?.getRenderViewInfo()
+                renderViewInfo?.let { info ->
+                    callback?.showOverlayView(info, RectF(faceRectLeft, faceRectTop, faceRectRight, faceRectBottom))
+                }
+
+                _loadStatus.emit(STATUS_SUCCESS)
+            } else {
+                // 人脸识别失败
+                _loadStatus.emit(STATUS_ERROR)
+                _selectedTabIndex.emit(TAB_ADJUST)
+                ToastUtils.showToast(appContext, appContext.getString(R.string.msg_face_detect_fail))
             }
         }
     }

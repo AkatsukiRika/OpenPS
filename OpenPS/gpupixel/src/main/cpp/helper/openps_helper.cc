@@ -168,6 +168,15 @@ void gpupixel::OpenPSHelper::setLandmarkCallback(gpupixel::FaceDetectorCallback 
   gpuSourceImage->RegLandmarkCallback(callback);
 }
 
+void gpupixel::OpenPSHelper::manualDetectFace(const gpupixel::FaceDetectorCallback& callback) {
+  gpuSourceImage->RegLandmarkCallback([=](const std::vector<float>& landmarks, std::vector<float> rect) {
+    lipstickFilter->SetFaceLandmarks(landmarks);
+    blusherFilter->SetFaceLandmarks(landmarks);
+    faceReshapeFilter->SetFaceLandmarks(landmarks);
+    callback(landmarks, std::move(rect));
+  });
+}
+
 void gpupixel::OpenPSHelper::setRawOutputCallback(gpupixel::RawOutputCallback callback) {
   if (targetRawDataOutput) {
     targetRawDataOutput->setPixelsCallbck(callback);
