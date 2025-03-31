@@ -57,13 +57,19 @@ void gpupixel::OpenPSHelper::changeImage(int width, int height,
   }
 }
 
-void gpupixel::OpenPSHelper::updateTransform(bool mirrored, bool flipped, float cropLeft, float cropTop, float cropRight, float cropBottom) {
+void gpupixel::OpenPSHelper::updateTransform(
+  bool mirrored, bool flipped,
+  float cropLeft, float cropTop,
+  float cropRight, float cropBottom,
+  float rotation
+) {
   isMirrored = mirrored;
   isFlipped = flipped;
   croppedLeft = cropLeft;
   croppedTop = cropTop;
   croppedRight = cropRight;
   croppedBottom = cropBottom;
+  rotationDegrees = rotation;
 }
 
 void gpupixel::OpenPSHelper::changeImage(std::string filename) {
@@ -485,7 +491,8 @@ void gpupixel::OpenPSHelper::addUndoRedoRecord() {
       contrastRecordLevel, exposureRecordLevel, saturationRecordLevel,
       sharpnessRecordLevel, brightnessRecordLevel, customFilterType,
       customFilterLevel, currentImageFileName, isMirrored, isFlipped,
-      croppedLeft, croppedTop, croppedRight, croppedBottom);
+      croppedLeft, croppedTop, croppedRight, croppedBottom,
+      rotationDegrees);
   undoRedoHelper.addRecord(record);
 }
 

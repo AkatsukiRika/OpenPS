@@ -15,7 +15,12 @@ internal object OpenPS {
 
     external fun nativeInitWithImage(width: Int, height: Int, channelCount: Int, bitmap: Bitmap, filename: String? = null)
 
-    external fun nativeUpdateTransform(mirrored: Boolean, flipped: Boolean, cropLeft: Float, cropTop: Float, cropRight: Float, cropBottom: Float)
+    external fun nativeUpdateTransform(
+        mirrored: Boolean, flipped: Boolean,
+        cropLeft: Float, cropTop: Float,
+        cropRight: Float, cropBottom: Float,
+        rotation: Float
+    )
 
     external fun nativeChangeImage(width: Int, height: Int, channelCount: Int, bitmap: Bitmap, filename: String? = null)
 

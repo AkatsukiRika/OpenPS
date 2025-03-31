@@ -55,7 +55,8 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
             val cropTop = renderView.transformHelper.cropTop
             val cropRight = renderView.transformHelper.cropRight
             val cropBottom = renderView.transformHelper.cropBottom
-            OpenPS.nativeUpdateTransform(mirrored, flipped, cropLeft, cropTop, cropRight, cropBottom)
+            val rotation = renderView.transformHelper.currentRotation
+            OpenPS.nativeUpdateTransform(mirrored, flipped, cropLeft, cropTop, cropRight, cropBottom, rotation)
             requestRender()
         }
     }

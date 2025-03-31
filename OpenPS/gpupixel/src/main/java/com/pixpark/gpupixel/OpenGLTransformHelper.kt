@@ -91,7 +91,7 @@ class OpenGLTransformHelper {
 
         // 将计算后的旋转矩阵与当前的 glMatrix 相乘
         Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
-        if (!isFirstRotate) {
+        if (!isFirstRotate && deltaRotation in listOf(90f, 270f, -90f, -270f)) {
             adjustScaleForRotation()
         }
         isFirstRotate = false

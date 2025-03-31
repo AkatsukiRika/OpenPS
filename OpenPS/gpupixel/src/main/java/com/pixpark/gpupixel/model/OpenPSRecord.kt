@@ -20,4 +20,5 @@ data class OpenPSRecord(
     val croppedTop: Float,
     val croppedRight: Float,
     val croppedBottom: Float,
+    val rotationDegrees: Float
 )

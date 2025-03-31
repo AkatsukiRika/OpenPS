@@ -36,6 +36,7 @@ public:
   const float croppedTop;
   const float croppedRight;
   const float croppedBottom;
+  const float rotationDegrees;
 
   std::string toString() const override {
     return Util::str_format(
@@ -44,12 +45,14 @@ public:
         "exposureLevel: %f, saturationLevel: %f, sharpnessLevel: %f, "
         "brightnessLevel: %f, customFilterType: %d, customFilterIntensity: %f, "
         "imageFileName: %s, isMirrored: %d, isFlipped: %d, "
-        "croppedLeft: %f, croppedTop: %f, croppedRight: %f, croppedBottom: %f",
+        "croppedLeft: %f, croppedTop: %f, croppedRight: %f, croppedBottom: %f, "
+        "rotationDegrees: %f",
         smoothLevel, whiteLevel, lipstickLevel, blusherLevel, eyeZoomLevel,
         faceSlimLevel, contrastLevel, exposureLevel, saturationLevel,
         sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity,
         imageFileName.c_str(), isMirrored, isFlipped,
-        croppedLeft, croppedTop, croppedRight, croppedBottom);
+        croppedLeft, croppedTop, croppedRight, croppedBottom,
+        rotationDegrees);
   }
 
   bool equals(const AbstractRecord& anotherRecord) const override {
@@ -84,6 +87,7 @@ public:
            croppedTop == record->croppedTop &&
            croppedRight == record->croppedRight &&
            croppedBottom == record->croppedBottom &&
+           rotationDegrees == record->rotationDegrees &&
            customFilterEquals;
   }
 
@@ -92,7 +96,8 @@ public:
                             eyeZoomLevel, faceSlimLevel, contrastLevel, exposureLevel,
                             saturationLevel, sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity,
                             imageFileName, isMirrored, isFlipped,
-                            croppedLeft, croppedTop, croppedRight, croppedBottom);
+                            croppedLeft, croppedTop, croppedRight, croppedBottom,
+                            rotationDegrees);
   }
 
   OpenPSRecord(float smoothLevel, float whiteLevel, float lipstickLevel,
@@ -100,7 +105,8 @@ public:
                float contrastLevel, float exposureLevel, float saturationLevel,
                float sharpnessLevel, float brightnessLevel, int customFilterType, float customFilterIntensity,
                std::string imageFileName = "", bool isMirrored = false, bool isFlipped = false,
-               float croppedLeft = 0, float croppedTop = 0, float croppedRight = 1, float croppedBottom = 1)
+               float croppedLeft = 0, float croppedTop = 0, float croppedRight = 1, float croppedBottom = 1,
+               float rotationDegrees = 0)
       : smoothLevel(smoothLevel), whiteLevel(whiteLevel),
         lipstickLevel(lipstickLevel), blusherLevel(blusherLevel),
         eyeZoomLevel(eyeZoomLevel), faceSlimLevel(faceSlimLevel),
@@ -108,7 +114,8 @@ public:
         saturationLevel(saturationLevel), sharpnessLevel(sharpnessLevel),
         brightnessLevel(brightnessLevel), customFilterType(customFilterType), customFilterIntensity(customFilterIntensity),
         imageFileName(imageFileName), isMirrored(isMirrored), isFlipped(isFlipped),
-        croppedLeft(croppedLeft), croppedTop(croppedTop), croppedRight(croppedRight), croppedBottom(croppedBottom) {};
+        croppedLeft(croppedLeft), croppedTop(croppedTop), croppedRight(croppedRight), croppedBottom(croppedBottom),
+        rotationDegrees(rotationDegrees) {};
 };
 
 NS_GPUPIXEL_END
