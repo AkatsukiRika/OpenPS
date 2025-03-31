@@ -29,7 +29,7 @@ class OpenGLTransformHelper {
         private set
     var cropBottom = 0f
         private set
-    private var currentRotation: Float = 0f
+    var currentRotation: Float = 0f
     var isFirstRotate = true
 
     init {
@@ -97,15 +97,26 @@ class OpenGLTransformHelper {
         isFirstRotate = false
     }
 
-    private fun adjustScaleForRotation() {
-        // 计算宽高比
-        val aspect = viewportWidth / viewportHeight
-        // 构造一个额外的缩放矩阵，交换宽高方向的缩放比
+    private fun recoverRotationAfterReset() {
+        val centerX = renderRect.centerX()
+        val centerY = renderRect.centerY()
+        val glFocusX = (centerX - viewportWidth / 2f) / (viewportWidth / 2f)
+        val glFocusY = (viewportHeight / 2f - centerY) / (viewportHeight / 2f)
+
         Matrix.setIdentityM(tempMatrix, 0)
-        // 为了保持显示比例，我们需要将 X 和 Y 的缩放因子互换
-        Matrix.scaleM(tempMatrix, 0, 1 / aspect, aspect, 1f)
-        // 将这个矩阵应用到 MVP 或当前的 glMatrix 上，这里以叠加方式为例
+        Matrix.translateM(tempMatrix, 0, glFocusX, glFocusY, 0f)
+        Matrix.rotateM(tempMatrix, 0, currentRotation, 0f, 0f, 1f)
+        Matrix.translateM(tempMatrix, 0, -glFocusX, -glFocusY, 0f)
         Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
+
+        if (currentRotation in listOf(90f, 270f, -90f, -270f)) {
+            adjustScaleForRotation()
+        }
+    }
+
+    private fun adjustScaleForRotation() {
+        val aspect = viewportWidth / viewportHeight
+        postScaleNonUniform(1 / aspect, aspect)
     }
 
     fun mirror(newState: Boolean) {
@@ -179,6 +190,7 @@ class OpenGLTransformHelper {
             if (isFlipped) {
                 postScaleNonUniform(1f, -1f)
             }
+            recoverRotationAfterReset()
         }
     }
 

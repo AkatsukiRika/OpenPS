@@ -44,6 +44,7 @@ import com.pixpark.gpupixel.view.OpenPSRenderView
 import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class CompositionFragment : Fragment() {
     private val viewModel: CompositionViewModel
@@ -56,7 +57,8 @@ class CompositionFragment : Fragment() {
         viewModel.initStates(
             originalBitmap = (requireActivity() as EditActivity).viewModel.currentBitmap,
             mirrorState = renderView.transformHelper.isMirrored,
-            flipState = renderView.transformHelper.isFlipped
+            flipState = renderView.transformHelper.isFlipped,
+            rotation = renderView.transformHelper.currentRotation.roundToInt()
         )
 
         renderView.enterComposition()

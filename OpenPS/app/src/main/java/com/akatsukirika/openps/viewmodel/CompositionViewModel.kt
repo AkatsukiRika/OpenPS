@@ -57,6 +57,8 @@ class CompositionViewModel : ViewModel() {
 
     private var initialFlipState: Boolean = false
 
+    private var initialRotationDegrees: Int = 0
+
     private var isSave = false
 
     init {
@@ -72,8 +74,8 @@ class CompositionViewModel : ViewModel() {
             }
 
             launch {
-                combine(isRectChanged, isMirrored, isFlipped) { flow1, flow2, flow3 ->
-                    canSave.value = flow1 || (flow2 != initialMirrorState) || (flow3 != initialFlipState)
+                combine(isRectChanged, isMirrored, isFlipped, rotationDegrees) { flow1, flow2, flow3, flow4 ->
+                    canSave.value = flow1 || (flow2 != initialMirrorState) || (flow3 != initialFlipState) || (flow4 != initialRotationDegrees)
                 }.collect {}
             }
 
@@ -85,7 +87,7 @@ class CompositionViewModel : ViewModel() {
         }
     }
 
-    fun initStates(originalBitmap: Bitmap? = null, mirrorState: Boolean, flipState: Boolean) {
+    fun initStates(originalBitmap: Bitmap? = null, mirrorState: Boolean, flipState: Boolean, rotation: Int) {
         currentTab.value = CompositionTab.CROP
         currentCropOptions.value = CropOptions.CUSTOM
         isRectChanged.value = false
@@ -93,6 +95,8 @@ class CompositionViewModel : ViewModel() {
         initialMirrorState = mirrorState
         isFlipped.value = flipState
         initialFlipState = flipState
+        rotationDegrees.value = rotation
+        initialRotationDegrees = rotation
         canSave.value = false
         isSave = false
         this.originalBitmap = originalBitmap
@@ -144,6 +148,7 @@ class CompositionViewModel : ViewModel() {
         if (!isSave) {
             isMirrored.value = initialMirrorState
             isFlipped.value = initialFlipState
+            rotationDegrees.value = initialRotationDegrees
         }
     }
 }
