@@ -24,7 +24,7 @@ class OpenPSRenderView : GLSurfaceView {
 
     constructor(context: Context) : super(context)
 
-    private val renderer: OpenPSRenderer
+    val renderer: OpenPSRenderer
     private val scaleGestureDetector: ScaleGestureDetector
     private val gestureDetector: GestureDetector
     private val matrix = Matrix()   // 上层记录手势变换的矩阵（以图片默认适配为初始状态）

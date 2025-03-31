@@ -237,13 +237,17 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
 
     suspend fun undo() = suspendCoroutine {
         renderView.postOnGLThread {
-            it.resume(OpenPS.nativeUndo())
+            val result = OpenPS.nativeUndo()
+            requestRender()
+            it.resume(result)
         }
     }
 
     suspend fun redo() = suspendCoroutine {
         renderView.postOnGLThread {
-            it.resume(OpenPS.nativeRedo())
+            val result = OpenPS.nativeRedo()
+            requestRender()
+            it.resume(result)
         }
     }
 
@@ -317,6 +321,7 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
 
         renderView.postOnGLThread {
             OpenPS.nativeManualDetectFace(this)
+            renderView.renderer.forceRenderImage = true
             requestRender()
         }
     }

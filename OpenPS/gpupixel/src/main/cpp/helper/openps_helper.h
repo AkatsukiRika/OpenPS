@@ -44,7 +44,7 @@ public:
 
   void buildNoFaceRenderPipeline();
 
-  void requestRender();
+  void requestRender(bool forceRenderImage);
 
   void setLandmarkCallback(FaceDetectorCallback callback);
 

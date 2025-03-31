@@ -162,8 +162,13 @@ void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
   }
 }
 
-void gpupixel::OpenPSHelper::requestRender() {
+void gpupixel::OpenPSHelper::requestRender(bool forceRenderImage) {
   if (gpuSourceImage) {
+    if (forceRenderImage) {
+      gpuSourceImage->Render();
+      return;
+    }
+
     if (matrixUpdated && imageCompareFilter && imageCompareFilter->getFramebuffer()) {
       imageCompareFilter->updateTargets(0, false);
       if (!targetView->updateMatrixState()) {

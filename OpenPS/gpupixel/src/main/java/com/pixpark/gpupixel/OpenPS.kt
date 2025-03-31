@@ -36,7 +36,7 @@ internal object OpenPS {
 
     external fun nativeBuildNoFaceRenderPipeline()
 
-    external fun nativeRequestRender()
+    external fun nativeRequestRender(forceRenderImage: Boolean)
 
     external fun nativeSetLandmarkCallback(receiver: Any)
 

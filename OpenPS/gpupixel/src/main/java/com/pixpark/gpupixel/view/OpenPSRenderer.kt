@@ -5,13 +5,14 @@ import com.pixpark.gpupixel.OpenPS
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-internal class OpenPSRenderer(private val callback: Callback) : GLSurfaceView.Renderer {
+class OpenPSRenderer(private val callback: Callback) : GLSurfaceView.Renderer {
     interface Callback {
         fun onFrameRateChanged(fps: Double)
     }
 
     private var lastFrameTime = 0L
     private var frameCount = 0L
+    var forceRenderImage = false
 
     override fun onSurfaceCreated(p0: GL10?, p1: EGLConfig?) {
         OpenPS.nativeInit()
@@ -35,6 +36,7 @@ internal class OpenPSRenderer(private val callback: Callback) : GLSurfaceView.Re
         } else {
             lastFrameTime = currentTime
         }
-        OpenPS.nativeRequestRender()
+        OpenPS.nativeRequestRender(forceRenderImage)
+        forceRenderImage = false
     }
 }
