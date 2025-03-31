@@ -151,10 +151,27 @@ class OpenGLTransformHelper {
     }
 
     fun postTranslate(dx: Float, dy: Float, fromUser: Boolean = true) {
-        val glDx = (dx / viewportWidth) * 2f / currentScale
-        val glDy = (-dy / viewportHeight) * 2f / currentScale
+        var glDx = (dx / viewportWidth) * 2f / currentScale
+        var glDy = (-dy / viewportHeight) * 2f / currentScale
 
         if (fromUser) {
+            val aspectRatio = viewportWidth / viewportHeight
+            when (currentRotation) {
+                90f, -270f -> {
+                    val temp = glDx
+                    glDx = glDy / aspectRatio
+                    glDy = -temp * aspectRatio
+                }
+                180f, -180f -> {
+                    glDx = -glDx
+                    glDy = -glDy
+                }
+                270f, -90f -> {
+                    val temp = glDx
+                    glDx = -glDy / aspectRatio
+                    glDy = temp * aspectRatio
+                }
+            }
             Matrix.translateM(glMatrix, 0, if (isMirrored) -glDx else glDx, if (isFlipped) -glDy else glDy, 0f)
         } else {
             Matrix.translateM(glMatrix, 0, glDx, glDy, 0f)
