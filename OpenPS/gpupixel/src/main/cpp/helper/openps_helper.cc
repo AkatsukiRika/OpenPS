@@ -124,9 +124,15 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   customFilter->setTexelSize(imageWidth, imageHeight);
   targetRawDataOutput = TargetRawDataOutput::create();
   gpuSourceImage->RegLandmarkCallback([=](std::vector<float> landmarks, std::vector<float> rect) {
-    lipstickFilter->SetFaceLandmarks(landmarks);
-    blusherFilter->SetFaceLandmarks(landmarks);
-    faceReshapeFilter->SetFaceLandmarks(landmarks);
+    if (lipstickFilter) {
+      lipstickFilter->SetFaceLandmarks(landmarks);
+    }
+    if (blusherFilter) {
+      blusherFilter->SetFaceLandmarks(landmarks);
+    }
+    if (faceReshapeFilter) {
+      faceReshapeFilter->SetFaceLandmarks(landmarks);
+    }
   });
   gpuSourceImage->addTarget(imageCompareFilter);
   imageCompareFilter->addTarget(targetView);
@@ -176,9 +182,15 @@ void gpupixel::OpenPSHelper::setLandmarkCallback(gpupixel::FaceDetectorCallback 
 
 void gpupixel::OpenPSHelper::manualDetectFace(const gpupixel::FaceDetectorCallback& callback) {
   gpuSourceImage->RegLandmarkCallback([=](const std::vector<float>& landmarks, std::vector<float> rect) {
-    lipstickFilter->SetFaceLandmarks(landmarks);
-    blusherFilter->SetFaceLandmarks(landmarks);
-    faceReshapeFilter->SetFaceLandmarks(landmarks);
+    if (lipstickFilter) {
+      lipstickFilter->SetFaceLandmarks(landmarks);
+    }
+    if (blusherFilter) {
+      blusherFilter->SetFaceLandmarks(landmarks);
+    }
+    if (faceReshapeFilter) {
+      faceReshapeFilter->SetFaceLandmarks(landmarks);
+    }
     callback(landmarks, std::move(rect));
   });
 }
