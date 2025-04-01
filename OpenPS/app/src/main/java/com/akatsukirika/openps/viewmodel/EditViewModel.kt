@@ -374,9 +374,6 @@ class EditViewModel : ViewModel() {
     }
 
     private fun updateAfterComposition(record: OpenPSRecord) {
-        callback?.mirror(record.isMirrored)
-        callback?.flip(record.isFlipped)
-        callback?.rotate(record.rotationDegrees)
         callback?.setCropRect(RectF(record.croppedLeft, record.croppedTop, record.croppedRight, record.croppedBottom))
         viewModelScope.launch {
             cropSkinMask()

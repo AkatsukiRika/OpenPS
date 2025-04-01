@@ -41,6 +41,9 @@ import com.akatsukirika.openps.compose.AppTheme
 import com.akatsukirika.openps.compose.CropOptions
 import com.akatsukirika.openps.viewmodel.CompositionViewModel
 import com.pixpark.gpupixel.view.OpenPSRenderView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
@@ -53,7 +56,11 @@ class CompositionFragment : Fragment() {
     private val renderView: OpenPSRenderView
         get() = (requireActivity() as EditActivity).binding.surfaceView
 
+    private var collectScope: CoroutineScope? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        collectScope = CoroutineScope(lifecycleScope.coroutineContext + SupervisorJob())
+
         viewModel.initStates(
             originalBitmap = (requireActivity() as EditActivity).viewModel.currentBitmap,
             mirrorState = renderView.transformHelper.isMirrored,
@@ -63,7 +70,7 @@ class CompositionFragment : Fragment() {
 
         renderView.enterComposition()
 
-        lifecycleScope.launch {
+        collectScope?.launch {
             launch {
                 viewModel.isMirrored.collect {
                     renderView.doMirrorTransform(it)
@@ -102,6 +109,7 @@ class CompositionFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        collectScope?.cancel()
         viewModel.restoreTransformStates()
     }
 }

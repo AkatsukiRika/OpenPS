@@ -201,13 +201,6 @@ class OpenGLTransformHelper {
                 rectTransformMatrix.postTranslate(0f, -bottomPadding / 2)
                 renderRect.transform(rectTransformMatrix)
             }
-            if (isMirrored) {
-                postScaleNonUniform(-1f, 1f)
-            }
-            if (isFlipped) {
-                postScaleNonUniform(1f, -1f)
-            }
-            recoverRotationAfterReset()
         }
     }
 
