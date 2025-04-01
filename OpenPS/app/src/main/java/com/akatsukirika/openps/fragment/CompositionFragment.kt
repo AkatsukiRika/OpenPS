@@ -50,6 +50,10 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 class CompositionFragment : Fragment() {
+    companion object {
+        const val TAG = "CompositionFragment"
+    }
+
     private val viewModel: CompositionViewModel
         get() = (requireActivity() as EditActivity).compositionViewModel
 
@@ -73,26 +77,28 @@ class CompositionFragment : Fragment() {
         collectScope?.launch {
             launch {
                 viewModel.isMirrored.collect {
+                    Log.d(TAG, "isMirrored = $it")
                     renderView.doMirrorTransform(it)
                 }
             }
 
             launch {
                 viewModel.isFlipped.collect {
+                    Log.d(TAG, "isFlipped = $it")
                     renderView.doFlipTransform(it)
                 }
             }
 
             launch {
                 viewModel.rotationDegrees.collect {
-                    Log.d("CompositionFragment", "rotationDegrees = $it")
+                    Log.d(TAG, "rotationDegrees = $it")
                     renderView.doRotateTransform(it)
                 }
             }
 
             launch {
                 viewModel.croppedRectF.collect {
-                    Log.d("CompositionFragment", "croppedRect = $it")
+                    Log.d(TAG, "croppedRect = $it")
                     renderView.transformHelper.setCropRect(it)
                 }
             }

@@ -86,6 +86,30 @@ object BitmapUtils {
         return Bitmap.createBitmap(bitmap, x, y, width, height)
     }
 
+    fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
+        if (degrees == 0f) {
+            return bitmap
+        }
+
+        val matrix = Matrix()
+        matrix.setRotate(degrees, bitmap.width / 2f, bitmap.height / 2f)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    fun mirrorBitmap(bitmap: Bitmap): Bitmap {
+        val matrix = Matrix()
+        // 水平镜像，x轴反转，y轴不变
+        matrix.postScale(-1f, 1f, bitmap.width / 2f, bitmap.height / 2f)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    fun flipBitmap(bitmap: Bitmap): Bitmap {
+        val matrix = Matrix()
+        // 垂直翻转，x轴不变，y轴反转
+        matrix.postScale(1f, -1f, bitmap.width / 2f, bitmap.height / 2f)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
     fun mergeBitmap(original: Bitmap, cropped: Bitmap, left: Float, top: Float, right: Float, bottom: Float): Bitmap {
         if (left < 0f || top < 0f || right > 1f || bottom > 1f || left >= right || top >= bottom) {
             throw IllegalArgumentException("Invalid merge parameters")

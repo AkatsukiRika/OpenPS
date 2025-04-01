@@ -248,9 +248,7 @@ private fun RotateOptionList(modifier: Modifier = Modifier, viewModel: Compositi
                 .width(70.dp)
                 .fillMaxHeight()
                 .clickable {
-                    scope.launch {
-                        viewModel.isMirrored.emit(!viewModel.isMirrored.value)
-                    }
+                    viewModel.mirror()
                 }
         ) {
             Icon(
@@ -277,9 +275,7 @@ private fun RotateOptionList(modifier: Modifier = Modifier, viewModel: Compositi
                 .width(70.dp)
                 .fillMaxHeight()
                 .clickable {
-                    scope.launch {
-                        viewModel.isFlipped.emit(!viewModel.isFlipped.value)
-                    }
+                    viewModel.flip()
                 }
         ) {
             Icon(

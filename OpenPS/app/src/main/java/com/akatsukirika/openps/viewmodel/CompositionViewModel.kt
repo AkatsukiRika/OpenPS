@@ -7,9 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akatsukirika.openps.compose.CompositionTab
 import com.akatsukirika.openps.compose.CropOptions
+import com.akatsukirika.openps.enum.RotateAction
 import com.akatsukirika.openps.utils.BitmapUtils
 import com.akatsukirika.openps.utils.BitmapUtils.scaleToEven
 import com.pixpark.gpupixel.model.RenderViewInfo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -60,6 +62,9 @@ class CompositionViewModel : ViewModel() {
     private var initialRotationDegrees: Int = 0
 
     private var isSave = false
+
+    // 按顺序记录整个房间内的所有旋转操作
+    private val rotateActionList = mutableListOf<RotateAction>()
 
     init {
         viewModelScope.launch {
@@ -128,20 +133,44 @@ class CompositionViewModel : ViewModel() {
             lastCroppedRectF.top + newBottom * (lastCroppedRectF.bottom - lastCroppedRectF.top)
         )
         originalBitmap?.let {
-            val croppedBitmap = BitmapUtils.cropBitmap(it, newLeft, newTop, newRight, newBottom).scaleToEven()
-            Log.d("CompositionViewModel", "croppedBitmap: ${croppedBitmap.width}, ${croppedBitmap.height}")
-            resultBitmap.value = croppedBitmap
+            viewModelScope.launch(Dispatchers.IO) {
+                val beginTime = System.currentTimeMillis()
+                var currentBitmap = it
+                currentBitmap = BitmapUtils.cropBitmap(currentBitmap, newLeft, newTop, newRight, newBottom).scaleToEven()
+                rotateActionList.forEach { action ->
+                    currentBitmap = when (action) {
+                        RotateAction.ROTATE_LEFT -> BitmapUtils.rotateBitmap(currentBitmap, -90f)
+                        RotateAction.ROTATE_RIGHT -> BitmapUtils.rotateBitmap(currentBitmap, 90f)
+                        RotateAction.MIRROR -> BitmapUtils.mirrorBitmap(currentBitmap)
+                        RotateAction.FLIP -> BitmapUtils.flipBitmap(currentBitmap)
+                    }
+                }
+                Log.d("CompositionViewModel", "Bitmap处理耗时: ${System.currentTimeMillis() - beginTime}ms")
+                resultBitmap.value = currentBitmap
+            }
         }
     }
 
     fun rotateLeft() {
         val newRotationDegrees = (rotationDegrees.value + 90) % 360
         rotationDegrees.value = newRotationDegrees
+        rotateActionList.add(RotateAction.ROTATE_LEFT)
     }
 
     fun rotateRight() {
         val newRotationDegrees = (rotationDegrees.value - 90) % 360
         rotationDegrees.value = newRotationDegrees
+        rotateActionList.add(RotateAction.ROTATE_RIGHT)
+    }
+
+    fun mirror() {
+        isMirrored.value = !isMirrored.value
+        rotateActionList.add(RotateAction.MIRROR)
+    }
+
+    fun flip() {
+        isFlipped.value = !isFlipped.value
+        rotateActionList.add(RotateAction.FLIP)
     }
 
     fun restoreTransformStates() {
@@ -150,6 +179,7 @@ class CompositionViewModel : ViewModel() {
             isFlipped.value = initialFlipState
             rotationDegrees.value = initialRotationDegrees
         }
+        rotateActionList.clear()
     }
 }
 

@@ -511,7 +511,6 @@ class EditViewModel : ViewModel() {
                 // 人脸识别失败
                 _loadStatus.emit(STATUS_ERROR)
                 _selectedTabIndex.emit(TAB_ADJUST)
-                ToastUtils.showToast(appContext, appContext.getString(R.string.msg_face_detect_fail))
             }
         }
     }

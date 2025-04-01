@@ -97,23 +97,6 @@ class OpenGLTransformHelper {
         isFirstRotate = false
     }
 
-    private fun recoverRotationAfterReset() {
-        val centerX = renderRect.centerX()
-        val centerY = renderRect.centerY()
-        val glFocusX = (centerX - viewportWidth / 2f) / (viewportWidth / 2f)
-        val glFocusY = (viewportHeight / 2f - centerY) / (viewportHeight / 2f)
-
-        Matrix.setIdentityM(tempMatrix, 0)
-        Matrix.translateM(tempMatrix, 0, glFocusX, glFocusY, 0f)
-        Matrix.rotateM(tempMatrix, 0, currentRotation, 0f, 0f, 1f)
-        Matrix.translateM(tempMatrix, 0, -glFocusX, -glFocusY, 0f)
-        Matrix.multiplyMM(glMatrix, 0, tempMatrix, 0, glMatrix, 0)
-
-        if (currentRotation in listOf(90f, 270f, -90f, -270f)) {
-            adjustScaleForRotation()
-        }
-    }
-
     private fun adjustScaleForRotation() {
         val aspect = viewportWidth / viewportHeight
         postScaleNonUniform(1 / aspect, aspect)
@@ -151,31 +134,10 @@ class OpenGLTransformHelper {
     }
 
     fun postTranslate(dx: Float, dy: Float, fromUser: Boolean = true) {
-        var glDx = (dx / viewportWidth) * 2f / currentScale
-        var glDy = (-dy / viewportHeight) * 2f / currentScale
+        val glDx = (dx / viewportWidth) * 2f / currentScale
+        val glDy = (-dy / viewportHeight) * 2f / currentScale
 
-        if (fromUser) {
-            val aspectRatio = viewportWidth / viewportHeight
-            when (currentRotation) {
-                90f, -270f -> {
-                    val temp = glDx
-                    glDx = glDy / aspectRatio
-                    glDy = -temp * aspectRatio
-                }
-                180f, -180f -> {
-                    glDx = -glDx
-                    glDy = -glDy
-                }
-                270f, -90f -> {
-                    val temp = glDx
-                    glDx = -glDy / aspectRatio
-                    glDy = temp * aspectRatio
-                }
-            }
-            Matrix.translateM(glMatrix, 0, if (isMirrored) -glDx else glDx, if (isFlipped) -glDy else glDy, 0f)
-        } else {
-            Matrix.translateM(glMatrix, 0, glDx, glDy, 0f)
-        }
+        Matrix.translateM(glMatrix, 0, glDx, glDy, 0f)
     }
 
     fun reset(bottomPadding: Float) {
