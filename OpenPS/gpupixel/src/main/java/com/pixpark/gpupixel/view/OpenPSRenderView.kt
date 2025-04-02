@@ -97,6 +97,7 @@ class OpenPSRenderView : GLSurfaceView {
     fun doRotateTransform(newDegrees: Int) {
         transformHelper.postRotate(newDegrees.toFloat())
         callback?.onGLMatrixChanged(transformHelper.getGLMatrix())
+        callback?.onRenderRectChanged(transformHelper.getRenderRect())
         updateMatricesFromGL()
     }
 

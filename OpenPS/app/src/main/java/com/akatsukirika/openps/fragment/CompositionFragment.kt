@@ -214,6 +214,10 @@ private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, on
         }
     }
 
+    LaunchedEffect(initialRect) {
+        onRectChanged(initialRect)
+    }
+
     /**
      * 除裁剪区域外，绘制半透明黑色遮罩
      */
