@@ -136,7 +136,6 @@ class CompositionViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val beginTime = System.currentTimeMillis()
                 var currentBitmap = it
-                currentBitmap = BitmapUtils.cropBitmap(currentBitmap, newLeft, newTop, newRight, newBottom).scaleToEven()
                 rotateActionList.forEach { action ->
                     currentBitmap = when (action) {
                         RotateAction.ROTATE_LEFT -> BitmapUtils.rotateBitmap(currentBitmap, -90f)
@@ -145,6 +144,7 @@ class CompositionViewModel : ViewModel() {
                         RotateAction.FLIP -> BitmapUtils.flipBitmap(currentBitmap)
                     }
                 }
+                currentBitmap = BitmapUtils.cropBitmap(currentBitmap, newLeft, newTop, newRight, newBottom).scaleToEven()
                 Log.d("CompositionViewModel", "Bitmap处理耗时: ${System.currentTimeMillis() - beginTime}ms")
                 resultBitmap.value = currentBitmap
             }

@@ -325,7 +325,7 @@ private fun DraggableRect(viewModel: CompositionViewModel, initialRect: Rect, on
 
     Canvas(modifier = Modifier
         .fillMaxSize()
-        .pointerInput(Unit) {
+        .pointerInput(initialRect) {
             detectDragGestures(
                 onDragEnd = {
                     draggingMode = DraggingMode.NOT_DRAGGING
