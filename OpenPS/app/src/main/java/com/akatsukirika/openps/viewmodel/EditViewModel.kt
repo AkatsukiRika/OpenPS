@@ -36,6 +36,7 @@ import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.BitmapUtils
 import com.akatsukirika.openps.utils.EvenDimensionsTransformation
 import com.akatsukirika.openps.utils.ToastUtils
+import com.akatsukirika.openps.utils.appContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
@@ -49,6 +50,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -355,7 +357,16 @@ class EditViewModel : ViewModel() {
     }
 
     private fun updateAfterComposition(record: OpenPSRecord) {
-        manualDetectFace()
+        viewModelScope.launch {
+            val bitmap = BitmapUtils.getBitmap(appContext, GPUPixel.getExternalPath() + File.separator + record.imageFileName)
+            bitmap?.let {
+                currentBitmap = it
+            }
+            helper?.getRenderViewInfo()?.let {
+                callback?.onRenderViewInfoReady(it)
+            }
+            manualDetectFace()
+        }
     }
 
     private fun startImageFilter(context: Context, bitmap: Bitmap) {
