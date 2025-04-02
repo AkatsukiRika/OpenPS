@@ -36,7 +36,6 @@ import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.BitmapUtils
 import com.akatsukirika.openps.utils.EvenDimensionsTransformation
 import com.akatsukirika.openps.utils.ToastUtils
-import com.akatsukirika.openps.utils.appContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.pixpark.gpupixel.GPUPixel
@@ -73,7 +72,8 @@ class EditViewModel : ViewModel() {
 
     private var callback: Callback? = null
 
-    private var skinMaskBitmap: Bitmap? = null
+    var skinMaskBitmap: Bitmap? = null
+        private set
 
     var originalBitmap: Bitmap? = null
         private set
@@ -249,21 +249,9 @@ class EditViewModel : ViewModel() {
                 helper?.getRenderViewInfo()?.let {
                     callback?.onRenderViewInfoReady(it)
                 }
-                cropSkinMask()
                 manualDetectFace()
             }
         }
-    }
-
-    /**
-     * 构图更改，根据裁剪区域将皮肤掩膜一同裁剪
-     */
-    private suspend fun cropSkinMask() = withContext(Dispatchers.IO) {
-        val cropRect = helper?.getCropRect() ?: return@withContext
-        val originalSkinMask = skinMaskBitmap ?: return@withContext
-        val cropResult = BitmapUtils.cropBitmap(originalSkinMask, cropRect.left, cropRect.top, cropRect.right, cropRect.bottom)
-        BitmapUtils.saveBitmapToFile(cropResult, GPUPixel.getResource_path(), FILENAME_SKIN_MASK)
-        helper?.updateSkinMask()
     }
 
     private fun updateHelperValue(addRecord: Boolean = false) {
@@ -375,9 +363,6 @@ class EditViewModel : ViewModel() {
 
     private fun updateAfterComposition(record: OpenPSRecord) {
         callback?.setCropRect(RectF(record.croppedLeft, record.croppedTop, record.croppedRight, record.croppedBottom))
-        viewModelScope.launch {
-            cropSkinMask()
-        }
         manualDetectFace()
     }
 

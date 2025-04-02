@@ -10,6 +10,9 @@ import com.akatsukirika.openps.compose.CropOptions
 import com.akatsukirika.openps.enum.RotateAction
 import com.akatsukirika.openps.utils.BitmapUtils
 import com.akatsukirika.openps.utils.BitmapUtils.scaleToEven
+import com.akatsukirika.openps.viewmodel.EditViewModel.Companion.FILENAME_SKIN_MASK
+import com.pixpark.gpupixel.GPUPixel
+import com.pixpark.gpupixel.OpenPSHelper
 import com.pixpark.gpupixel.model.RenderViewInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -53,7 +56,11 @@ class CompositionViewModel : ViewModel() {
 
     var renderViewInfo: RenderViewInfo? = null
 
+    private var helper: OpenPSHelper? = null
+
     private var originalBitmap: Bitmap? = null
+
+    private var skinMaskBitmap: Bitmap? = null
 
     private var initialMirrorState: Boolean = false
 
@@ -92,7 +99,14 @@ class CompositionViewModel : ViewModel() {
         }
     }
 
-    fun initStates(originalBitmap: Bitmap? = null, mirrorState: Boolean, flipState: Boolean, rotation: Int) {
+    fun initStates(
+        helper: OpenPSHelper? = null,
+        originalBitmap: Bitmap? = null,
+        skinMaskBitmap: Bitmap? = null,
+        mirrorState: Boolean,
+        flipState: Boolean,
+        rotation: Int
+    ) {
         currentTab.value = CompositionTab.CROP
         currentCropOptions.value = CropOptions.CUSTOM
         isRectChanged.value = false
@@ -104,7 +118,9 @@ class CompositionViewModel : ViewModel() {
         initialRotationDegrees = rotation
         canSave.value = false
         isSave = false
+        this.helper = helper
         this.originalBitmap = originalBitmap
+        this.skinMaskBitmap = skinMaskBitmap
         resultBitmap.value = null
     }
 
@@ -136,6 +152,7 @@ class CompositionViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val beginTime = System.currentTimeMillis()
                 var currentBitmap = it
+                var currentSkinMask = skinMaskBitmap
                 rotateActionList.forEach { action ->
                     currentBitmap = when (action) {
                         RotateAction.ROTATE_LEFT -> BitmapUtils.rotateBitmap(currentBitmap, -90f)
@@ -143,8 +160,21 @@ class CompositionViewModel : ViewModel() {
                         RotateAction.MIRROR -> BitmapUtils.mirrorBitmap(currentBitmap)
                         RotateAction.FLIP -> BitmapUtils.flipBitmap(currentBitmap)
                     }
+                    if (currentSkinMask != null) {
+                        currentSkinMask = when (action) {
+                            RotateAction.ROTATE_LEFT -> BitmapUtils.rotateBitmap(currentSkinMask!!, -90f)
+                            RotateAction.ROTATE_RIGHT -> BitmapUtils.rotateBitmap(currentSkinMask!!, 90f)
+                            RotateAction.MIRROR -> BitmapUtils.mirrorBitmap(currentSkinMask!!)
+                            RotateAction.FLIP -> BitmapUtils.flipBitmap(currentSkinMask!!)
+                        }
+                    }
                 }
                 currentBitmap = BitmapUtils.cropBitmap(currentBitmap, newLeft, newTop, newRight, newBottom).scaleToEven()
+                if (currentSkinMask != null) {
+                    currentSkinMask = BitmapUtils.cropBitmap(currentSkinMask!!, newLeft, newTop, newRight, newBottom).scaleToEven()
+                    BitmapUtils.saveBitmapToFile(currentSkinMask!!, GPUPixel.getResource_path(), FILENAME_SKIN_MASK)
+                    helper?.updateSkinMask()
+                }
                 Log.d("CompositionViewModel", "Bitmap处理耗时: ${System.currentTimeMillis() - beginTime}ms")
                 resultBitmap.value = currentBitmap
             }

@@ -66,7 +66,9 @@ class CompositionFragment : Fragment() {
         collectScope = CoroutineScope(lifecycleScope.coroutineContext + SupervisorJob())
 
         viewModel.initStates(
+            helper = (requireActivity() as EditActivity).viewModel.helper,
             originalBitmap = (requireActivity() as EditActivity).viewModel.currentBitmap,
+            skinMaskBitmap = (requireActivity() as EditActivity).viewModel.skinMaskBitmap,
             mirrorState = renderView.transformHelper.isMirrored,
             flipState = renderView.transformHelper.isFlipped,
             rotation = renderView.transformHelper.currentRotation.roundToInt()
