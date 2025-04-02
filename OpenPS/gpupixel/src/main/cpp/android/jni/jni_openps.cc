@@ -41,18 +41,6 @@ Java_com_pixpark_gpupixel_OpenPS_nativeInitWithImage(JNIEnv *env, jobject thiz,
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeUpdateTransform(JNIEnv *env, jobject thiz,
-                                                       jboolean mirrored, jboolean flipped,
-                                                       jfloat crop_left, jfloat crop_top,
-                                                       jfloat crop_right, jfloat crop_bottom,
-                                                       jfloat rotation) {
-  if (openPSHelper) {
-    openPSHelper->updateTransform(mirrored, flipped, crop_left, crop_top, crop_right, crop_bottom, rotation);
-  }
-}
-
-extern "C"
-JNIEXPORT void JNICALL
 Java_com_pixpark_gpupixel_OpenPS_nativeChangeImage(JNIEnv *env, jobject thiz,
                                                    jint width, jint height,
                                                    jint channel_count,
@@ -326,14 +314,12 @@ Java_com_pixpark_gpupixel_OpenPS_nativeUndo(JNIEnv *env, jobject thiz) {
       return nullptr;
     }
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
-    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFZZFFFFF)V");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIF)V");
     jobject kotlinObject = env->NewObject(kotlinClass, constructor, record->smoothLevel, record->whiteLevel,
                                           record->lipstickLevel, record->blusherLevel, record->eyeZoomLevel,
                                           record->faceSlimLevel, record->contrastLevel, record->exposureLevel,
                                           record->saturationLevel, record->sharpnessLevel, record->brightnessLevel,
-                                          record->customFilterType, record->customFilterIntensity, record->isMirrored, record->isFlipped,
-                                          record->croppedLeft, record->croppedTop, record->croppedRight, record->croppedBottom,
-                                          record->rotationDegrees);
+                                          record->customFilterType, record->customFilterIntensity);
     return kotlinObject;
   }
   return nullptr;
@@ -347,14 +333,12 @@ Java_com_pixpark_gpupixel_OpenPS_nativeRedo(JNIEnv *env, jobject thiz) {
       return nullptr;
     }
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
-    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFZZFFFFF)V");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIF)V");
     jobject kotlinObject = env->NewObject(kotlinClass, constructor, record->smoothLevel, record->whiteLevel,
                                           record->lipstickLevel, record->blusherLevel, record->eyeZoomLevel,
                                           record->faceSlimLevel, record->contrastLevel, record->exposureLevel,
                                           record->saturationLevel, record->sharpnessLevel, record->brightnessLevel,
-                                          record->customFilterType, record->customFilterIntensity, record->isMirrored, record->isFlipped,
-                                          record->croppedLeft, record->croppedTop, record->croppedRight, record->croppedBottom,
-                                          record->rotationDegrees);
+                                          record->customFilterType, record->customFilterIntensity);
     return kotlinObject;
   }
   return nullptr;

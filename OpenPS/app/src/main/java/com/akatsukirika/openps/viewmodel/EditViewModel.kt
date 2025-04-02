@@ -238,9 +238,6 @@ class EditViewModel : ViewModel() {
      * @param updateTransform 构图房间保存更改时传true
      */
     fun changeImage(bitmap: Bitmap, updateTransform: Boolean = false) {
-        if (updateTransform) {
-            helper?.updateTransform()
-        }
         helper?.changeImage(bitmap)
         currentBitmap = bitmap
         viewModelScope.launch {
@@ -362,7 +359,6 @@ class EditViewModel : ViewModel() {
     }
 
     private fun updateAfterComposition(record: OpenPSRecord) {
-        callback?.setCropRect(RectF(record.croppedLeft, record.croppedTop, record.croppedRight, record.croppedBottom))
         manualDetectFace()
     }
 

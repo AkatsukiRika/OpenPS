@@ -1,7 +1,6 @@
 package com.pixpark.gpupixel
 
 import android.graphics.Bitmap
-import android.graphics.RectF
 import android.util.Log
 import com.pixpark.gpupixel.GPUPixel.GPUPixelLandmarkCallback
 import com.pixpark.gpupixel.model.LandmarkResult
@@ -46,27 +45,6 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
             }
         }
     }
-
-    fun updateTransform() {
-        renderView.postOnGLThread {
-            val mirrored = renderView.transformHelper.isMirrored
-            val flipped = renderView.transformHelper.isFlipped
-            val cropLeft = renderView.transformHelper.cropLeft
-            val cropTop = renderView.transformHelper.cropTop
-            val cropRight = renderView.transformHelper.cropRight
-            val cropBottom = renderView.transformHelper.cropBottom
-            val rotation = renderView.transformHelper.currentRotation
-            OpenPS.nativeUpdateTransform(mirrored, flipped, cropLeft, cropTop, cropRight, cropBottom, rotation)
-            requestRender()
-        }
-    }
-
-    fun getCropRect() = RectF(
-        renderView.transformHelper.cropLeft,
-        renderView.transformHelper.cropTop,
-        renderView.transformHelper.cropRight,
-        renderView.transformHelper.cropBottom
-    )
 
     fun changeImage(bitmap: Bitmap) {
         val width = bitmap.width
