@@ -169,9 +169,9 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
-    fun updateSkinMask() {
+    fun updateSkinMask(fileName: String = "skin_mask.png") {
         renderView.postOnGLThread {
-            OpenPS.nativeUpdateSkinMask()
+            OpenPS.nativeUpdateSkinMask(fileName)
             requestRender()
         }
     }

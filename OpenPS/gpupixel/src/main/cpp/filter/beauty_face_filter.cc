@@ -83,7 +83,7 @@ void BeautyFaceFilter::setRadius(float radius) {
   boxHighPassFilter->setRadius(radius);
 }
 
-void BeautyFaceFilter::updateSkinMask() {
-  beautyFilter->updateSkinMaskTexture();
+void BeautyFaceFilter::updateSkinMask(std::string fileName) {
+  beautyFilter->updateSkinMaskTexture(fileName);
 }
 NS_GPUPIXEL_END

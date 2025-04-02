@@ -331,9 +331,9 @@ void gpupixel::OpenPSHelper::applyCustomFilter(int type, float level, bool addRe
   }
 }
 
-void gpupixel::OpenPSHelper::updateSkinMask() {
+void gpupixel::OpenPSHelper::updateSkinMask(std::string fileName) {
   if (beautyFaceFilter) {
-    beautyFaceFilter->updateSkinMask();
+    beautyFaceFilter->updateSkinMask(fileName);
   }
 }
 

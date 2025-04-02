@@ -261,9 +261,17 @@ Java_com_pixpark_gpupixel_OpenPS_nativeApplyCustomFilter(JNIEnv *env, jobject th
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_pixpark_gpupixel_OpenPS_nativeUpdateSkinMask(JNIEnv *env, jobject thiz) {
+Java_com_pixpark_gpupixel_OpenPS_nativeUpdateSkinMask(JNIEnv *env, jobject thiz, jstring skin_mask) {
   if (openPSHelper) {
-    openPSHelper->updateSkinMask();
+    const char* skinMaskStr = nullptr;
+    if (skin_mask != nullptr) {
+      skinMaskStr = env->GetStringUTFChars(skin_mask, nullptr);
+    }
+    std::string skinMaskString = skinMaskStr ? skinMaskStr : "";
+    if (skinMaskStr != nullptr) {
+      env->ReleaseStringUTFChars(skin_mask, skinMaskStr);
+    }
+    openPSHelper->updateSkinMask(skinMaskString);
   }
 }
 

@@ -400,8 +400,8 @@ NS_GPUPIXEL_BEGIN
 #endif
     }
 
-  void BeautyFaceUnitFilter::updateSkinMaskTexture() {
-      skinMaskImage_ = SourceImage::create(Util::getResourcePath("skin_mask.png"));
+  void BeautyFaceUnitFilter::updateSkinMaskTexture(std::string fileName) {
+      skinMaskImage_ = SourceImage::create(Util::getResourcePath(fileName));
   }
 
 NS_GPUPIXEL_END
