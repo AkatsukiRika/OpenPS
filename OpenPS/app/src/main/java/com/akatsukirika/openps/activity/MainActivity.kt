@@ -1,5 +1,7 @@
 package com.akatsukirika.openps.activity
 
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -16,6 +18,11 @@ import com.pixpark.gpupixel.GPUPixel
 class MainActivity : AppCompatActivity() {
     companion object {
         private const val PERMISSION_REQUEST_CODE = 100
+
+        fun startMe(activity: Activity) {
+            val intent = Intent(activity, MainActivity::class.java)
+            activity.startActivity(intent)
+        }
     }
 
     private lateinit var binding: ActivityMainBinding

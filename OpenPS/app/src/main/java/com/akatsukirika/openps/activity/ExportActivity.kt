@@ -33,7 +33,7 @@ class ExportActivity : AppCompatActivity() {
 
         binding.llBack.setOnClickListener {
             setResult(RESULT_OK)
-            finish()
+            MainActivity.startMe(this)
         }
     }
 
