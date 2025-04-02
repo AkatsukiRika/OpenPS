@@ -98,14 +98,18 @@ class OpenGLTransformHelper {
         renderRect.transform(rectTransformMatrix)
 
         if (!isFirstRotate && deltaRotation in listOf(90f, 270f, -90f, -270f)) {
-            adjustScaleForRotation()
+            val compensateScale = viewportWidth / renderRect.width()
+            adjustScaleForRotation(compensateScale)
+            val compensateMatrix = android.graphics.Matrix()
+            compensateMatrix.postScale(compensateScale, compensateScale, centerX, centerY)
+            renderRect.transform(compensateMatrix)
         }
         isFirstRotate = false
     }
 
-    private fun adjustScaleForRotation() {
+    private fun adjustScaleForRotation(compensateScale: Float) {
         val aspect = viewportWidth / viewportHeight
-        postScaleNonUniform(1 / aspect, aspect)
+        postScaleNonUniform(compensateScale / aspect, aspect * compensateScale)
     }
 
     fun mirror(newState: Boolean) {
