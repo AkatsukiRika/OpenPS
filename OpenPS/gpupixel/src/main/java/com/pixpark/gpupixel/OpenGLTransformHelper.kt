@@ -21,14 +21,6 @@ class OpenGLTransformHelper {
         private set
     var isFlipped = false
         private set
-    var cropLeft = 0f
-        private set
-    var cropTop = 0f
-        private set
-    var cropRight = 0f
-        private set
-    var cropBottom = 0f
-        private set
     var currentRotation: Float = 0f
     var isFirstRotate = true
 
@@ -174,13 +166,6 @@ class OpenGLTransformHelper {
                 renderRect.transform(rectTransformMatrix)
             }
         }
-    }
-
-    fun setCropRect(rectF: RectF) {
-        cropLeft = rectF.left
-        cropTop = rectF.top
-        cropRight = rectF.right
-        cropBottom = rectF.bottom
     }
 
     fun getGLMatrix() = glMatrix

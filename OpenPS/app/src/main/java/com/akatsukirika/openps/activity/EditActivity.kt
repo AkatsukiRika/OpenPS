@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.roundToInt
 
 class EditActivity : AppCompatActivity() {
     lateinit var binding: ActivityEditBinding
@@ -123,22 +122,6 @@ class EditActivity : AppCompatActivity() {
                 override fun onRenderViewInfoReady(info: RenderViewInfo) {
                     binding.surfaceView.transformHelper.setRenderViewInfo(info)
                     initBaseMatrix(info)
-                }
-
-                override fun mirror(newState: Boolean) {
-                    binding.surfaceView.doMirrorTransform(newState)
-                }
-
-                override fun flip(newState: Boolean) {
-                    binding.surfaceView.doFlipTransform(newState)
-                }
-
-                override fun rotate(newDegrees: Float) {
-                    binding.surfaceView.doRotateTransform(newDegrees.roundToInt())
-                }
-
-                override fun setCropRect(rect: RectF) {
-                    binding.surfaceView.transformHelper.setCropRect(rect)
                 }
             }
         )

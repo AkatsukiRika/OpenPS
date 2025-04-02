@@ -61,10 +61,6 @@ class EditViewModel : ViewModel() {
         fun showOverlayView(info: RenderViewInfo, faceRectF: RectF)
         fun setDebugImage(bitmap: Bitmap)
         fun onRenderViewInfoReady(info: RenderViewInfo)
-        fun mirror(newState: Boolean)
-        fun flip(newState: Boolean)
-        fun rotate(newDegrees: Float)
-        fun setCropRect(rect: RectF)
     }
 
     var helper: OpenPSHelper? = null

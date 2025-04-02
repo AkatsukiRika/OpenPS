@@ -101,7 +101,6 @@ class CompositionFragment : Fragment() {
             launch {
                 viewModel.croppedRectF.collect {
                     Log.d(TAG, "croppedRect = $it")
-                    renderView.transformHelper.setCropRect(it)
                 }
             }
         }
