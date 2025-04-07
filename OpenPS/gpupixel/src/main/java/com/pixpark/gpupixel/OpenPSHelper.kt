@@ -46,21 +46,29 @@ class OpenPSHelper(private val renderView: OpenPSRenderView) {
         }
     }
 
-    fun changeImage(bitmap: Bitmap) {
+    suspend fun changeImage(bitmap: Bitmap, skinMaskBitmap: Bitmap?) = withContext(Dispatchers.IO) {
         val width = bitmap.width
         val height = bitmap.height
         val channelCount = BitmapUtils.getChannels(bitmap)
         val savedBitmapName = getSavedBitmapName()
+        val savedSkinMaskBitmapName = if (skinMaskBitmap != null) {
+            savedBitmapName.replace("saved_bitmap", "skin_mask")
+        } else null
 
-        renderView.postOnGLThread {
-            OpenPS.nativeChangeImage(width, height, channelCount, bitmap, savedBitmapName)
-            requestRender()
+        if (skinMaskBitmap != null && savedSkinMaskBitmapName != null) {
+            BitmapUtils.saveBitmapToFile(skinMaskBitmap, GPUPixel.getResource_path(), savedSkinMaskBitmapName)
+            Log.d(TAG, "Skin mask bitmap saved to ${GPUPixel.getResource_path()}/$savedSkinMaskBitmapName")
         }
 
-        scope.launch(Dispatchers.IO) {
-            BitmapUtils.saveBitmapToFile(bitmap, GPUPixel.getExternalPath(), savedBitmapName)
-            Log.d(TAG, "Changed bitmap saved to ${GPUPixel.getExternalPath()}/$savedBitmapName")
+        withContext(Dispatchers.Main) {
+            renderView.postOnGLThread {
+                OpenPS.nativeChangeImage(width, height, channelCount, bitmap, savedBitmapName, savedSkinMaskBitmapName)
+                requestRender()
+            }
         }
+
+        BitmapUtils.saveBitmapToFile(bitmap, GPUPixel.getExternalPath(), savedBitmapName)
+        Log.d(TAG, "Changed bitmap saved to ${GPUPixel.getExternalPath()}/$savedBitmapName")
     }
 
     fun buildBasicRenderPipeline() {

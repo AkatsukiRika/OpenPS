@@ -15,7 +15,14 @@ internal object OpenPS {
 
     external fun nativeInitWithImage(width: Int, height: Int, channelCount: Int, bitmap: Bitmap, filename: String? = null)
 
-    external fun nativeChangeImage(width: Int, height: Int, channelCount: Int, bitmap: Bitmap, filename: String? = null)
+    external fun nativeChangeImage(
+        width: Int,
+        height: Int,
+        channelCount: Int,
+        bitmap: Bitmap,
+        filename: String? = null,
+        skinMaskFilename: String? = null
+    )
 
     external fun nativeDestroy()
 

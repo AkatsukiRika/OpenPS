@@ -39,11 +39,11 @@ const val MODE_ERASER = 2
 const val MODE_GENERATE = 3
 
 @Composable
-fun EliminatePenScreen(callback: EliminatePenCallback, viewModel: EliminateViewModel) {
+fun EliminatePenScreen(callback: EliminatePenCallback, viewModel: EliminateViewModel, modifier: Modifier = Modifier) {
     val mode = viewModel.mode.collectAsState().value
     val readyToGenerate = viewModel.readyToGenerate.collectAsState().value
 
-    Column(modifier = Modifier
+    Column(modifier = modifier
         .fillMaxWidth()
         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
         .background(AppColors.DarkBG),

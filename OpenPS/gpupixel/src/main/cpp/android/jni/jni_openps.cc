@@ -45,7 +45,8 @@ Java_com_pixpark_gpupixel_OpenPS_nativeChangeImage(JNIEnv *env, jobject thiz,
                                                    jint width, jint height,
                                                    jint channel_count,
                                                    jobject bitmap,
-                                                   jstring filename) {
+                                                   jstring filename,
+                                                   jstring skin_mask_filename) {
   AndroidBitmapInfo info;
   void *pixels;
   if ((AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
@@ -55,13 +56,24 @@ Java_com_pixpark_gpupixel_OpenPS_nativeChangeImage(JNIEnv *env, jobject thiz,
   if (filename != nullptr) {
     filenameStr = env->GetStringUTFChars(filename, nullptr);
   }
+  const char* skinMaskFilenameStr = nullptr;
+  if (skin_mask_filename != nullptr) {
+    skinMaskFilenameStr = env->GetStringUTFChars(skin_mask_filename, nullptr);
+  }
   if ((AndroidBitmap_lockPixels(env, bitmap, &pixels)) >= 0) {
     if (openPSHelper) {
-      openPSHelper->changeImage(width, height, channel_count, (const unsigned char *) pixels, filenameStr);
+      openPSHelper->changeImage(
+        width, height, channel_count,
+        (const unsigned char *) pixels,
+        filenameStr, skinMaskFilenameStr
+      );
     }
   }
   if (filenameStr != nullptr) {
     env->ReleaseStringUTFChars(filename, filenameStr);
+  }
+  if (skinMaskFilenameStr != nullptr) {
+    env->ReleaseStringUTFChars(skin_mask_filename, skinMaskFilenameStr);
   }
   AndroidBitmap_unlockPixels(env, bitmap);
 }

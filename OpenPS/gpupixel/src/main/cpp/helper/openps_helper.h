@@ -23,7 +23,13 @@ public:
 
   void initWithImage(int width, int height, int channelCount, const unsigned char* pixels, const char* filename = nullptr);
 
-  void changeImage(int width, int height, int channelCount, const unsigned char* pixels, const char* filename = nullptr);
+  void changeImage(
+    int width, int height,
+    int channelCount,
+    const unsigned char* pixels,
+    const char* filename = nullptr,
+    const char* skinMaskFilename = nullptr
+  );
 
   void changeImage(std::string filename);
 
@@ -122,6 +128,7 @@ private:
   float brightnessLevel = DEFAULT_LEVEL;
   float customFilterLevel = DEFAULT_LEVEL;
   std::string currentImageFileName = "";
+  std::string currentSkinMaskFileName = "";
 
   int imageWidth = 0;
   int imageHeight = 0;

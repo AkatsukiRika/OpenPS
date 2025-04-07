@@ -30,6 +30,7 @@ public:
   const int customFilterType;
   const float customFilterIntensity;
   const std::string imageFileName;
+  const std::string skinMaskFileName;
 
   std::string toString() const override {
     return Util::str_format(
@@ -37,11 +38,11 @@ public:
         "eyeZoomLevel: %f, faceSlimLevel: %f, contrastLevel: %f, "
         "exposureLevel: %f, saturationLevel: %f, sharpnessLevel: %f, "
         "brightnessLevel: %f, customFilterType: %d, customFilterIntensity: %f, "
-        "imageFileName: %s",
+        "imageFileName: %s, skinMaskFileName: %s",
         smoothLevel, whiteLevel, lipstickLevel, blusherLevel, eyeZoomLevel,
         faceSlimLevel, contrastLevel, exposureLevel, saturationLevel,
         sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity,
-        imageFileName.c_str());
+        imageFileName.c_str(), skinMaskFileName.c_str());
   }
 
   bool equals(const AbstractRecord& anotherRecord) const override {
@@ -70,6 +71,7 @@ public:
            sharpnessLevel == record->sharpnessLevel &&
            brightnessLevel == record->brightnessLevel &&
            imageFileName == record->imageFileName &&
+           skinMaskFileName == record->skinMaskFileName &&
            customFilterEquals;
   }
 
@@ -77,21 +79,21 @@ public:
     return new OpenPSRecord(smoothLevel, whiteLevel, lipstickLevel, blusherLevel,
                             eyeZoomLevel, faceSlimLevel, contrastLevel, exposureLevel,
                             saturationLevel, sharpnessLevel, brightnessLevel, customFilterType, customFilterIntensity,
-                            imageFileName);
+                            imageFileName, skinMaskFileName);
   }
 
   OpenPSRecord(float smoothLevel, float whiteLevel, float lipstickLevel,
                float blusherLevel, float eyeZoomLevel, float faceSlimLevel,
                float contrastLevel, float exposureLevel, float saturationLevel,
                float sharpnessLevel, float brightnessLevel, int customFilterType, float customFilterIntensity,
-               std::string imageFileName = "")
+               std::string imageFileName = "", std::string skinMaskFileName = "")
       : smoothLevel(smoothLevel), whiteLevel(whiteLevel),
         lipstickLevel(lipstickLevel), blusherLevel(blusherLevel),
         eyeZoomLevel(eyeZoomLevel), faceSlimLevel(faceSlimLevel),
         contrastLevel(contrastLevel), exposureLevel(exposureLevel),
         saturationLevel(saturationLevel), sharpnessLevel(sharpnessLevel),
         brightnessLevel(brightnessLevel), customFilterType(customFilterType), customFilterIntensity(customFilterIntensity),
-        imageFileName(imageFileName) {};
+        imageFileName(imageFileName), skinMaskFileName(skinMaskFileName) {};
 };
 
 NS_GPUPIXEL_END

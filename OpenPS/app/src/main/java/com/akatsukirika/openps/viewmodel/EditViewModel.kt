@@ -235,10 +235,13 @@ class EditViewModel : ViewModel() {
     /**
      * @param updateTransform 构图房间保存更改时传true
      */
-    fun changeImage(bitmap: Bitmap, updateTransform: Boolean = false) {
-        helper?.changeImage(bitmap)
-        currentBitmap = bitmap
+    fun changeImage(bitmap: Bitmap, skinMask: Bitmap? = null, updateTransform: Boolean = false) {
         viewModelScope.launch {
+            helper?.changeImage(bitmap, skinMask ?: skinMaskBitmap)
+            currentBitmap = bitmap
+            skinMask?.let {
+                skinMaskBitmap = it
+            }
             refreshUndoRedo()
             if (updateTransform) {
                 helper?.getRenderViewInfo()?.let {

@@ -38,20 +38,24 @@ void gpupixel::OpenPSHelper::initWithImage(int width, int height,
   if (filename) {
     currentImageFileName = filename;
     initialImageFileName = filename;
-    addUndoRedoRecord();
   }
 }
 
 void gpupixel::OpenPSHelper::changeImage(int width, int height,
                                          int channelCount,
                                          const unsigned char *pixels,
-                                         const char* filename) {
+                                         const char* filename,
+                                         const char* skinMaskFilename) {
   if (gpuSourceImage) {
     gpuSourceImage->init(width, height, channelCount, pixels);
     imageWidth = width;
     imageHeight = height;
     if (filename) {
       currentImageFileName = filename;
+      if (skinMaskFilename) {
+        updateSkinMask(skinMaskFilename);
+        currentSkinMaskFileName = skinMaskFilename;
+      }
       addUndoRedoRecord();
     }
   }
@@ -122,6 +126,8 @@ void gpupixel::OpenPSHelper::buildRealRenderPipeline() {
   gpuSourceImage->addTarget(imageCompareFilter);
   imageCompareFilter->addTarget(targetView);
   imageCompareFilter->addTarget(targetRawDataOutput);
+  currentSkinMaskFileName = "skin_mask.png";
+  addUndoRedoRecord();
 }
 
 void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
@@ -144,6 +150,7 @@ void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
     gpuSourceImage->addTarget(imageCompareFilter);
     imageCompareFilter->addTarget(targetView);
     imageCompareFilter->addTarget(targetRawDataOutput);
+    addUndoRedoRecord();
   }
 }
 
@@ -442,6 +449,11 @@ std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::undo() {
   if (check && openPSRecord) {
     setLevels(*openPSRecord);
     changeImage(openPSRecord->imageFileName);
+    currentImageFileName = openPSRecord->imageFileName;
+    if (!openPSRecord->skinMaskFileName.empty()) {
+      updateSkinMask(openPSRecord->skinMaskFileName);
+      currentSkinMaskFileName = openPSRecord->skinMaskFileName;
+    }
     return openPSRecord;
   }
 
@@ -456,6 +468,11 @@ std::shared_ptr<gpupixel::OpenPSRecord> gpupixel::OpenPSHelper::redo() {
   if (check && openPSRecord) {
     setLevels(*openPSRecord);
     changeImage(openPSRecord->imageFileName);
+    currentImageFileName = openPSRecord->imageFileName;
+    if (!openPSRecord->skinMaskFileName.empty()) {
+      updateSkinMask(openPSRecord->skinMaskFileName);
+      currentSkinMaskFileName = openPSRecord->skinMaskFileName;
+    }
     return openPSRecord;
   }
 
@@ -491,8 +508,8 @@ void gpupixel::OpenPSHelper::addUndoRedoRecord() {
       smoothRecordLevel, whiteRecordLevel, lipstickRecordLevel,
       blusherRecordLevel, eyeZoomRecordLevel, faceSlimRecordLevel,
       contrastRecordLevel, exposureRecordLevel, saturationRecordLevel,
-      sharpnessRecordLevel, brightnessRecordLevel, customFilterType,
-      customFilterLevel, currentImageFileName);
+      sharpnessRecordLevel, brightnessRecordLevel, customFilterType,customFilterLevel,
+      currentImageFileName, currentSkinMaskFileName);
   undoRedoHelper.addRecord(record);
 }
 

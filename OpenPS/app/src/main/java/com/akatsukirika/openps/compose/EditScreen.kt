@@ -4,7 +4,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,16 +15,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -56,45 +66,92 @@ fun EditScreen(
 ) {
     AppTheme {
         val selectedModule = viewModel.selectedModule.collectAsState(initial = MODULE_NONE).value
+        val loadStatus = viewModel.loadStatus.collectAsState(initial = STATUS_IDLE).value
+        var moduleSelectLayoutHeight by remember { mutableIntStateOf(0) }
+        var compositionScreenHeight by remember { mutableIntStateOf(0) }
+        var eliminatePenScreenHeight by remember { mutableIntStateOf(0) }
+        var imageEffectScreenHeight by remember { mutableIntStateOf(0) }
+        var loadingMaskHeight by remember { mutableIntStateOf(0) }
 
-        Column(modifier = Modifier.fillMaxWidth()) {
-            if (selectedModule != MODULE_COMPOSITION) {
-                OperationRow(
-                    viewModel = viewModel,
-                    modifier = Modifier.align(Alignment.End)
+        LaunchedEffect(selectedModule) {
+            when (selectedModule) {
+                MODULE_NONE -> {
+                    loadingMaskHeight = moduleSelectLayoutHeight
+                }
+                MODULE_COMPOSITION -> {
+                    loadingMaskHeight = compositionScreenHeight
+                }
+                MODULE_ELIMINATE_PEN -> {
+                    loadingMaskHeight = eliminatePenScreenHeight
+                }
+                MODULE_IMAGE_EFFECT -> {
+                    loadingMaskHeight = imageEffectScreenHeight
+                }
+            }
+        }
+
+        Box {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                if (selectedModule != MODULE_COMPOSITION) {
+                    OperationRow(
+                        viewModel = viewModel,
+                        modifier = Modifier.align(Alignment.End)
+                    )
+                }
+
+                AnimatedVisibility(visible = selectedModule == MODULE_NONE) {
+                    ModuleSelectLayout(viewModel, modifier = Modifier.onSizeChanged {
+                        moduleSelectLayoutHeight = it.height
+                    })
+                }
+
+                AnimatedVisibility(visible = selectedModule == MODULE_COMPOSITION) {
+                    CompositionScreen(compositionViewModel, visible = selectedModule == MODULE_COMPOSITION, modifier = Modifier.onSizeChanged {
+                        compositionScreenHeight = it.height
+                    })
+                }
+
+                AnimatedVisibility(visible = selectedModule == MODULE_ELIMINATE_PEN) {
+                    EliminatePenScreen(object : EliminatePenCallback {
+                        override fun onCancel() {
+                            viewModel.selectedModule.value = MODULE_NONE
+                        }
+
+                        override fun onConfirm() {
+                            viewModel.selectedModule.value = MODULE_NONE
+                        }
+                    }, eliminateViewModel, modifier = Modifier.onSizeChanged {
+                        eliminatePenScreenHeight = it.height
+                    })
+                }
+
+                AnimatedVisibility(visible = selectedModule == MODULE_IMAGE_EFFECT) {
+                    ImageEffectScreen(viewModel, modifier = Modifier.onSizeChanged {
+                        imageEffectScreenHeight = it.height
+                    })
+                }
+            }
+
+            if (loadStatus == STATUS_LOADING) {
+                LoadingMask(modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(with(LocalDensity.current) {
+                        loadingMaskHeight.toDp()
+                    })
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {}
                 )
-            }
-
-            AnimatedVisibility(visible = selectedModule == MODULE_NONE) {
-                ModuleSelectLayout(viewModel)
-            }
-
-            AnimatedVisibility(visible = selectedModule == MODULE_COMPOSITION) {
-                CompositionScreen(compositionViewModel, visible = selectedModule == MODULE_COMPOSITION)
-            }
-
-            AnimatedVisibility(visible = selectedModule == MODULE_ELIMINATE_PEN) {
-                EliminatePenScreen(object : EliminatePenCallback {
-                    override fun onCancel() {
-                        viewModel.selectedModule.value = MODULE_NONE
-                    }
-
-                    override fun onConfirm() {
-                        viewModel.selectedModule.value = MODULE_NONE
-                    }
-                }, eliminateViewModel)
-            }
-
-            AnimatedVisibility(visible = selectedModule == MODULE_IMAGE_EFFECT) {
-                ImageEffectScreen(viewModel)
             }
         }
     }
 }
 
 @Composable
-private fun ModuleSelectLayout(viewModel: EditViewModel) {
-    Row(modifier = Modifier
+private fun ModuleSelectLayout(viewModel: EditViewModel, modifier: Modifier = Modifier) {
+    Row(modifier = modifier
         .fillMaxWidth()
         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
         .background(AppColors.DarkBG),
@@ -220,6 +277,16 @@ private fun OperationRow(modifier: Modifier = Modifier, viewModel: EditViewModel
                         viewModel.helper?.onCompareEnd()
                     })
                 }
+        )
+    }
+}
+
+@Composable
+private fun LoadingMask(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.background(Color.Black.copy(alpha = 0.5f))) {
+        CircularProgressIndicator(
+            modifier = Modifier.align(Alignment.Center),
+            color = AppColors.Green500
         )
     }
 }

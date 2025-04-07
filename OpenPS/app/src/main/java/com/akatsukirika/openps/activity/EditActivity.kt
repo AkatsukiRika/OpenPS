@@ -190,11 +190,13 @@ class EditActivity : AppCompatActivity() {
             }
 
             launch {
-                compositionViewModel.resultBitmap.collect {
-                    if (it != null) {
-                        viewModel.changeImage(it, updateTransform = true)
-                        viewModel.selectedModule.value = MODULE_NONE
-                    }
+                compositionViewModel.resultEvent.collect {
+                    viewModel.changeImage(
+                        bitmap = it.bitmap,
+                        skinMask = it.skinMaskBitmap,
+                        updateTransform = true
+                    )
+                    viewModel.selectedModule.value = MODULE_NONE
                 }
             }
 

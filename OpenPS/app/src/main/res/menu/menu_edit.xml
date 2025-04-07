@@ -5,7 +5,8 @@
         android:id="@+id/show_face_rect"
         android:icon="@drawable/ic_visibility"
         android:title="@string/show_face_rect"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"
+        android:visible="false" />
     <item
         android:id="@+id/save_to_gallery"
         android:icon="@drawable/ic_save"

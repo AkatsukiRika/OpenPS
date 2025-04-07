@@ -10,8 +10,6 @@ import com.akatsukirika.openps.compose.CropOptions
 import com.akatsukirika.openps.enum.RotateAction
 import com.akatsukirika.openps.utils.BitmapUtils
 import com.akatsukirika.openps.utils.BitmapUtils.scaleToEven
-import com.akatsukirika.openps.viewmodel.EditViewModel.Companion.FILENAME_SKIN_MASK
-import com.pixpark.gpupixel.GPUPixel
 import com.pixpark.gpupixel.OpenPSHelper
 import com.pixpark.gpupixel.model.RenderViewInfo
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +50,7 @@ class CompositionViewModel : ViewModel() {
 
     val saveEvent = MutableSharedFlow<SaveEvent>(replay = 0)
 
-    val resultBitmap = MutableStateFlow<Bitmap?>(null)
+    val resultEvent = MutableSharedFlow<ResultEvent>(replay = 0)
 
     var renderViewInfo: RenderViewInfo? = null
 
@@ -121,7 +119,6 @@ class CompositionViewModel : ViewModel() {
         this.helper = helper
         this.originalBitmap = originalBitmap
         this.skinMaskBitmap = skinMaskBitmap
-        resultBitmap.value = null
     }
 
     fun getRatio(): Float {
@@ -172,11 +169,9 @@ class CompositionViewModel : ViewModel() {
                 currentBitmap = BitmapUtils.cropBitmap(currentBitmap, newLeft, newTop, newRight, newBottom).scaleToEven()
                 if (currentSkinMask != null) {
                     currentSkinMask = BitmapUtils.cropBitmap(currentSkinMask!!, newLeft, newTop, newRight, newBottom).scaleToEven()
-                    BitmapUtils.saveBitmapToFile(currentSkinMask!!, GPUPixel.getResource_path(), FILENAME_SKIN_MASK)
-                    helper?.updateSkinMask()
                 }
+                resultEvent.emit(ResultEvent(currentBitmap, currentSkinMask))
                 Log.d("CompositionViewModel", "Bitmap处理耗时: ${System.currentTimeMillis() - beginTime}ms")
-                resultBitmap.value = currentBitmap
             }
         }
     }
@@ -214,3 +209,8 @@ class CompositionViewModel : ViewModel() {
 }
 
 data object SaveEvent
+
+data class ResultEvent(
+    val bitmap: Bitmap,
+    val skinMaskBitmap: Bitmap? = null,
+)

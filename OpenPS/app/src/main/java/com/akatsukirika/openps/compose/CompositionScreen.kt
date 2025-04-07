@@ -67,7 +67,7 @@ enum class CropOptions(
 }
 
 @Composable
-fun CompositionScreen(viewModel: CompositionViewModel, visible: Boolean) {
+fun CompositionScreen(viewModel: CompositionViewModel, visible: Boolean, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val selectedTab = viewModel.currentTab.collectAsState().value
     val selectedCropOption = viewModel.currentCropOptions.collectAsState().value
@@ -87,7 +87,7 @@ fun CompositionScreen(viewModel: CompositionViewModel, visible: Boolean) {
             Text(text = stringResource(id = R.string.save_changes))
         }
 
-        Column(modifier = Modifier
+        Column(modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .background(AppColors.DarkBG)
