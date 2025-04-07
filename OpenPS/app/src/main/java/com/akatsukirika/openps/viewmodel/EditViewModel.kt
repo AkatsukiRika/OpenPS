@@ -365,6 +365,10 @@ class EditViewModel : ViewModel() {
             bitmap?.let {
                 currentBitmap = it
             }
+            val skinMaskBitmap = BitmapUtils.getBitmap(appContext, GPUPixel.getResource_path() + File.separator + record.skinMaskFileName)
+            skinMaskBitmap?.let {
+                this@EditViewModel.skinMaskBitmap = it
+            }
             helper?.getRenderViewInfo()?.let {
                 callback?.onRenderViewInfoReady(it)
             }

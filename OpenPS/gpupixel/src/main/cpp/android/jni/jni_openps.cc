@@ -334,15 +334,17 @@ Java_com_pixpark_gpupixel_OpenPS_nativeUndo(JNIEnv *env, jobject thiz) {
       return nullptr;
     }
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
-    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFLjava/lang/String;)V");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFLjava/lang/String;Ljava/lang/String;)V");
     jstring imageFileNameJString = env->NewStringUTF(record->imageFileName.c_str());
+    jstring skinMaskFileNameJString = env->NewStringUTF(record->skinMaskFileName.c_str());
     jobject kotlinObject = env->NewObject(kotlinClass, constructor, record->smoothLevel, record->whiteLevel,
                                           record->lipstickLevel, record->blusherLevel, record->eyeZoomLevel,
                                           record->faceSlimLevel, record->contrastLevel, record->exposureLevel,
                                           record->saturationLevel, record->sharpnessLevel, record->brightnessLevel,
                                           record->customFilterType, record->customFilterIntensity,
-                                          imageFileNameJString);
+                                          imageFileNameJString, skinMaskFileNameJString);
     env->DeleteLocalRef(imageFileNameJString);
+    env->DeleteLocalRef(skinMaskFileNameJString);
     return kotlinObject;
   }
   return nullptr;
@@ -356,15 +358,17 @@ Java_com_pixpark_gpupixel_OpenPS_nativeRedo(JNIEnv *env, jobject thiz) {
       return nullptr;
     }
     jclass kotlinClass = env->FindClass("com/pixpark/gpupixel/model/OpenPSRecord");
-    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFLjava/lang/String;)V");
+    jmethodID constructor = env->GetMethodID(kotlinClass, "<init>", "(FFFFFFFFFFFIFLjava/lang/String;Ljava/lang/String;)V");
     jstring imageFileNameJString = env->NewStringUTF(record->imageFileName.c_str());
+    jstring skinMaskFileNameJString = env->NewStringUTF(record->skinMaskFileName.c_str());
     jobject kotlinObject = env->NewObject(kotlinClass, constructor, record->smoothLevel, record->whiteLevel,
                                           record->lipstickLevel, record->blusherLevel, record->eyeZoomLevel,
                                           record->faceSlimLevel, record->contrastLevel, record->exposureLevel,
                                           record->saturationLevel, record->sharpnessLevel, record->brightnessLevel,
                                           record->customFilterType, record->customFilterIntensity,
-                                          imageFileNameJString);
+                                          imageFileNameJString, skinMaskFileNameJString);
     env->DeleteLocalRef(imageFileNameJString);
+    env->DeleteLocalRef(skinMaskFileNameJString);
     return kotlinObject;
   }
   return nullptr;

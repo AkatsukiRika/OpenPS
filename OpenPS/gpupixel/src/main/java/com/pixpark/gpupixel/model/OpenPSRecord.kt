@@ -14,5 +14,6 @@ data class OpenPSRecord(
     val brightnessLevel: Float,
     val customFilterType: Int,
     val customFilterIntensity: Float,
-    val imageFileName: String
+    val imageFileName: String,
+    val skinMaskFileName: String
 )
