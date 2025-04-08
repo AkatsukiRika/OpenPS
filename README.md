@@ -7,10 +7,17 @@
 | Key | Value |
 | --- | ----- |
 | Supported Platforms | Android 6.0 or above |
-| Latest Version | 1.3.1 |
+| Latest Version | 1.4.0 |
 | GUI Language | English |
 
 ## Update Notes
+
+### Version 1.4.0
+
+- Composition Feature
+    - Supports image cropping with various aspect ratios, including original ratio, free ratio, square, rectangle, etc
+    - Supports image rotation in 90-degree increments
+    - Supports horizontal mirroring and vertical flipping of the image
 
 ### Version 1.3.1
 
