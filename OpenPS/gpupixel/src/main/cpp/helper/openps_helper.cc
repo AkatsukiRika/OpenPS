@@ -564,10 +564,30 @@ void gpupixel::OpenPSHelper::refreshRenderPipeline() {
   if (gpuSourceImage && needRebuild) {
     gpuSourceImage->removeAllTargets();
     std::shared_ptr<Source> lastSource = gpuSourceImage;
+    std::string framebufferStr;
+    if (gpuSourceImage->getFramebuffer()) {
+      framebufferStr = std::to_string(gpuSourceImage->getFramebuffer()->getFramebuffer());
+    } else {
+      framebufferStr = "null";
+    }
+    std::string pipelineLog = "gpuSourceImage(" + framebufferStr + ")->";
     for (auto filter : filterList) {
       lastSource = lastSource->addTarget(filter);
+      if (filter->getFramebuffer()) {
+        framebufferStr = std::to_string(filter->getFramebuffer()->getFramebuffer());
+      } else {
+        framebufferStr = "null";
+      }
+      pipelineLog += filter->getFilterClassName() + "(" + framebufferStr + ")->";
     }
     lastSource->addTarget(imageCompareFilter);
+    if (imageCompareFilter->getFramebuffer()) {
+      framebufferStr = std::to_string(imageCompareFilter->getFramebuffer()->getFramebuffer());
+    } else {
+      framebufferStr = "null";
+    }
+    pipelineLog += "imageCompareFilter(" + framebufferStr + ")";
+    Util::Log("Pipeline", pipelineLog);
     imageCompareFilter->addTarget(targetView);
     imageCompareFilter->addTarget(targetRawDataOutput);
   }
