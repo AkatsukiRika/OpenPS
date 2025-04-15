@@ -36,6 +36,7 @@ class GPUPIXEL_API Util {
   static std::string getExternalPathJni(std::string name);
   // Pipeline Debug
   static void onProgramCreated(int id, const char* filterName, bool isActive);
+  static void onActivateProgram(int id);
 #endif
 
 private:

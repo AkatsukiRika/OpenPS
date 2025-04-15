@@ -24,12 +24,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.akatsukirika.openps.interop.PipelineDebugHelper
 import com.akatsukirika.openps.model.debug.DebugProgramItem
 import com.akatsukirika.openps.viewmodel.PipelineViewModel
 
 @Composable
 fun PipelineScreen(viewModel: PipelineViewModel) {
-    val programItemList = viewModel.programItemList.collectAsState().value
+    val programItemList = PipelineDebugHelper.programItems.collectAsState().value
 
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -46,11 +47,19 @@ fun ProgramItemRow(debugItemList: List<DebugProgramItem>) {
         LazyRow(modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, Color.White)
-            .padding(16.dp)
+            .padding(vertical = 16.dp)
         ) {
+            item {
+                Spacer(modifier = Modifier.width(16.dp))
+            }
+
             items(debugItemList) {
                 ProgramItem(it)
 
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            item {
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }

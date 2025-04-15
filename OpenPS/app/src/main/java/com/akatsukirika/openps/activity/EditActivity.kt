@@ -28,6 +28,7 @@ import com.akatsukirika.openps.databinding.ActivityEditBinding
 import com.akatsukirika.openps.fragment.CompositionFragment
 import com.akatsukirika.openps.fragment.EliminatePenFragment
 import com.akatsukirika.openps.interop.NativeLib
+import com.akatsukirika.openps.interop.PipelineDebugHelper
 import com.akatsukirika.openps.store.SettingsStore
 import com.akatsukirika.openps.utils.FrameRateObserver
 import com.akatsukirika.openps.viewmodel.CompositionViewModel
@@ -235,6 +236,7 @@ class EditActivity : AppCompatActivity() {
         viewModel.destroy()
         NativeLib.releaseBitmap()
         frameRateObserver.endObserve()
+        PipelineDebugHelper.clearPrograms()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

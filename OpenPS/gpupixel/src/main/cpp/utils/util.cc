@@ -261,4 +261,29 @@ void Util::onProgramCreated(int id, const char* filterName, bool isActive) {
   env->DeleteLocalRef(myObjectClass);
 }
 
+void Util::onActivateProgram(int id) {
+  JavaVM* jvm = GetJVM();
+  JNIEnv* env = GetEnv(jvm);
+
+  jclass myObjectClass = env->FindClass("com/akatsukirika/openps/interop/PipelineDebugHelper");
+  if (myObjectClass == nullptr) {
+    return;
+  }
+  jfieldID instanceFieldId = env->GetStaticFieldID(myObjectClass, "INSTANCE", "Lcom/akatsukirika/openps/interop/PipelineDebugHelper;");
+  if (instanceFieldId == nullptr) {
+    return;
+  }
+  jobject myObjectInstance = env->GetStaticObjectField(myObjectClass, instanceFieldId);
+  if (myObjectInstance == nullptr) {
+    return;
+  }
+  jmethodID methodId = env->GetMethodID(myObjectClass, "onActivateProgram", "(I)V");
+  if (methodId == nullptr) {
+    return;
+  }
+  env->CallVoidMethod(myObjectInstance, methodId, id);
+  env->DeleteLocalRef(myObjectInstance);
+  env->DeleteLocalRef(myObjectClass);
+}
+
 NS_GPUPIXEL_END
