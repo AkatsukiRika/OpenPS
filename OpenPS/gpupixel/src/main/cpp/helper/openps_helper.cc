@@ -32,6 +32,7 @@ void gpupixel::OpenPSHelper::initWithImage(int width, int height,
   gpuSourceImage = SourceImage::create_from_memory(width, height, channelCount, pixels);
   initialSourceImage = SourceImage::create_from_memory(width, height, channelCount, pixels);
   imageCompareFilter = ImageCompareFilter::create();
+  imageCompareFilter->setFilterClassName("ImageCompareFilter");
   imageCompareFilter->setOriginalImage(initialSourceImage);
   imageWidth = width;
   imageHeight = height;
@@ -155,6 +156,12 @@ void gpupixel::OpenPSHelper::buildNoFaceRenderPipeline() {
 }
 
 void gpupixel::OpenPSHelper::requestRender(bool forceRenderImage) {
+  std::lock_guard<std::mutex> lock(pipelineMutex);
+  if (isPipelineDirty) {
+    refreshRenderPipeline();
+    isPipelineDirty = false;
+  }
+
   if (gpuSourceImage) {
     if (forceRenderImage) {
       gpuSourceImage->Render();
@@ -200,72 +207,79 @@ void gpupixel::OpenPSHelper::setRawOutputCallback(gpupixel::RawOutputCallback ca
 
 void gpupixel::OpenPSHelper::setSmoothLevel(float level, bool addRecord) {
   if (beautyFaceFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     smoothLevel = level;
     beautyFaceFilter->setBlurAlpha(level);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setWhiteLevel(float level, bool addRecord) {
   if (beautyFaceFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     whiteLevel = level / 2;
     beautyFaceFilter->setWhite(whiteLevel);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setLipstickLevel(float level, bool addRecord) {
   if (lipstickFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     lipstickLevel = level;
     lipstickFilter->setBlendLevel(level);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setBlusherLevel(float level, bool addRecord) {
   if (blusherFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     blusherLevel = level;
     blusherFilter->setBlendLevel(level);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setEyeZoomLevel(float level, bool addRecord) {
   if (faceReshapeFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     eyeZoomLevel = level / 5;
     faceReshapeFilter->setEyeZoomLevel(eyeZoomLevel);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setFaceSlimLevel(float level, bool addRecord) {
   if (faceReshapeFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     faceSlimLevel = level / 10;
     faceReshapeFilter->setFaceSlimLevel(faceSlimLevel);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setContrastLevel(float level, bool addRecord) {
   if (contrastFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     // 滤镜本身支持0～4，为避免极端效果限制在0.5～2
     if (level < 0) {
       contrastLevel = 1.0 - 0.5 * abs(level);
@@ -276,53 +290,57 @@ void gpupixel::OpenPSHelper::setContrastLevel(float level, bool addRecord) {
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setExposureLevel(float level, bool addRecord) {
   if (exposureFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     // 滤镜本身支持-10～10，为避免极端效果限制在-1.5～1.5
     exposureLevel = level * 1.5;
     exposureFilter->setExposure(exposureLevel);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setSaturationLevel(float level, bool addRecord) {
   if (saturationFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     saturationLevel = level + 1.0;
     saturationFilter->setSaturation(saturationLevel);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setSharpenLevel(float level, bool addRecord) {
   if (sharpenFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     sharpnessLevel = level * 2;
     sharpenFilter->setSharpness(sharpnessLevel);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 
 void gpupixel::OpenPSHelper::setBrightnessLevel(float level, bool addRecord) {
   if (brightnessFilter) {
+    std::lock_guard<std::mutex> lock(pipelineMutex);
     // 滤镜支持-1～1，为避免极端效果限制在-0.5～0.5
     brightnessLevel = level * 0.5;
     brightnessFilter->setBrightness(brightnessLevel);
     if (addRecord) {
       addUndoRedoRecord();
     }
-    refreshRenderPipeline();
+    isPipelineDirty = true;
   }
 }
 

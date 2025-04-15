@@ -12,6 +12,7 @@
 #include "undo_redo_helper.h"
 #include "abstract_record.h"
 #include "openps_record.h"
+#include <mutex>
 
 NS_GPUPIXEL_BEGIN
 
@@ -134,6 +135,9 @@ private:
   int imageHeight = 0;
   bool matrixUpdated = false;
   std::string initialImageFileName = "";
+
+  std::mutex pipelineMutex;
+  bool isPipelineDirty = false;
 
   UndoRedoHelper undoRedoHelper;
   void addUndoRedoRecord();
