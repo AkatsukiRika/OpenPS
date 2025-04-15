@@ -231,4 +231,34 @@ void Util::Log(const std::string& tag,std::string format, ...) {
 #endif
 }
 
+void Util::onProgramCreated(int id, const char* filterName, bool isActive) {
+  JavaVM* jvm = GetJVM();
+  JNIEnv* env = GetEnv(jvm);
+
+  jclass myObjectClass = env->FindClass("com/akatsukirika/openps/interop/PipelineDebugHelper");
+  if (myObjectClass == nullptr) {
+    return;
+  }
+  jfieldID instanceFieldId = env->GetStaticFieldID(myObjectClass, "INSTANCE", "Lcom/akatsukirika/openps/interop/PipelineDebugHelper;");
+  if (instanceFieldId == nullptr) {
+    return;
+  }
+  jobject myObjectInstance = env->GetStaticObjectField(myObjectClass, instanceFieldId);
+  if (myObjectInstance == nullptr) {
+    return;
+  }
+  jmethodID methodId = env->GetMethodID(myObjectClass, "onProgramCreated", "(ILjava/lang/String;Z)V");
+  if (methodId == nullptr) {
+    return;
+  }
+  jstring filterNameJString = env->NewStringUTF(filterName);
+  if (filterNameJString == nullptr) {
+    return;
+  }
+  env->CallVoidMethod(myObjectInstance, methodId, id, filterNameJString, isActive);
+  env->DeleteLocalRef(filterNameJString);
+  env->DeleteLocalRef(myObjectInstance);
+  env->DeleteLocalRef(myObjectClass);
+}
+
 NS_GPUPIXEL_END

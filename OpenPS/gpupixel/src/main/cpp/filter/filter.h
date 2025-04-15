@@ -65,6 +65,9 @@ class GPUPIXEL_API Filter : public Source, public Target {
 
   void setFilterClassName(const std::string filterClassName) {
     _filterClassName = filterClassName;
+    if (_filterProgram != nullptr) {
+      Util::onProgramCreated(_filterProgram->getID(), getFilterClassName().c_str(), false);
+    }
   }
 
   std::string getFilterClassName() const { return _filterClassName; };

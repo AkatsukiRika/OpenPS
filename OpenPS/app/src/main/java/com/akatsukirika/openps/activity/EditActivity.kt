@@ -242,6 +242,7 @@ class EditActivity : AppCompatActivity() {
         menu?.findItem(R.id.show_skin_mask)?.setVisible(SettingsStore.isDebugMode)
         menu?.findItem(R.id.show_frame_rate)?.setVisible(SettingsStore.isDebugMode)
         menu?.findItem(R.id.show_matrix_info)?.setVisible(SettingsStore.isDebugMode)
+        menu?.findItem(R.id.visualize_pipeline)?.setVisible(SettingsStore.isDebugMode)
         return true
     }
 
@@ -281,6 +282,10 @@ class EditActivity : AppCompatActivity() {
             R.id.show_matrix_info -> {
                 viewModel.showMatrixInfo.update { !it }
                 binding.transformLayout.setDebug(viewModel.showMatrixInfo.value)
+                true
+            }
+            R.id.visualize_pipeline -> {
+                PipelineActivity.startMe(this)
                 true
             }
             R.id.save_to_gallery -> {

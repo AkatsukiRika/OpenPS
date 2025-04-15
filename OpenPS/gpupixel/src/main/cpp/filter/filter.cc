@@ -69,6 +69,9 @@ bool Filter::initWithShaderString(const std::string& vertexShaderSource,
   _inputNum = inputNumber;
   _filterProgram =
       GLProgram::createByShaderString(vertexShaderSource, fragmentShaderSource);
+  if (_filterProgram != nullptr) {
+    Util::onProgramCreated(_filterProgram->getID(), getFilterClassName().c_str(), false);
+  }
   _filterPositionAttribute = _filterProgram->getAttribLocation("position");
   GPUPixelContext::getInstance()->setActiveShaderProgram(_filterProgram);
   CHECK_GL(glEnableVertexAttribArray(_filterPositionAttribute));

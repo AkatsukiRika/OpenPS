@@ -24,4 +24,8 @@
         android:id="@+id/show_matrix_info"
         android:title="@string/show_matrix_info"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/visualize_pipeline"
+        android:title="@string/visualize_pipeline"
+        app:showAsAction="never" />
 </menu>

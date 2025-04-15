@@ -36,6 +36,9 @@
 
         <activity android:name=".activity.GalleryActivity"
             android:screenOrientation="portrait" />
+
+        <activity android:name=".activity.PipelineActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

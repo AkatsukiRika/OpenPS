@@ -34,6 +34,8 @@ class GPUPIXEL_API Util {
 #if defined(GPUPIXEL_ANDROID)
   static std::string getResourcePathJni(std::string name);
   static std::string getExternalPathJni(std::string name);
+  // Pipeline Debug
+  static void onProgramCreated(int id, const char* filterName, bool isActive);
 #endif
 
 private:
