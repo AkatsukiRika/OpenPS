@@ -37,7 +37,8 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x ./OpenPS/gradlew
       - name: Build with Gradle
-        run: ./OpenPS/gradlew assembleDebug
+        working-directory: ./OpenPS
+        run: ./gradlew assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
