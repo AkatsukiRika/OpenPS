@@ -35,6 +35,8 @@ jobs:
           cmake: true
           cmake-version: 3.18.1
           components: platform-tools
+      - name: Install CMake 3.18.1
+        run: sdkmanager "cmake;3.18.1"
       - name: Make Gradle executable
         run: chmod +x ./OpenPS/gradlew
       - name: Build with Gradle
