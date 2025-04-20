@@ -17,7 +17,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          lfs: true
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v3
         with:
@@ -32,8 +34,6 @@ jobs:
       - name: Build with Gradle
         working-directory: ./OpenPS
         run: ./gradlew assembleDebug
-      - name: List build output directory
-        run: ls -R ./OpenPS/app/build/outputs/
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
