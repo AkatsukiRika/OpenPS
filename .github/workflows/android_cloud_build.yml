@@ -1,0 +1,45 @@
+name: Android Cloud Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Assemble Debug APK
+    runs-on: ubuntu-latest
+
+    env:
+      ANDROID_API_LEVEL: 34
+      ANDROID_BUILD_TOOLS_VERSION: "34.0.0"
+      NDK_VERSION: "21.4.7075529"
+      JAVA_VERSION: "17"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: ${{ env.ANDROID_API_LEVEL }}
+          build-tools: ${{ env.ANDROID_BUILD_TOOLS_VERSION }}
+          ndk: ${{ env.NDK_VERSION }}
+          cmake: true
+          components: platform-tools
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-debug.apk
+          path: OpenPS/OpenPS/app/build/outputs/apk/debug/app-debug.apk
