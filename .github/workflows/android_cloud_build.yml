@@ -35,7 +35,7 @@ jobs:
           cmake: true
           components: platform-tools
       - name: Make Gradle executable
-        run: chmod +x ./gradlew
+        run: chmod +x ./OpenPS/gradlew
       - name: Build with Gradle
         run: ./gradlew assembleDebug
       - name: Upload APK
