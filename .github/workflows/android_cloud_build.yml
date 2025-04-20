@@ -33,8 +33,7 @@ jobs:
         working-directory: ./OpenPS
         run: ./gradlew assembleDebug
       - name: Upload APK
-        working-directory: ./OpenPS
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          path: ./app/build/outputs/apk/debug/app-debug.apk
+          path: ./OpenPS/app/build/outputs/apk/debug/app-debug.apk
